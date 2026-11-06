@@ -1,0 +1,106 @@
+/* watchit styles on top of Pico CSS. Keep this small. */
+
+:root {
+  --watchit-nav-height: 4rem;
+}
+
+/* ---- Navigation: top bar on desktop ------------------------------------- */
+
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: var(--pico-background-color);
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--pico-color);
+}
+
+.app-nav ul a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.app-nav ul a[aria-current="page"] {
+  color: var(--pico-primary);
+  font-weight: 600;
+}
+
+.app-nav svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Navigation: bottom tab bar on phones ------------------------------- */
+
+@media (max-width: 767px) {
+  .app-brand {
+    display: none;
+  }
+
+  .app-nav {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0 env(safe-area-inset-bottom);
+    border-bottom: none;
+    border-top: 1px solid var(--pico-muted-border-color);
+  }
+
+  .app-nav ul {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-nav ul li {
+    padding: 0;
+    flex: 1;
+  }
+
+  .app-nav ul a {
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0.5rem 0;
+    font-size: 0.7rem;
+  }
+
+  .app-nav svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Keep content clear of the fixed bottom bar */
+  body {
+    padding-bottom: calc(var(--watchit-nav-height) + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---- Misc ------------------------------------------------------------------ */
+
+.site-footer {
+  text-align: center;
+  color: var(--pico-muted-color);
+}

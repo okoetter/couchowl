@@ -1,0 +1,12 @@
+.git
+.venv
+.env
+data/
+staticfiles/
+**/__pycache__
+**/tests/
+.pytest_cache
+.ruff_cache
+docs/
+*.md
+!core/static/vendor/README.md

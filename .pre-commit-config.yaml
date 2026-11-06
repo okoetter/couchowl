@@ -1,0 +1,27 @@
+# Runs before every commit (install once with: uv run pre-commit install).
+# All hooks use the tool versions pinned in uv.lock – no separate downloads.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff (lint)
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff (format)
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: missing-migrations
+        name: django (no missing migrations)
+        entry: uv run python manage.py makemigrations --check --dry-run --settings=config.settings_test
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: pytest
+        name: pytest
+        entry: uv run pytest -q
+        language: system
+        pass_filenames: false
+        always_run: true

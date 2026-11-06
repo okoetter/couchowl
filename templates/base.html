@@ -1,0 +1,41 @@
+{% load static i18n %}<!doctype html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}"{% if theme != "auto" %} data-theme="{{ theme }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#1a2b4a">
+  {# Every page sets its own title block #}
+  <title>{% block title %}{% endblock %} · watchit</title>
+
+  {# PWA: manifest and icons #}
+  <link rel="manifest" href="{% url 'core:manifest' %}">
+  <link rel="icon" href="{% static 'core/icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'core/apple-touch-icon.png' %}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="watchit">
+
+  <link rel="stylesheet" href="{% static 'vendor/pico.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/watchit.css' %}">
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+  <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
+</head>
+{# Every htmx request sends the CSRF token automatically #}
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  {% include "core/_nav.html" %}
+
+  <main class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <article class="message message-{{ message.tags }}" role="status">{{ message }}</article>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container site-footer">
+    <small>watchit {{ WATCHIT_VERSION }}</small>
+  </footer>
+</body>
+</html>

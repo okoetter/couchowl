@@ -1,0 +1,143 @@
+"""
+Django settings for watchit.
+
+All configuration comes from environment variables (see .env.example).
+Without a .env file, safe-ish development defaults are used.
+"""
+
+from pathlib import Path
+
+import environ
+
+from config.mail import mailer_from_url
+from config.version import get_version
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+# Read .env if present (local development). In Docker, variables come from compose.
+environ.Env.read_env(BASE_DIR / ".env")
+
+VERSION = get_version()
+
+# --- Core ---------------------------------------------------------------------
+
+DEBUG = env.bool("DEBUG", default=False)
+SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-only-change-me" if DEBUG else None)
+# localhost is always allowed so the container healthcheck works with any configuration
+ALLOWED_HOSTS = [*env.list("ALLOWED_HOSTS", default=[]), "localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Directory for all runtime data: database, poster cache, backups.
+# In Docker this is a volume mounted at /data.
+DATA_DIR = Path(env("DATA_DIR", default=str(BASE_DIR / "data")))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
+    "core",
+    "accounts",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Must come after AuthenticationMiddleware: applies the user's profile language
+    "accounts.middleware.UserLanguageMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "core.context_processors.watchit",
+            ],
+        },
+    },
+]
+
+# --- Database -----------------------------------------------------------------
+# SQLite by default; PostgreSQL via e.g. DATABASE_URL=postgres://user:pass@db:5432/watchit
+
+DATABASES = {
+    "default": env.db("DATABASE_URL", default=f"sqlite:///{DATA_DIR / 'db.sqlite3'}"),
+}
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# --- Auth ---------------------------------------------------------------------
+
+AUTH_USER_MODEL = "accounts.User"
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# --- Internationalization -----------------------------------------------------
+# UI texts live in locale/<lang>/LC_MESSAGES/django.po. Source strings are English.
+
+LANGUAGES = [
+    ("de", "Deutsch"),
+    ("en", "English"),
+]
+LANGUAGE_CODE = env("DEFAULT_LANGUAGE", default="de")
+LOCALE_PATHS = [BASE_DIR / "locale"]
+USE_I18N = True
+
+TIME_ZONE = env("TIME_ZONE", default="Europe/Berlin")
+USE_TZ = True
+
+# Defaults for TMDB content; users can override them in their profile.
+DEFAULT_TMDB_LANGUAGE = env("DEFAULT_TMDB_LANGUAGE", default="de-DE")
+DEFAULT_REGION = env("DEFAULT_REGION", default="")  # empty: derive from TMDB language
+
+# --- Static files -------------------------------------------------------------
+
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# --- E-mail -------------------------------------------------------------------
+# Optional. Without EMAIL_URL, features that need e-mail are hidden.
+# Development: EMAIL_URL=consolemail://  (mails are printed to the terminal)
+
+EMAIL_ENABLED = "EMAIL_URL" in env
+MAILERS = {"default": mailer_from_url(env("EMAIL_URL"))} if EMAIL_ENABLED else {}
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="watchit <watchit@localhost>")
+
+# --- Logging ------------------------------------------------------------------
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+}

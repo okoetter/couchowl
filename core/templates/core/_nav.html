@@ -1,0 +1,41 @@
+{% load i18n static %}
+{% with current=request.resolver_match.url_name %}
+<nav class="app-nav" aria-label="{% translate 'Main navigation' %}">
+  <a class="app-brand" href="{% url 'core:dashboard' %}">
+    <img src="{% static 'core/icon.svg' %}" alt="" width="28" height="28">
+    <strong>watchit</strong>
+  </a>
+  <ul>
+    <li>
+      <a href="{% url 'core:dashboard' %}" {% if current == "dashboard" %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+        <span>{% translate "Dashboard" %}</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'core:lists' %}" {% if current == "lists" %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span>{% translate "Lists" %}</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'core:upcoming' %}" {% if current == "upcoming" %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>{% translate "Upcoming" %}</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'core:search' %}" {% if current == "search" %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <span>{% translate "Search" %}</span>
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'core:profile' %}" {% if current == "profile" %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span>{% translate "Profile" %}</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+{% endwith %}

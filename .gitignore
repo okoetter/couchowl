@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local configuration and secrets
+.env
+
+# Local runtime data (database, poster cache, backups)
+data/
+staticfiles/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

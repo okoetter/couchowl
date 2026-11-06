@@ -1,0 +1,100 @@
+# German translation of watchit.
+# This file is distributed under the same license as the watchit package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: watchit\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 18:45+0100\n"
+"PO-Revision-Date: 2026-11-06 18:50+0100\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/admin.py:12
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: accounts/models.py:11
+msgid "Automatic (system)"
+msgstr "Automatisch (System)"
+
+#: accounts/models.py:12
+msgid "Light"
+msgstr "Hell"
+
+#: accounts/models.py:13
+msgid "Dark"
+msgstr "Dunkel"
+
+#: accounts/models.py:17
+msgid "interface language"
+msgstr "Sprache der Oberfläche"
+
+#: accounts/models.py:23
+msgid "language for movie and show information"
+msgstr "Sprache für Film- und Serieninfos"
+
+#: accounts/models.py:26
+msgid "TMDB language code, e.g. de-DE or en-US."
+msgstr "TMDB-Sprachcode, z. B. de-DE oder en-US."
+
+#: accounts/models.py:29
+msgid "region"
+msgstr "Region"
+
+#: accounts/models.py:33
+msgid ""
+"Country for streaming providers and release dates, e.g. DE. Empty: derived "
+"from the language for movie and show information."
+msgstr ""
+"Land für Streaming-Anbieter und Veröffentlichungstermine, z. B. DE. Leer: "
+"wird aus der Sprache für Film- und Serieninfos abgeleitet."
+
+#: accounts/models.py:38
+msgid "color scheme"
+msgstr "Farbschema"
+
+#: core/templates/core/_nav.html:3
+msgid "Main navigation"
+msgstr "Hauptnavigation"
+
+#: core/templates/core/_nav.html:12 core/templates/core/dashboard.html:4
+#: core/templates/core/dashboard.html:7
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: core/templates/core/_nav.html:18 core/urls.py:11
+msgid "Lists"
+msgstr "Listen"
+
+#: core/templates/core/_nav.html:24 core/urls.py:12
+msgid "Upcoming"
+msgstr "Demnächst"
+
+#: core/templates/core/_nav.html:30 core/urls.py:13
+msgid "Search"
+msgstr "Suche"
+
+#: core/templates/core/_nav.html:36 core/urls.py:14
+msgid "Profile"
+msgstr "Profil"
+
+#: core/templates/core/dashboard.html:8
+msgid ""
+"Welcome to watchit. Your shows and upcoming seasons will appear here soon."
+msgstr ""
+"Willkommen bei watchit. Hier erscheinen bald deine Serien und kommenden "
+"Staffeln."
+
+#: core/templates/core/placeholder.html:8
+msgid "This page is coming soon."
+msgstr "Diese Seite kommt bald."
+
+#: core/views.py:43
+msgid "Your watchlist for movies and TV shows"
+msgstr "Deine Watchlist für Filme und Serien"

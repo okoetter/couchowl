@@ -1,0 +1,5 @@
+# Scheduled jobs inside the container (run by supercronic). Times are UTC.
+# Later milestones add: daily TMDB sync and database backup.
+
+# Remove expired login sessions
+15 3 * * * python manage.py clearsessions

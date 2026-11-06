@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Android "maskable" variant: full-bleed background, motif inside the 80% safe zone. -->
+  <rect width="512" height="512" fill="#1a2b4a"/>
+  <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
+    <path d="M64 256c48-84 116-128 192-128s144 44 192 128c-48 84-116 128-192 128S112 340 64 256z"
+          fill="#ffffff"/>
+    <circle cx="256" cy="256" r="84" fill="#e8a33d"/>
+    <path d="M232 214v84l70-42z" fill="#1a2b4a"/>
+  </g>
+</svg>
