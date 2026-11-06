@@ -12,6 +12,8 @@
   - **Kompilierte Übersetzungen (`.mo`) werden mit eingecheckt**, damit niemand gettext installieren muss, der nur entwickelt oder das Image baut. gettext braucht nur, wer Übersetzungen ändert.
   - **`localhost` und `127.0.0.1` sind immer in `ALLOWED_HOSTS`**, damit der Docker-Healthcheck funktioniert.
 
+- **2026-11-06 – TMDB-Zugang:** Statt des kurzen API-Schlüssels (`?api_key=` in der URL) nutzen wir den **„API-Token für Lesezugriff“** als `Authorization: Bearer`-Header. So taucht er nicht in URLs oder Logs auf. Variable: `TMDB_API_TOKEN` (ersetzt `TMDB_API_KEY`).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
