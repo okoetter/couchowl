@@ -1,0 +1,9 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate with name=inviter.get_username %}Hello,
+
+{{ name }} has invited you to watchit, a watchlist for movies and TV shows.
+Create your account with this link:{% endblocktranslate %}
+
+{{ url }}
+
+{% blocktranslate with date=expires_at|date:"DATETIME_FORMAT" %}The link is valid until {{ date }} and can only be used once.{% endblocktranslate %}
+{% endautoescape %}

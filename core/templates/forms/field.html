@@ -1,0 +1,15 @@
+{% comment %}
+  One form field, used by {{ form }} and {{ form.x.as_field_group }} (see core/forms.py).
+  Same as Django's default, but in the order Pico CSS expects:
+  label, input, errors, then a small muted help text.
+{% endcomment %}
+{% if field.use_fieldset %}
+  <fieldset{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+  {% if field.label %}{{ field.legend_tag }}{% endif %}
+{% else %}
+  {% if field.label %}{{ field.label_tag }}{% endif %}
+{% endif %}
+{{ field }}
+{{ field.errors }}
+{% if field.help_text %}<div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>{% endif %}
+{% if field.use_fieldset %}</fieldset>{% endif %}

@@ -19,3 +19,7 @@ staticfiles/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Playwright output
+screenshots/
+test-results/

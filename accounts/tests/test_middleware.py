@@ -13,10 +13,10 @@ def make_user(db):
 
 
 def test_anonymous_user_gets_server_default_language(client, db):
-    content = client.get(reverse("core:dashboard")).content.decode()
+    content = client.get(reverse("accounts:login")).content.decode()
 
     assert '<html lang="de"' in content
-    assert "Listen" in content
+    assert "Anmelden" in content
 
 
 def test_profile_language_overrides_default(client, make_user):

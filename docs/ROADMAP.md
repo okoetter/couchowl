@@ -3,7 +3,7 @@
 ## Milestones to 1.0
 
 - [x] **0 – Project skeleton:** Django, i18n, base layout with navigation, PWA, Docker, tests, pre-commit
-- [ ] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
+- [x] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
 - [ ] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
 - [ ] **3 – Lists and movies:** private lists, grid/compact view, movie "watched" with date
 - [ ] **4 – Shows and episodes:** season/episode tracking with dates, "follow" flag

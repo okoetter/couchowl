@@ -29,6 +29,9 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - Custom user model `accounts.User` (`ui_language`, `tmdb_language`, `region`, `theme`).
 - Tests: pytest-django, settings `config/settings_test.py`. TMDB is always mocked
   (marker `live` for real API checks, `e2e` for Playwright; both skipped by default).
+- UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at
+  the images in `screenshots/` (light/dark, desktop/phone) before asking Oliver to test.
+- Form fields render via `core/templates/forms/field.html` (label, input, errors, help text).
 
 ## Commands
 - Dev server: `uv run python manage.py runserver` (needs `.env`, copy from `.env.example`, `DEBUG=True`)

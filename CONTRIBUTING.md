@@ -47,6 +47,26 @@ uv run python manage.py runserver    # http://localhost:8000
 | New migration after model changes | `uv run python manage.py makemigrations` |
 | Production-like test in Docker | `docker compose up -d --build`, then open `http://localhost:8000` |
 
+## Browser tests (end-to-end)
+
+A few core flows are tested in a real browser with [Playwright](https://playwright.dev/python/).
+They are slower and not part of the pre-commit hook. Install the browser once (Chromium,
+about 150 MB, goes to your user cache directory):
+
+```sh
+uv run playwright install chromium
+```
+
+Run them:
+
+```sh
+uv run pytest -m e2e                            # all browser tests
+uv run pytest -m e2e e2e/test_screenshots.py    # only screenshots
+```
+
+`e2e/test_screenshots.py` saves screenshots of important pages (light/dark, desktop/phone)
+to `screenshots/` (ignored by git) for a quick visual review. Add `--headed` to watch the browser.
+
 ## Translations
 
 Source strings in code and templates are English. Never hardcode UI text: use

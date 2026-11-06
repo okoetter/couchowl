@@ -5,6 +5,7 @@
     <img src="{% static 'core/icon.svg' %}" alt="" width="28" height="28">
     <strong>watchit</strong>
   </a>
+  {% if user.is_authenticated %}
   <ul>
     <li>
       <a href="{% url 'core:dashboard' %}" {% if current == "dashboard" %}aria-current="page"{% endif %}>
@@ -31,11 +32,12 @@
       </a>
     </li>
     <li>
-      <a href="{% url 'core:profile' %}" {% if current == "profile" %}aria-current="page"{% endif %}>
+      <a href="{% url 'accounts:profile' %}" {% if current == "profile" or current == "password_change" %}aria-current="page"{% endif %}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
         <span>{% translate "Profile" %}</span>
       </a>
     </li>
   </ul>
+  {% endif %}
 </nav>
 {% endwith %}

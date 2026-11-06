@@ -1,0 +1,11 @@
+{% extends "accounts/_narrow.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Login locked" %}{% endblock %}
+
+{% block card %}
+  <h1>{% translate "Login locked" %}</h1>
+  <p>{% translate "Too many failed login attempts. Please try again later." %}</p>
+  <p><small>{% translate "If you cannot wait, your administrator can unlock your account." %}</small></p>
+  <a href="{% url 'accounts:login' %}">{% translate "Back to login" %}</a>
+{% endblock %}

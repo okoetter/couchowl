@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Invite-only accounts: admins create one-time invitation links in the Django admin
+  (optionally sent by e-mail)
+- Login and logout; every page requires login
+- Profile page: e-mail, interface language, language for movie/show information,
+  color scheme, region (under "Advanced")
+- Change password; "forgot password" by e-mail (only when e-mail is configured, rate-limited)
+- Admin action to create password reset links (works without e-mail)
+- Brute-force protection with django-axes
+- `docs/administration.md`
+
 ## [0.1.0] - 2026-11-06
 
 ### Added

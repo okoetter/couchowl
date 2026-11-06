@@ -14,6 +14,17 @@
 
 - **2026-11-06 – TMDB-Zugang:** Statt des kurzen API-Schlüssels (`?api_key=` in der URL) nutzen wir den **„API-Token für Lesezugriff“** als `Authorization: Bearer`-Header. So taucht er nicht in URLs oder Logs auf. Variable: `TMDB_API_TOKEN` (ersetzt `TMDB_API_KEY`).
 
+- **2026-11-06 – Meilenstein 1 (Konten):**
+  - **Login-Pflicht für alle Seiten** über Djangos `LoginRequiredMiddleware`; öffentlich sind nur Login, Registrierung per Einladung, Passwort-Reset, Healthcheck und Manifest.
+  - **Einladungen:** Nach dem Speichern im Admin wird der Link direkt angezeigt (zum Kopieren). Mit SMTP und eingetragener E-Mail geht er automatisch per Mail raus; per Admin-Aktion erneut versendbar. Gültigkeit über `INVITATION_EXPIRY_DAYS` (Standard 7).
+  - **E-Mail-Adresse optional, aber eindeutig**, falls angegeben (sonst ginge eine Reset-Mail an mehrere Konten). Im Profil änderbar.
+  - **TMDB-Sprache im Profil als Auswahlliste** gängiger Sprachen statt Freitext.
+  - **Reset-Links** gelten `PASSWORD_RESET_TIMEOUT_HOURS` (Standard 24 h) und funktionieren auch ohne SMTP (Admin-Aktion).
+  - **Drosselung „Passwort vergessen“:** 5 Anfragen pro Stunde und IP, über Djangos Cache. Der Cache liegt dafür als Dateicache in `DATA_DIR/cache`, damit alle gunicorn-Prozesse ihn teilen.
+  - **Formularfelder** in der Reihenfolge Label → Feld → Fehler → Hilfetext (klein, grau), über ein eigenes Feld-Template (`core/templates/forms/field.html`). Alle Fehler stehen einheitlich im roten Kasten.
+  - **E2E-Tests mit Playwright jetzt eingerichtet** (`e2e/`, Marker `e2e`): Ablauf Einladung → Registrierung → Login sowie Screenshots wichtiger Seiten (hell/dunkel, Desktop/Handy), damit Claude die Optik selbst prüfen kann, bevor Oliver testet.
+  - **django-axes 9.0.0** (erste Version mit offiziellem Django-6.1-Support): sperrt die Kombination aus Nutzername **und** IP nach 5 Fehlversuchen für 60 Minuten. Nur nach IP zu sperren wäre hinter dem Reverse Proxy gefährlich, weil dort alle Anfragen dieselbe IP haben (echte Client-IP über Proxy-Header folgt in Meilenstein 7).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 

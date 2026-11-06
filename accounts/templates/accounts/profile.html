@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Profile" %}{% endblock %}
+
+{% block content %}
+  <h1>{% translate "Profile" %}</h1>
+  <p>{% blocktranslate with name=user.get_username %}Logged in as <strong>{{ name }}</strong>.{% endblocktranslate %}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.email.as_field_group }}</div>
+    <div>{{ form.ui_language.as_field_group }}</div>
+    <div>{{ form.tmdb_language.as_field_group }}</div>
+    <div>{{ form.theme.as_field_group }}</div>
+    <details{% if form.region.errors %} open{% endif %}>
+      <summary>{% translate "Advanced" %}</summary>
+            <div>{{ form.region.as_field_group }}</div>
+      <p class="helptext">{% blocktranslate with region=user.effective_region %}Currently used: {{ region }}{% endblocktranslate %}</p>
+    </details>
+    <button type="submit">{% translate "Save" %}</button>
+  </form>
+
+  <hr>
+  <div class="actions">
+    <a href="{% url 'accounts:password_change' %}" role="button" class="secondary outline">{% translate "Change password" %}</a>
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="secondary">{% translate "Log out" %}</button>
+    </form>
+  </div>
+{% endblock %}

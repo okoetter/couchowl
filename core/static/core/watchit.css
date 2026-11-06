@@ -7,6 +7,7 @@
 /* ---- Navigation: top bar on desktop ------------------------------------- */
 
 .app-nav {
+  min-height: var(--watchit-nav-height);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -103,4 +104,112 @@
 .site-footer {
   text-align: center;
   color: var(--pico-muted-color);
+}
+
+/* Help text below a form field (see core/templates/forms/field.html) */
+.helptext {
+  margin-top: calc(var(--pico-spacing) * -0.5);
+  margin-bottom: var(--pico-spacing);
+  font-size: 0.875em;
+  color: var(--pico-muted-color);
+}
+
+.helptext ul {
+  margin-bottom: 0;
+  padding-left: 1.25em;
+}
+
+.helptext li {
+  margin-bottom: 0;
+}
+
+/* Pico colors some elements (e.g. list items) itself; help text stays muted throughout */
+.helptext * {
+  color: var(--pico-muted-color);
+}
+
+/* Errors directly below an input: pull them up like the help text */
+input + .errorlist,
+select + .errorlist,
+textarea + .errorlist {
+  margin-top: calc(var(--pico-spacing) * -0.5);
+}
+
+/* Login, registration and password pages */
+.narrow {
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+/* Logged out: the nav only shows the brand, also on phones */
+@media (max-width: 767px) {
+  .app-nav:not(:has(ul)) {
+    position: static;
+    padding: 0 1rem;
+    border-top: none;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+  }
+
+  .app-nav:not(:has(ul)) .app-brand {
+    display: flex;
+    min-height: var(--watchit-nav-height);
+  }
+}
+
+/* ---- Errors ------------------------------------------------------------------ */
+/* Django renders form errors as <ul class="errorlist"> (field, e.g. wrong old password)
+   and <ul class="errorlist nonfield"> (whole form, e.g. wrong login). Both look the same. */
+
+:root {
+  --watchit-error-color: var(--pico-del-color);
+}
+
+.errorlist {
+  margin: 0 0 var(--pico-spacing);
+  padding: calc(var(--pico-spacing) / 2) var(--pico-spacing);
+  list-style: none;
+  color: var(--watchit-error-color);
+  border-left: 4px solid var(--watchit-error-color);
+  border-radius: var(--pico-border-radius);
+  background: color-mix(in srgb, var(--watchit-error-color) 10%, transparent);
+}
+
+.errorlist li {
+  list-style: none;
+}
+
+/* Page messages (django.contrib.messages) with level "error" */
+.message-error {
+  color: var(--watchit-error-color);
+  border-left: 4px solid var(--watchit-error-color);
+}
+
+/* ---- Button row (e.g. profile: link button + button in its own form) ------- */
+/* Pico styles <a role="button"> and <form><button> differently (margins, width);
+   in this row every action has the same size. */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+
+.actions > * {
+  flex: 1 1 12rem;
+  display: flex;
+  margin: 0;
+}
+
+/* A button inside a <form> fills its form */
+.actions > * > button {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+}
+
+/* Link buttons: center the label when stretched to the row height */
+.actions > [role="button"] {
+  align-items: center;
+  justify-content: center;
 }

@@ -21,3 +21,4 @@ LANGUAGE_CODE = "de"
 DEFAULT_TMDB_LANGUAGE = "de-DE"
 DEFAULT_REGION = ""
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]  # fast tests only
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}

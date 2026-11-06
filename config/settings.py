@@ -5,6 +5,7 @@ All configuration comes from environment variables (see .env.example).
 Without a .env file, safe-ish development defaults are used.
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "axes",
     "core",
     "accounts",
 ]
@@ -53,10 +55,14 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Every page requires login unless the view is marked with @login_not_required
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     # Must come after AuthenticationMiddleware: applies the user's profile language
     "accounts.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Should be last: turns axes lockouts into a proper "locked out" response
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -79,6 +85,9 @@ TEMPLATES = [
     },
 ]
 
+# Form fields in Pico's order: label, input, errors, help text (core/templates/forms/)
+FORM_RENDERER = "core.forms.FormRenderer"
+
 # --- Database -----------------------------------------------------------------
 # SQLite by default; PostgreSQL via e.g. DATABASE_URL=postgres://user:pass@db:5432/watchit
 
@@ -90,6 +99,31 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # --- Auth ---------------------------------------------------------------------
 
 AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "core:dashboard"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
+AUTHENTICATION_BACKENDS = [
+    # Must be first: rejects logins while a username/IP combination is locked out
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# How long an invitation link stays valid
+INVITATION_EXPIRY_DAYS = env.int("INVITATION_EXPIRY_DAYS", default=7)
+# How long a password reset link stays valid (Django setting, in seconds)
+PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT_HOURS", default=24) * 3600
+# Max. "forgot password" requests per IP address and hour
+PASSWORD_RESET_RATE_LIMIT = 5
+
+# --- Brute-force protection (django-axes) ---------------------------------------
+# After AXES_FAILURE_LIMIT failed logins, the combination of username and IP address
+# is locked for AXES_COOLOFF_TIME. Admins can unlock early: manage.py axes_reset
+AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
+AXES_COOLOFF_TIME = timedelta(minutes=env.int("AXES_COOLOFF_MINUTES", default=60))
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_TEMPLATE = "accounts/locked_out.html"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -115,6 +149,16 @@ USE_TZ = True
 # Defaults for TMDB content; users can override them in their profile.
 DEFAULT_TMDB_LANGUAGE = env("DEFAULT_TMDB_LANGUAGE", default="de-DE")
 DEFAULT_REGION = env("DEFAULT_REGION", default="")  # empty: derive from TMDB language
+
+# --- Cache ----------------------------------------------------------------------
+# File-based, so all gunicorn worker processes share it (used for rate limits).
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": DATA_DIR / "cache",
+    }
+}
 
 # --- Static files -------------------------------------------------------------
 

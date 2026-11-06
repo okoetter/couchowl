@@ -1,0 +1,22 @@
+{% extends "accounts/_narrow.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Log in" %}{% endblock %}
+
+{% block card %}
+  <h1>{% translate "Log in" %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit">{% translate "Log in" %}</button>
+  </form>
+  <footer>
+    {% if email_enabled %}
+      <a href="{% url 'accounts:password_reset' %}">{% translate "Forgot your password?" %}</a>
+    {% else %}
+      <small>{% translate "Forgot your password? Please contact your administrator." %}</small>
+    {% endif %}
+    <br><small>{% translate "watchit is invite-only. Ask your administrator for an invitation link." %}</small>
+  </footer>
+{% endblock %}

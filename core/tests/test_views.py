@@ -3,9 +3,8 @@ from django.conf import settings
 from django.urls import reverse
 
 
-@pytest.mark.django_db
-def test_dashboard_renders_in_german_by_default(client):
-    response = client.get(reverse("core:dashboard"))
+def test_dashboard_renders_in_german_by_default(auth_client):
+    response = auth_client.get(reverse("core:dashboard"))
 
     assert response.status_code == 200
     content = response.content.decode()
@@ -16,9 +15,8 @@ def test_dashboard_renders_in_german_by_default(client):
     assert 'aria-current="page"' in content
 
 
-@pytest.mark.django_db
-def test_assets_are_served_locally_without_cdn(client):
-    content = client.get(reverse("core:dashboard")).content.decode()
+def test_assets_are_served_locally_without_cdn(auth_client):
+    content = auth_client.get(reverse("core:dashboard")).content.decode()
 
     assert "/static/vendor/htmx.min.js" in content
     assert "/static/vendor/pico.min.css" in content
@@ -26,10 +24,9 @@ def test_assets_are_served_locally_without_cdn(client):
         assert cdn not in content
 
 
-@pytest.mark.django_db
-@pytest.mark.parametrize("name", ["lists", "upcoming", "search", "profile"])
-def test_placeholder_pages_exist(client, name):
-    response = client.get(reverse(f"core:{name}"))
+@pytest.mark.parametrize("name", ["lists", "upcoming", "search"])
+def test_placeholder_pages_exist(auth_client, name):
+    response = auth_client.get(reverse(f"core:{name}"))
 
     assert response.status_code == 200
     assert "Diese Seite kommt bald." in response.content.decode()

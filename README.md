@@ -17,11 +17,18 @@ A self-hosted watchlist for movies and TV shows.
 ## Quick start (Docker)
 
 ```sh
-cp .env.example .env    # then edit: SECRET_KEY, ALLOWED_HOSTS, TMDB_API_KEY
+cp .env.example .env    # then edit: SECRET_KEY, ALLOWED_HOSTS, TMDB_API_TOKEN
 docker compose up -d --build
 ```
 
-Open <http://localhost:8000>. All settings are documented in [.env.example](.env.example).
+Create the first admin account, then open <http://localhost:8000>:
+
+```sh
+docker compose exec watchit python manage.py createsuperuser
+```
+
+All settings are documented in [.env.example](.env.example). Inviting users, password resets
+and e-mail setup are described in [docs/administration.md](docs/administration.md).
 
 ## Development
 

@@ -1,0 +1,9 @@
+{% extends "accounts/_narrow.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Too many requests" %}{% endblock %}
+
+{% block card %}
+  <h1>{% translate "Too many requests" %}</h1>
+  <p>{% translate "Please wait a while and try again later." %}</p>
+{% endblock %}
