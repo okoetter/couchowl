@@ -135,20 +135,23 @@ AUTH_PASSWORD_VALIDATORS = [
 # --- Internationalization -----------------------------------------------------
 # UI texts live in locale/<lang>/LC_MESSAGES/django.po. Source strings are English.
 
+# Language names in their own language, so everyone finds theirs
 LANGUAGES = [
-    ("de", "Deutsch"),
     ("en", "English"),
+    ("de", "Deutsch"),
 ]
-LANGUAGE_CODE = env("DEFAULT_LANGUAGE", default="de")
+# Fallback interface language: for visitors whose browser language has no translation,
+# and for users whose region's main language has none
+LANGUAGE_CODE = env("DEFAULT_LANGUAGE", default="en")
 LOCALE_PATHS = [BASE_DIR / "locale"]
 USE_I18N = True
 
 TIME_ZONE = env("TIME_ZONE", default="Europe/Berlin")
 USE_TZ = True
 
-# Defaults for TMDB content; users can override them in their profile.
-DEFAULT_TMDB_LANGUAGE = env("DEFAULT_TMDB_LANGUAGE", default="de-DE")
-DEFAULT_REGION = env("DEFAULT_REGION", default="")  # empty: derive from TMDB language
+# Region for new users whose browser doesn't reveal a country (empty: US).
+# Languages for movie/show texts are derived from the region (accounts/regions.py).
+DEFAULT_REGION = env("DEFAULT_REGION", default="")
 
 # --- Cache ----------------------------------------------------------------------
 # File-based, so all gunicorn worker processes share it (used for rate limits).

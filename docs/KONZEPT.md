@@ -30,6 +30,15 @@
   - **„Folgen“ statt „verfolgen“:** Der Button auf der Serienseite heißt „Folgen“ (aktiv: „Gefolgt“), englisch „Follow“/„Following“. „Folgen“ ist der gängige Begriff (wie bei sozialen Netzwerken), „verfolgen“ klingt nach Hinterherjagen.
   - **Systemliste „Gefolgte Serien“** („Followed shows“): erscheint unter „Listen“ automatisch, sobald der Nutzer mindestens einer Serie folgt, und zeigt alle gefolgten Serien. Sie wird nicht gespeichert, sondern per Abfrage berechnet, ist nicht löschbar oder umbenennbar und lässt sich im Profil ein- und ausblenden (Standard: an). Umsetzung mit Meilenstein 3/4.
 
+- **2026-11-07 – Englisch zuerst, Region als Haupteinstellung:**
+  - Standardsprache der Oberfläche ist **Englisch** (`DEFAULT_LANGUAGE=en`); Deutsch ist eine Übersetzung.
+  - Nicht angemeldete Besucher bekommen ihre Browsersprache, wenn es eine Übersetzung gibt, sonst Englisch.
+  - **Die Region bestimmt die Sprachen:** Oberfläche = Hauptsprache des Landes, falls übersetzt, sonst Englisch; TMDB-Sprache = Hauptsprache + Land (AT → `de-AT`, FR → `fr-FR`). Beide Sprachen sind im Profil unter „Erweitert“ überschreibbar, Standard „Automatisch“.
+  - **Region neuer Nutzer:** beim ersten Seitenaufruf nach dem Login aus der Browsersprache abgeleitet und gespeichert (`de-AT` → AT, nur `de` → DE). Klappt das nicht: `DEFAULT_REGION`, sonst US. Gilt auch für per `createsuperuser` angelegte Admins.
+  - Region im Profil oben als Länderauswahl mit übersetzten Namen. Länderdaten (Namen, Amtssprachen) kommen aus **Babel** (Unicode CLDR).
+  - `DEFAULT_TMDB_LANGUAGE` entfällt (ergibt sich aus der Region).
+  - Einladungsmails gehen in der Sprache des einladenden Admins raus.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -63,13 +72,14 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
     - **Aktualisierung** über die drei Wege aus „TMDB-Datenabruf“: Der Button „Jetzt aktualisieren“ erneuert Texte **und** Poster eines Titels, „Alle aktualisieren“ und der tägliche Sync entsprechend für alle betroffenen Titel
   - Optionale Links zu Impressum und Datenschutzerklärung im Footer über `IMPRINT_URL` und `PRIVACY_URL`
 - **Mehrsprachigkeit:**
-  - keine hartkodierten Texte; Sprachdateien (gettext `.po`); zum Start Deutsch
-  - Standardwerte per Umgebungsvariable: `DEFAULT_LANGUAGE`, `DEFAULT_TMDB_LANGUAGE`, `DEFAULT_REGION`
-  - pro Nutzer im Profil einstellbar: UI-Sprache und TMDB-Sprache (z. B. `de-DE`); fehlt eine Beschreibung in der gewählten Sprache, wird die englische angezeigt
-  - **Region** (Land für Streaming-Anbieter, Veröffentlichungsdaten, Altersfreigaben):
-    - wird automatisch aus der TMDB-Sprache abgeleitet (`de-DE` → `DE`)
-    - nur unter „Erweitert“ im Profil überschreibbar (z. B. deutsche Texte, aber österreichische Anbieter)
-    - Feld `region` am User leer bedeutet „automatisch“
+  - keine hartkodierten Texte; Sprachdateien (gettext `.po`); Quelltexte Englisch, **Englisch ist Standard**, Deutsch die erste Übersetzung
+  - **Region** (Land für Streaming-Anbieter, Veröffentlichungsdaten, Altersfreigaben) ist die Haupteinstellung:
+    - neue Nutzer: beim ersten Login aus der Browsersprache abgeleitet (`de-AT` → AT, `de` → DE), sonst `DEFAULT_REGION`, sonst US
+    - im Profil oben als Länderauswahl änderbar
+  - **Sprachen folgen der Region**, unter „Erweitert“ im Profil überschreibbar (leer = automatisch):
+    - Oberfläche: Hauptsprache des Landes, falls übersetzt, sonst Englisch
+    - TMDB-Sprache: Hauptsprache + Land (z. B. `de-AT`); fehlt eine Beschreibung in dieser Sprache, wird die englische angezeigt
+  - nicht angemeldete Besucher: Browsersprache, falls übersetzt, sonst `DEFAULT_LANGUAGE` (Standard `en`)
 - **Später, nicht im MVP:** siehe Abschnitt „Backlog (ToDo)“
 
 ### Konten und E-Mail
@@ -150,7 +160,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Git ab dem ersten Schritt
 
 ## Datenmodell (Entwurf)
-- `User` (eigenes User-Modell von Anfang an): `ui_language`, `tmdb_language`, `region`; ab Meilenstein 3/4 `show_followed_list` (Systemliste „Gefolgte Serien“ anzeigen, Standard an)
+- `User` (eigenes User-Modell von Anfang an): `region`, `ui_language`, `tmdb_language` (leer = aus Region), `theme`; ab Meilenstein 3/4 `show_followed_list` (Systemliste „Gefolgte Serien“ anzeigen, Standard an)
 - `Invitation`: Token, E-Mail (optional), `created_by`, `expires_at`, `used_by`
 - `Title`: `tmdb_id` + `media_type` (Film/Serie) sowie sprachneutrale Daten (Poster, Daten, Status, Networks)
 - `TitleTranslation`: Titel, Sprache, Name, Beschreibung (Cache pro Sprache)
@@ -299,7 +309,7 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - Bewertungen
 - Benachrichtigungen per E-Mail oder Push bei neuen Staffeln
 - Öffentliche JSON-API (z. B. django-ninja)
-- Weitere UI-Sprachen (zuerst Englisch)
+- Weitere UI-Sprachen
 
 ## Später zu entscheiden
 - Open-Source-Lizenz (z. B. MIT oder AGPL-3.0) → spätestens bei Meilenstein 7
@@ -310,6 +320,6 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
   - `uv run pytest` muss grün sein
   - `uv run manage.py runserver` lokal starten; Oliver prüft die Funktion im Browser
 - Ab Meilenstein 0: `docker compose up --build` lokal; die Startseite unter `http://localhost:8000` muss laden
-- Mehrsprachigkeit: im Profil die Sprache auf Englisch stellen → UI und TMDB-Texte wechseln (sobald eine englische `.po`-Datei existiert)
+- Mehrsprachigkeit: im Profil die Region oder die Sprache ändern → UI und TMDB-Texte wechseln
 - Sync: `manage.py sync_tmdb` manuell ausführen → Ankündigungen erscheinen auf dem Dashboard
 - Zum Abschluss: Deployment auf der DS218+ über den Container Manager und Zugriff über die eigene Domain

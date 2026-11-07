@@ -11,7 +11,7 @@ A self-hosted watchlist for movies and TV shows.
 - Dashboard with the next episode of every show you are watching
 - Follow shows (automatic "Followed shows" list) and see announcements for new seasons,
   including where they stream
-- Invite-only accounts, interface in multiple languages (German first)
+- Invite-only accounts; interface in English and German, picked from your country automatically
 - Privacy-friendly: no CDNs, your browser never talks to third parties
 - Installable on your phone (PWA); runs as a single small Docker container (SQLite by default)
 

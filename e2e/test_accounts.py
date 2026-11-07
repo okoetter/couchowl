@@ -5,14 +5,14 @@ import re
 import pytest
 from playwright.sync_api import expect
 
-from e2e.conftest import PASSWORD, login
+from e2e.conftest import LOCALE, PASSWORD, login
 
 pytestmark = pytest.mark.e2e
 
 
 def test_invitation_registration_and_login(live_server, admin, browser):
     # Admin creates an invitation in the Django admin and copies the link
-    admin_page = browser.new_context().new_page()
+    admin_page = browser.new_context(locale=LOCALE).new_page()
     login(admin_page, live_server.url, "admin")
     admin_page.goto(f"{live_server.url}/admin/accounts/invitation/add/")
     admin_page.locator("#id_email").fill("ben@example.com")
@@ -21,7 +21,7 @@ def test_invitation_registration_and_login(live_server, admin, browser):
     assert re.fullmatch(rf"{live_server.url}/accounts/register/[\w-]+/", link)
 
     # The invitee registers in a fresh browser session
-    page = browser.new_context().new_page()
+    page = browser.new_context(locale=LOCALE).new_page()
     page.goto(link)
     expect(page.locator("#id_email")).to_have_value("ben@example.com")
     page.locator("#id_username").fill("ben")
@@ -39,7 +39,7 @@ def test_invitation_registration_and_login(live_server, admin, browser):
     expect(page.get_by_role("heading", name="Dashboard")).to_be_visible()
 
     # The invitation link cannot be used a second time
-    other = browser.new_context().new_page()
+    other = browser.new_context(locale=LOCALE).new_page()
     other.goto(link)
     expect(other.get_by_role("heading", name="Ungültige Einladung")).to_be_visible()
 
@@ -62,7 +62,7 @@ def test_profile_action_buttons_have_equal_height(live_server, member, page):
 
 
 def test_profile_action_buttons_stack_on_phones(live_server, member, browser):
-    page = browser.new_context(viewport={"width": 390, "height": 844}).new_page()
+    page = browser.new_context(locale=LOCALE, viewport={"width": 390, "height": 844}).new_page()
     login(page, live_server.url, "anna")
     page.goto(f"{live_server.url}/accounts/profile/")
 

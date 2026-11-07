@@ -2,10 +2,11 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
+from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
-from .countries import COUNTRY_CODES
 from .models import User
+from .regions import country_choices, tmdb_language_for_region, ui_language_for_region
 
 # Languages TMDB has good coverage for. Values are TMDB language codes.
 TMDB_LANGUAGES = [
@@ -62,36 +63,45 @@ class RegistrationForm(UserCreationForm):
 
 
 class ProfileForm(forms.ModelForm):
+    """Region first; both languages are 'automatic' (derived from the region) by default."""
+
     class Meta:
         model = User
-        fields = ("email", "ui_language", "tmdb_language", "theme", "region")
+        fields = ("email", "region", "theme", "ui_language", "tmdb_language")
         help_texts = {
             "email": _("Optional. Needed if you want to reset a forgotten password yourself."),
-            "region": _(
-                "Two-letter country code (e.g. AT) for streaming providers and release dates. "
-                "Leave empty to derive it from the language for movie and show information."
-            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        ui_default = dict(settings.LANGUAGES).get(settings.LANGUAGE_CODE, settings.LANGUAGE_CODE)
+        user = self.instance
+        self.fields["region"] = forms.ChoiceField(
+            label=_("Region"),
+            choices=country_choices(get_language()),
+            help_text=_(
+                "Country for streaming providers and release dates. "
+                "Also determines the languages below, unless you choose them yourself."
+            ),
+        )
+        self.initial["region"] = user.effective_region
+
+        # "Automatic" shows what the region currently results in
+        region_ui = ui_language_for_region(user.effective_region)
         self.fields["ui_language"].choices = [
-            ("", _("Server default (%(language)s)") % {"language": ui_default}),
+            ("", _("Automatic (%(language)s)") % {"language": dict(settings.LANGUAGES)[region_ui]}),
             *settings.LANGUAGES,
         ]
         tmdb_choices = list(TMDB_LANGUAGES)
-        current = self.instance.tmdb_language
-        if current and current not in dict(tmdb_choices):
-            tmdb_choices.append((current, current))  # keep values set via the admin
+        if user.tmdb_language and user.tmdb_language not in dict(tmdb_choices):
+            tmdb_choices.append((user.tmdb_language, user.tmdb_language))  # set via the admin
         self.fields["tmdb_language"] = forms.ChoiceField(
             label=self.fields["tmdb_language"].label,
             required=False,
             choices=[
                 (
                     "",
-                    _("Server default (%(language)s)")
-                    % {"language": settings.DEFAULT_TMDB_LANGUAGE},
+                    _("Automatic (%(language)s)")
+                    % {"language": tmdb_language_for_region(user.effective_region)},
                 ),
                 *tmdb_choices,
             ],
@@ -99,9 +109,3 @@ class ProfileForm(forms.ModelForm):
 
     def clean_email(self):
         return _check_email_unique(self.cleaned_data.get("email", ""), exclude_pk=self.instance.pk)
-
-    def clean_region(self):
-        region = self.cleaned_data.get("region", "").strip().upper()
-        if region and region not in COUNTRY_CODES:
-            raise ValidationError(_("Enter a valid two-letter country code such as DE or AT."))
-        return region

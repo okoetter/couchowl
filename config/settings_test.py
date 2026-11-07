@@ -17,8 +17,9 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
+# Tests run in German so the translations are exercised too
+# (production defaults: English, region from the browser or US)
 LANGUAGE_CODE = "de"
-DEFAULT_TMDB_LANGUAGE = "de-DE"
-DEFAULT_REGION = ""
+DEFAULT_REGION = "DE"
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]  # fast tests only
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}

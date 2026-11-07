@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from e2e.conftest import login
+from e2e.conftest import LOCALE, login
 
 pytestmark = pytest.mark.e2e
 
@@ -35,9 +35,7 @@ def show_profile(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/accounts/profile/")
     page.get_by_text("Erweitert").click()
-    page.get_by_label("Region").fill("xy")
-    page.get_by_role("button", name="Speichern").click()
-    page.wait_for_load_state()
+    page.wait_for_timeout(300)  # let Pico's chevron animation finish
 
 
 def show_password_change(page, url):
@@ -53,7 +51,7 @@ def show_password_change(page, url):
 PAGES = {
     "login-error": show_login_error,
     "register-error": show_register,
-    "profile-error": show_profile,
+    "profile": show_profile,
     "password-change-error": show_password_change,
 }
 
@@ -62,7 +60,7 @@ PAGES = {
 @pytest.mark.parametrize("device", VIEWPORTS)
 @pytest.mark.parametrize("name", PAGES)
 def test_screenshot(live_server, member, browser, name, device, scheme):
-    context = browser.new_context(viewport=VIEWPORTS[device], color_scheme=scheme)
+    context = browser.new_context(locale=LOCALE, viewport=VIEWPORTS[device], color_scheme=scheme)
     page = context.new_page()
 
     PAGES[name](page, live_server.url)

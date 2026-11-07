@@ -1,6 +1,5 @@
 """Build and send invitation and password reset links."""
 
-from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -34,8 +33,8 @@ def send_invitation_email(request, invitation) -> None:
         "expires_at": invitation.expires_at,
         "inviter": request.user,
     }
-    # The invitee has no profile yet, so use the server default language
-    with translation.override(settings.LANGUAGE_CODE):
+    # The invitee has no profile yet; the inviter's language is the best guess
+    with translation.override(request.user.effective_ui_language):
         subject = render_to_string("accounts/email/invitation_subject.txt", context).strip()
         body = render_to_string("accounts/email/invitation_body.txt", context)
     send_mail(subject, body, None, [invitation.email])

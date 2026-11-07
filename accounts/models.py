@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from .regions import default_region, tmdb_language_for_region, ui_language_for_region
+
 
 class User(AbstractUser):
     """watchit user. A custom model from day one makes later changes painless."""
@@ -17,7 +19,18 @@ class User(AbstractUser):
         LIGHT = "light", _("Light")
         DARK = "dark", _("Dark")
 
-    # Empty value = use the server default from the environment (.env)
+    # Region is the main setting; both languages are derived from it unless set.
+    # Empty region: detected from the browser on the next request (see middleware).
+    region = models.CharField(
+        _("region"),
+        max_length=2,
+        blank=True,
+        help_text=_(
+            "Country for streaming providers and release dates, e.g. DE. "
+            "Also determines the languages unless you choose them yourself."
+        ),
+    )
+    # Empty value = automatic (derived from the region)
     ui_language = models.CharField(
         _("interface language"),
         max_length=10,
@@ -30,43 +43,24 @@ class User(AbstractUser):
         blank=True,
         help_text=_("TMDB language code, e.g. de-DE or en-US."),
     )
-    region = models.CharField(
-        _("region"),
-        max_length=2,
-        blank=True,
-        help_text=_(
-            "Country for streaming providers and release dates, e.g. DE. "
-            "Empty: derived from the language for movie and show information."
-        ),
-    )
     theme = models.CharField(
         _("color scheme"), max_length=10, choices=Theme.choices, default=Theme.AUTO
     )
 
     @property
+    def effective_region(self) -> str:
+        """Saved region > server default (DEFAULT_REGION) > US."""
+        return self.region.upper() if self.region else default_region()
+
+    @property
     def effective_ui_language(self) -> str:
-        return self.ui_language or settings.LANGUAGE_CODE
+        """Chosen language > main language of the region (if translated) > English."""
+        return self.ui_language or ui_language_for_region(self.effective_region)
 
     @property
     def effective_tmdb_language(self) -> str:
-        return self.tmdb_language or settings.DEFAULT_TMDB_LANGUAGE
-
-    @property
-    def effective_region(self) -> str:
-        """Explicit region > server default > country part of the TMDB language."""
-        if self.region:
-            return self.region.upper()
-        if settings.DEFAULT_REGION:
-            return settings.DEFAULT_REGION.upper()
-        return region_from_language(self.effective_tmdb_language)
-
-
-def region_from_language(language: str, fallback: str = "US") -> str:
-    """'de-DE' -> 'DE', 'en' -> fallback."""
-    parts = language.replace("_", "-").split("-")
-    if len(parts) >= 2 and len(parts[1]) == 2:
-        return parts[1].upper()
-    return fallback
+        """Chosen language > main language of the region plus country, e.g. de-AT."""
+        return self.tmdb_language or tmdb_language_for_region(self.effective_region)
 
 
 def _new_invitation_token() -> str:

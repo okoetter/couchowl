@@ -11,13 +11,12 @@
     {% csrf_token %}
     {{ form.non_field_errors }}
     <div>{{ form.email.as_field_group }}</div>
-    <div>{{ form.ui_language.as_field_group }}</div>
-    <div>{{ form.tmdb_language.as_field_group }}</div>
+    <div>{{ form.region.as_field_group }}</div>
     <div>{{ form.theme.as_field_group }}</div>
-    <details{% if form.region.errors %} open{% endif %}>
+    <details{% if form.ui_language.errors or form.tmdb_language.errors %} open{% endif %}>
       <summary>{% translate "Advanced" %}</summary>
-            <div>{{ form.region.as_field_group }}</div>
-      <p class="helptext">{% blocktranslate with region=user.effective_region %}Currently used: {{ region }}{% endblocktranslate %}</p>
+      <div>{{ form.ui_language.as_field_group }}</div>
+      <div>{{ form.tmdb_language.as_field_group }}</div>
     </details>
     <button type="submit">{% translate "Save" %}</button>
   </form>

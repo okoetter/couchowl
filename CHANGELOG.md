@@ -10,12 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Invite-only accounts: admins create one-time invitation links in the Django admin
   (optionally sent by e-mail)
 - Login and logout; every page requires login
-- Profile page: e-mail, interface language, language for movie/show information,
-  color scheme, region (under "Advanced")
+- Profile page: e-mail, region, color scheme; interface language and language for
+  movie/show information under "Advanced"
+- Region is detected from the browser on first login; both languages follow the region
+  unless chosen explicitly. English is the default interface language
 - Change password; "forgot password" by e-mail (only when e-mail is configured, rate-limited)
 - Admin action to create password reset links (works without e-mail)
 - Brute-force protection with django-axes
 - `docs/administration.md`
+
+### Removed
+- `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)
 
 ## [0.1.0] - 2026-11-06
 

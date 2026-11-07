@@ -36,3 +36,13 @@ def login(page, base_url, username, password=PASSWORD, *, expect_success=True):
         page.wait_for_url(lambda url: "/accounts/login/" not in url)
     else:
         page.wait_for_load_state()
+
+
+# The browser reports German, so new users get region DE and a German interface
+# (the tests look for German texts). Used by the `page` fixture of pytest-playwright.
+LOCALE = "de-DE"
+
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {**browser_context_args, "locale": LOCALE}

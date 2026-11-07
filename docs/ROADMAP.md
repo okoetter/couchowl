@@ -23,4 +23,4 @@
 - [ ] Ratings
 - [ ] Notifications (e-mail/push) for new seasons
 - [ ] Public JSON API (e.g. django-ninja)
-- [ ] More UI languages (English first)
+- [ ] More UI languages

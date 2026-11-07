@@ -10,7 +10,7 @@ def save_profile(client, **data):
         "ui_language": "",
         "tmdb_language": "",
         "theme": "auto",
-        "region": "",
+        "region": "DE",
     }
     payload.update(data)
     return client.post(reverse("accounts:profile"), payload)
@@ -21,13 +21,14 @@ def test_profile_page_shows_settings(auth_client):
 
     assert "Profil" in content
     assert "Erweitert" in content
-    assert "Serverstandard (de-DE)" in content
-    assert "Aktuell verwendet: DE" in content
+    assert '<option value="DE" selected>Deutschland</option>' in content
+    assert "Automatisch (Deutsch)" in content
+    assert "Automatisch (de-DE)" in content
 
 
 def test_save_profile(auth_client, user):
     response = save_profile(
-        auth_client, ui_language="en", tmdb_language="en-GB", theme="dark", region="at"
+        auth_client, ui_language="en", tmdb_language="en-GB", theme="dark", region="AT"
     )
 
     assert response["Location"] == reverse("accounts:profile")
@@ -35,7 +36,7 @@ def test_save_profile(auth_client, user):
     assert user.ui_language == "en"
     assert user.tmdb_language == "en-GB"
     assert user.theme == "dark"
-    assert user.region == "AT"  # normalized to upper case
+    assert user.region == "AT"
 
 
 def test_new_language_applies_after_saving(auth_client):
@@ -47,27 +48,30 @@ def test_new_language_applies_after_saving(auth_client):
     assert "Your profile has been saved." in content
 
 
-@pytest.mark.parametrize("region", ["D", "DEU", "1A", "XY", "EU"])
+@pytest.mark.parametrize("region", ["", "D", "de", "XY", "EU"])
 def test_invalid_region_is_rejected(auth_client, user, region):
     response = save_profile(auth_client, region=region)
 
     assert response.status_code == 200
     user.refresh_from_db()
-    assert user.region == ""
+    assert user.region == "DE"
 
 
-@pytest.mark.parametrize("region", ["ch", "GB", " us "])
-def test_valid_regions_are_accepted(auth_client, user, region):
-    save_profile(auth_client, region=region)
+def test_changing_region_changes_automatic_languages(auth_client, user):
+    save_profile(auth_client, region="US")
 
     user.refresh_from_db()
-    assert user.region == region.strip().upper()
+    assert user.effective_ui_language == "en"
+    assert user.effective_tmdb_language == "en-US"
+    content = auth_client.get(reverse("accounts:profile")).content.decode()
+    assert '<html lang="en"' in content
+    assert "Automatic (English)" in content
+    assert "Automatic (en-US)" in content
 
 
-def test_invalid_region_shows_error_and_opens_advanced(auth_client):
-    content = save_profile(auth_client, region="XY").content.decode()
+def test_invalid_language_opens_advanced_section(auth_client):
+    content = save_profile(auth_client, tmdb_language="xx-YY").content.decode()
 
-    assert "Gib einen gültigen zweistelligen Ländercode" in content
     assert "<details open>" in content
 
 
