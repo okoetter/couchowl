@@ -41,7 +41,7 @@
                   <strong>{{ result.title }}</strong>
                   <small>
                     {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}
-                    {% if result.media_type == "movie" and result.tmdb_id in watched %}
+                    {% if result.key in watched %}
                       · <span class="watched-badge">✓ {% translate "Watched" %}</span>
                     {% endif %}
                     {% if result.original_title != result.title %}<br>{{ result.original_title }}{% endif %}

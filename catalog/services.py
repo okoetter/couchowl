@@ -12,7 +12,15 @@ from django.db import transaction
 from django.utils import timezone
 
 from . import tmdb
-from .models import MediaType, Title, TitleTranslation
+from .models import (
+    Episode,
+    EpisodeTranslation,
+    MediaType,
+    Season,
+    SeasonTranslation,
+    Title,
+    TitleTranslation,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +39,11 @@ class SearchResult:
     original_title: str
     year: int | None
     poster_path: str
+
+    @property
+    def key(self) -> str:
+        """Unique across movies and shows (they have separate TMDB IDs), e.g. "tv-70523"."""
+        return f"{self.media_type}-{self.tmdb_id}"
 
     @property
     def media_type_label(self) -> str:
@@ -132,6 +145,10 @@ def get_title(
 
     try:
         data = tmdb.get_client().details(media_type, tmdb_id, language)
+        seasons = None
+        if media_type == MediaType.TV:
+            numbers = [s["season_number"] for s in data.get("seasons") or []]
+            seasons = load_seasons(tmdb_id, numbers, language)
     except tmdb.TMDBNotFound:
         raise
     except tmdb.TMDBError:
@@ -140,7 +157,7 @@ def get_title(
         logger.warning("Showing outdated data for %s %s: TMDB unavailable", media_type, tmdb_id)
         return translation
 
-    return save_title(media_type, data, language)
+    return save_title(media_type, data, language, seasons=seasons)
 
 
 def best_translations(titles, language: str) -> dict[int, TitleTranslation]:
@@ -151,15 +168,24 @@ def best_translations(titles, language: str) -> dict[int, TitleTranslation]:
     (same fallback order as `localize`, then any). Titles without any translation are
     missing from the result (templates then show the original title).
     """
-    best: dict[int, tuple[int, TitleTranslation]] = {}
-    for translation in TitleTranslation.objects.filter(title__in=titles):
+    return best_texts(TitleTranslation.objects.filter(title__in=titles), language, owner="title_id")
+
+
+def best_texts(translations, language: str, *, owner: str) -> dict:
+    """Pick the best of the stored `translations` per owner (e.g. owner="title_id").
+
+    Same order as `localize`; any other language is better than nothing.
+    """
+    best: dict[int, tuple[int, object]] = {}
+    for translation in translations:
         lang, _sep, country = translation.language.partition("-")
         rank = _language_rank({"iso_639_1": lang, "iso_3166_1": country}, language)
         rank = 5 if rank is None else rank
-        current = best.get(translation.title_id)
+        key = getattr(translation, owner)
+        current = best.get(key)
         if current is None or rank < current[0]:
-            best[translation.title_id] = (rank, translation)
-    return {title_id: translation for title_id, (_rank, translation) in best.items()}
+            best[key] = (rank, translation)
+    return {key: translation for key, (_rank, translation) in best.items()}
 
 
 def is_outdated(translation: TitleTranslation) -> bool:
@@ -167,8 +193,14 @@ def is_outdated(translation: TitleTranslation) -> bool:
 
 
 @transaction.atomic
-def save_title(media_type: str, data: dict, language: str) -> TitleTranslation:
-    """Store a TMDB details response (with translations) for `language`."""
+def save_title(
+    media_type: str, data: dict, language: str, *, seasons: dict[int, dict] | None = None
+) -> TitleTranslation:
+    """Store a TMDB details response (with translations) for `language`.
+
+    `seasons` (shows only, see load_seasons) replaces the stored seasons and episodes;
+    None leaves them as they are.
+    """
     is_movie = media_type == MediaType.MOVIE
     original = data.get("original_title" if is_movie else "original_name") or ""
     title, _created = Title.objects.update_or_create(
@@ -192,7 +224,150 @@ def save_title(media_type: str, data: dict, language: str) -> TitleTranslation:
             "fetched_at": timezone.now(),
         },
     )
+    if seasons is not None:
+        save_seasons(title, seasons, language)
     return translation
+
+
+# --- Seasons and episodes ------------------------------------------------------------------
+
+
+def fallback_languages(language: str) -> list[str]:
+    """Languages to ask TMDB for season and episode texts, best first.
+
+    TMDB has no translation list for episodes, and for e.g. "de-AT" it only returns
+    placeholders ("Folge 1", no description). Plain "de" returns any German text.
+    """
+    lang, _sep, country = language.partition("-")
+    languages = [language]
+    # de-AT: also plain "de"; de-DE and en-US already are the main variant
+    if country and country != {"en": "US"}.get(lang, lang.upper()):
+        languages.append(lang)
+    if lang != "en":
+        languages.append("en-US")
+    return languages
+
+
+def load_seasons(tmdb_id: int, numbers: list[int], language: str) -> dict[int, dict]:
+    """All seasons of a show with episodes, as {number: TMDB season} with texts in `language`.
+
+    Episodes without a description get name and description from the next language in
+    `fallback_languages` (both from the same language, so they match); seasons too.
+    The next language is only requested for seasons whose episodes still lack texts
+    (season descriptions are often empty everywhere, so they don't trigger a request).
+    """
+    client = tmdb.get_client()
+    seasons: dict[int, dict] = {}
+    wanted = list(numbers)
+    for lang in fallback_languages(language):
+        loaded = {}
+        for i in range(0, len(wanted), tmdb.MAX_APPENDED_SEASONS):
+            loaded.update(client.seasons(tmdb_id, wanted[i : i + tmdb.MAX_APPENDED_SEASONS], lang))
+        if not seasons:
+            seasons = loaded
+        else:
+            _fill_missing_texts(seasons, loaded)
+        wanted = [number for number, season in seasons.items() if _lacks_texts(season)]
+        if not wanted:
+            break
+    return seasons
+
+
+def _lacks_texts(season: dict) -> bool:
+    return any(not episode.get("overview") for episode in season.get("episodes") or [])
+
+
+def _fill_missing_texts(seasons: dict[int, dict], other: dict[int, dict]) -> None:
+    for number, season in seasons.items():
+        replacement = other.get(number) or {}
+        if not season.get("overview") and replacement.get("overview"):
+            season["name"] = replacement.get("name") or season.get("name")
+            season["overview"] = replacement["overview"]
+        replacements = {e.get("episode_number"): e for e in replacement.get("episodes") or []}
+        for episode in season.get("episodes") or []:
+            found = replacements.get(episode.get("episode_number")) or {}
+            if not episode.get("overview") and found.get("overview"):
+                episode["name"] = found.get("name") or episode.get("name")
+                episode["overview"] = found["overview"]
+
+
+def save_seasons(show: Title, seasons: dict[int, dict], language: str) -> None:
+    """Replace the stored seasons and episodes of `show` with `seasons` (see load_seasons).
+
+    Bulk "upserts" (insert or update in one statement): long-running shows have hundreds
+    of episodes, and one query per episode would be slow. Seasons and episodes that TMDB
+    no longer lists are deleted, together with their watched marks.
+    """
+    Season.objects.bulk_create(
+        [
+            Season(show=show, number=number, air_date=_parse_date(data.get("air_date")))
+            for number, data in seasons.items()
+        ],
+        update_conflicts=True,
+        unique_fields=["show", "number"],
+        update_fields=["air_date"],
+    )
+    show.seasons.exclude(number__in=list(seasons)).delete()
+    season_ids = dict(show.seasons.values_list("number", "pk"))
+    SeasonTranslation.objects.bulk_create(
+        [
+            SeasonTranslation(
+                season_id=season_ids[number],
+                language=language,
+                name=data.get("name") or "",
+                overview=data.get("overview") or "",
+            )
+            for number, data in seasons.items()
+        ],
+        update_conflicts=True,
+        unique_fields=["season", "language"],
+        update_fields=["name", "overview"],
+    )
+
+    episodes = {
+        (number, e["episode_number"]): e
+        for number, data in seasons.items()
+        for e in data.get("episodes") or []
+        if e.get("episode_number") is not None
+    }
+    Episode.objects.bulk_create(
+        [
+            Episode(
+                season_id=season_ids[season_number],
+                number=episode_number,
+                tmdb_id=data.get("id"),
+                air_date=_parse_date(data.get("air_date")),
+                runtime=data.get("runtime"),
+            )
+            for (season_number, episode_number), data in episodes.items()
+        ],
+        update_conflicts=True,
+        unique_fields=["season", "number"],
+        update_fields=["tmdb_id", "air_date", "runtime"],
+    )
+    stored = Episode.objects.filter(season__show=show).values_list("season__number", "number", "pk")
+    episode_ids = {}
+    gone = []
+    for season_number, episode_number, pk in stored:
+        if (season_number, episode_number) in episodes:
+            episode_ids[season_number, episode_number] = pk
+        else:
+            gone.append(pk)
+    Episode.objects.filter(pk__in=gone).delete()
+    EpisodeTranslation.objects.bulk_create(
+        [
+            EpisodeTranslation(
+                episode_id=episode_ids[key],
+                language=language,
+                name=data.get("name") or "",
+                overview=data.get("overview") or "",
+            )
+            for key, data in episodes.items()
+        ],
+        update_conflicts=True,
+        unique_fields=["episode", "language"],
+        update_fields=["name", "overview"],
+    )
 
 
 def localize(data: dict, language: str, *, name_field: str) -> tuple[str, str]:

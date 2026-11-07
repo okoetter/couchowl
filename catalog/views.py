@@ -7,6 +7,8 @@ from django.db.models import Count
 from django.db.models.functions import Lower
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.cache import patch_cache_control, patch_vary_headers
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
@@ -15,9 +17,9 @@ from accounts.models import User
 from accounts.throttle import hit
 
 from . import lists as list_rules
-from . import posters, services, tmdb
+from . import posters, services, shows, tmdb
 from .forms import ListForm, WatchedDateForm
-from .models import MediaType, Title, TitleTranslation, UserList, WatchedMovie
+from .models import Episode, MediaType, Season, Title, TitleTranslation, UserList, WatchedMovie
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +52,10 @@ def search(request):
                 logger.exception("TMDB search failed")
                 error = _("TMDB can't be reached right now. Please try again later.")
 
-    watched = list_rules.watched_movie_ids(
-        request.user, (r.tmdb_id for r in results if r.media_type == MediaType.MOVIE)
-    )
+    movie_ids = [r.tmdb_id for r in results if r.media_type == MediaType.MOVIE]
+    show_ids = [r.tmdb_id for r in results if r.media_type == MediaType.TV]
+    watched = {f"movie-{i}" for i in list_rules.watched_movie_ids(request.user, movie_ids)}
+    watched |= {f"tv-{i}" for i in shows.watched_show_ids(request.user, show_ids)}
     context = {
         "query": query,
         "results": results,
@@ -91,9 +94,22 @@ def poster(request, size, filename):
 # --- Lists ---------------------------------------------------------------------------------
 
 
-def _user_list(request, pk) -> UserList:
-    """A list of the logged-in user. Other users' lists don't exist for them (404)."""
+def _user_list(request, pk) -> UserList | list_rules.FollowedShows:
+    """A list of the logged-in user. Other users' lists don't exist for them (404).
+
+    pk "followed" is the system list "Followed shows" (computed, not stored).
+    """
+    if pk == list_rules.FollowedShows.pk:
+        return list_rules.FollowedShows(request.user)
     return get_object_or_404(UserList, pk=pk, user=request.user)
+
+
+def _editable_list(request, pk) -> UserList:
+    """A list the user may rename, delete or remove entries from (not a system list)."""
+    user_list = _user_list(request, pk)
+    if user_list.is_system:
+        raise Http404
+    return user_list
 
 
 def lists(request):
@@ -108,7 +124,13 @@ def lists(request):
         form = ListForm(user=request.user)
     # Meta.ordering is ignored in queries with aggregates (Count), so sort explicitly
     user_lists = request.user.lists.annotate(item_count=Count("items")).order_by(Lower("name"))
-    return render(request, "catalog/lists.html", {"lists": user_lists, "form": form})
+    # The system list appears as soon as the user follows a show (unless hidden in the profile)
+    followed = None
+    if request.user.show_followed_list:
+        followed = list_rules.FollowedShows(request.user)
+        followed.item_count = followed.items.count()
+    context = {"lists": user_lists, "followed": followed, "form": form}
+    return render(request, "catalog/lists.html", context)
 
 
 @require_GET
@@ -153,12 +175,17 @@ def _list_context(request, user_list: UserList) -> dict:
             "title_id", flat=True
         )
     )
+    progress = shows.progress(request.user, [t for t in titles if not t.is_movie])
     for item in all_items:
         item.translation = translations.get(item.title_id)
-        item.watched = item.title_id in watched
+        if item.title.is_movie:
+            item.watched = item.title_id in watched
+        else:
+            # A show is watched when all aired episodes are (see catalog.shows)
+            item.progress = progress[item.title_id]
+            item.watched = item.progress.complete
 
     # Lists are small, so filtering in Python is simple and fast enough.
-    # Shows count as unwatched until episode tracking exists (milestone 4).
     items = [
         item
         for item in all_items
@@ -202,15 +229,18 @@ def _list_response(request, user_list: UserList):
     return redirect(user_list.get_absolute_url() + _filter_query(_list_filters(request)))
 
 
-def _item_response(request, user_list: UserList, item_pk: int):
+def _item_response(request, user_list: UserList, item_pk: int, *, toast: Episode | None = None):
     """After an action on one entry: update as little as possible (htmx).
 
     Replacing the whole list would rebuild every poster image, which flickers. So:
     - entry still shown: only its watched button (and the compact view's "watched" text)
     - entry gone (removed, or no longer matching the filter): only this entry disappears
     - nothing left to show: the whole content, with the "empty" message
+    `toast`: an episode that was just marked; a message with "undo" is added.
     """
     if not _is_htmx_fragment_request(request):
+        if toast is not None:
+            messages.success(request, _("%(episode)s watched.") % {"episode": toast.code})
         return redirect(user_list.get_absolute_url() + _filter_query(_list_filters(request)))
     context = _list_context(request, user_list)
     item = next((item for item in context["items"] if item.pk == item_pk), None)
@@ -229,12 +259,24 @@ def _item_response(request, user_list: UserList, item_pk: int):
             corner=request.user.list_layout == User.ListLayout.GRID,
         )
         response = render(request, "catalog/_watched_toggle_response.html", context)
+    if toast is not None:
+        response.content += _toast(request, user_list, item_pk, toast).encode()
     patch_vary_headers(response, ["HX-Request"])
     return response
 
 
+def _toast(request, user_list, item_pk, episode: Episode | None) -> str:
+    """The "S2 E5 watched · Undo" message (htmx puts it in place by its id)."""
+    context = {
+        "episode": episode,
+        "undo_url": reverse("catalog:list_item_watched", args=[user_list.pk, item_pk])
+        + _filter_query(_list_filters(request)),
+    }
+    return render_to_string("catalog/_toast.html", context, request=request)
+
+
 def list_rename(request, pk):
-    user_list = _user_list(request, pk)
+    user_list = _editable_list(request, pk)
     if request.method == "POST":
         # Separate instance: an invalid name must not show up elsewhere on the page
         form = ListForm(request.POST, instance=_user_list(request, pk), user=request.user)
@@ -249,7 +291,7 @@ def list_rename(request, pk):
 
 def list_delete(request, pk):
     """GET asks for confirmation, POST deletes. The titles themselves stay in the catalog."""
-    user_list = _user_list(request, pk)
+    user_list = _editable_list(request, pk)
     if request.method == "POST":
         user_list.delete()
         messages.success(request, _("List “%(name)s” deleted.") % {"name": user_list})
@@ -274,21 +316,23 @@ def list_layout(request, pk):
 
 @require_POST
 def list_item_remove(request, pk, item_pk):
-    user_list = _user_list(request, pk)
+    user_list = _editable_list(request, pk)
     get_object_or_404(user_list.items, pk=item_pk).delete()
     return _item_response(request, user_list, item_pk)
 
 
 @require_POST
 def list_item_watched(request, pk, item_pk):
-    """Watched button on a list entry: `watched` present = mark (today), missing = undo.
+    """Watched button on a list entry.
 
-    Only movies for now; shows get "next episode watched" with milestone 4.
+    Movies: `watched` present = mark (today), missing = undo.
+    Shows: mark the next episode (today) and show "S2 E5 watched · Undo";
+    `undo=<episode id>` takes that back.
     """
     user_list = _user_list(request, pk)
-    item = get_object_or_404(
-        user_list.items.select_related("title"), pk=item_pk, title__media_type=MediaType.MOVIE
-    )
+    item = get_object_or_404(user_list.items.select_related("title"), pk=item_pk)
+    if not item.title.is_movie:
+        return _show_item_watched(request, user_list, item)
     if request.POST.get("watched"):
         # Already watched: keep the date that may have been set on the detail page
         if not WatchedMovie.objects.filter(user=request.user, title=item.title).exists():
@@ -296,6 +340,21 @@ def list_item_watched(request, pk, item_pk):
     else:
         list_rules.unmark_watched(request.user, item.title)
     return _item_response(request, user_list, item.pk)
+
+
+def _show_item_watched(request, user_list, item):
+    if undo := request.POST.get("undo"):
+        episode = get_object_or_404(Episode, pk=undo, season__show=item.title)
+        shows.unmark_episodes(request.user, [episode])
+        if not _is_htmx_fragment_request(request):
+            return _list_response(request, user_list)
+        # The whole content, because the entry may have left the filter in the meantime
+        # ("morph" keeps the posters); the empty toast hides the message
+        response = _render_list(request, user_list, full_page=False)
+        response.content += _toast(request, user_list, item.pk, None).encode()
+        return response
+    episode = shows.watch_next(request.user, item.title)
+    return _item_response(request, user_list, item.pk, toast=episode)
 
 
 # --- Movies and shows ------------------------------------------------------------------------
@@ -329,6 +388,8 @@ def title_detail(request, media_type, tmdb_id):
     }
     if title.is_movie:
         context.update(_watched_context(request, title))
+    else:
+        context.update(_show_context(request, title))
     return render(request, "catalog/title_detail.html", context)
 
 
@@ -423,3 +484,194 @@ def movie_watched(request, tmdb_id):
     if form is not None:  # invalid date without JavaScript
         messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
     return redirect(movie)
+
+
+# --- Shows: following, seasons and episodes --------------------------------------------------
+
+
+def _show(tmdb_id) -> Title:
+    """A stored show (actions need it stored; the detail page loads it from TMDB first)."""
+    return get_object_or_404(Title, media_type=MediaType.TV, tmdb_id=tmdb_id)
+
+
+def _season_anchor_url(show: Title, season: int, anchor: str = "") -> str:
+    """Detail page with this season opened, scrolled to `anchor` (fallback without JS)."""
+    return f"{show.get_absolute_url()}?season={season}#{anchor or f'season-{season}'}"
+
+
+def _show_context(request, show: Title) -> dict:
+    """Everything the seasons part of a show's detail page needs.
+
+    Only the open season gets its episodes; the others load them when opened (htmx), so
+    long-running shows with hundreds of episodes stay fast. Open is the season from
+    ?season=N (also the fallback without JavaScript), else the one with the next episode.
+    """
+    language = request.user.effective_tmdb_language
+    try:
+        open_season = int(request.GET.get("season", ""))
+    except ValueError:
+        open_season = None
+    context = _progress_context(request, show)
+    next_episode = context["progress"].next_episode
+    if open_season is None and next_episode is not None:
+        open_season = next_episode.season.number
+    seasons = shows.seasons_overview(request.user, show, language)
+    for season in seasons:
+        season.episode_rows = None
+        if season.number == open_season:
+            _add_episode_rows(request, show, season)
+    return {
+        **context,
+        "following": shows.is_following(request.user, show),
+        "seasons": seasons,
+        "open_season": open_season,
+    }
+
+
+def _progress_context(request, show: Title) -> dict:
+    """Progress line at the top: "12 of 26 episodes watched · Next: S2 E5 …"."""
+    progress = shows.progress(request.user, [show])[show.pk]
+    next_name = ""
+    if progress.next_episode is not None:
+        names = shows.episode_names([progress.next_episode], request.user.effective_tmdb_language)
+        next_name = names.get(progress.next_episode.pk, "")
+    return {"title": show, "progress": progress, "next_name": next_name}
+
+
+def _date_form(prefix, watched_at, has_date=True) -> WatchedDateForm:
+    """Date form for an episode or season. Prefixes keep the fields of many forms apart."""
+    return WatchedDateForm(
+        prefix=prefix,
+        initial={"watched_at": watched_at, "unknown": not has_date},
+    )
+
+
+def _add_episode_rows(request, show: Title, season: Season, bound_forms=None) -> None:
+    """Load the episodes of `season` with their date forms (`bound_forms` show errors)."""
+    bound_forms = bound_forms or {}
+    season.episode_rows = shows.season_episodes(
+        request.user, season, request.user.effective_tmdb_language
+    )
+    for episode in season.episode_rows:
+        prefix = f"e{season.number}-{episode.number}"
+        if episode.watched:
+            episode.date_form = bound_forms.get(prefix) or _date_form(
+                prefix, episode.watched.watched_at, episode.watched.watched_at is not None
+            )
+    prefix = f"s{season.number}"
+    season.date_form = bound_forms.get(prefix) or _date_form(
+        prefix, season.last_watched, season.last_watched is not None
+    )
+
+
+def _season_context(request, show: Title, number: int, bound_forms=None) -> dict:
+    season = next(
+        (
+            s
+            for s in shows.seasons_overview(
+                request.user, show, request.user.effective_tmdb_language
+            )
+            if s.number == number
+        ),
+        None,
+    )
+    if season is None:
+        raise Http404
+    _add_episode_rows(request, show, season, bound_forms)
+    return {**_progress_context(request, show), "season": season}
+
+
+@require_POST
+def show_follow(request, tmdb_id):
+    """Follow button: `following` present = follow, missing = unfollow."""
+    show = _show(tmdb_id)
+    shows.set_following(request.user, show, bool(request.POST.get("following")))
+    if _is_htmx_fragment_request(request):
+        context = {"title": show, "following": shows.is_following(request.user, show)}
+        return render(request, "catalog/title_detail.html#follow", context)
+    return redirect(show)
+
+
+@require_GET
+def season_episodes(request, tmdb_id, season):
+    """Episodes of a season, loaded when the season is opened on the detail page."""
+    show = _show(tmdb_id)
+    if not _is_htmx_fragment_request(request):
+        return redirect(_season_anchor_url(show, season))
+    response = render(
+        request, "catalog/_seasons.html#season-episodes", _season_context(request, show, season)
+    )
+    patch_vary_headers(response, ["HX-Request"])
+    return response
+
+
+def _date_from_form(request, prefix):
+    """(date, unknown, form): a valid date form gives (date or None, unknown?, None)."""
+    form = WatchedDateForm(request.POST, prefix=prefix)
+    if form.is_valid():
+        watched_at = form.cleaned_data["watched_at"]
+        return watched_at, watched_at is None, None
+    return None, False, form
+
+
+@require_POST
+def episode_watched(request, tmdb_id, season, episode):
+    """Mark an episode as watched (today), change its date, or undo."""
+    show = _show(tmdb_id)
+    found = get_object_or_404(
+        Episode.objects.select_related("season"),
+        season__show=show,
+        season__number=season,
+        number=episode,
+    )
+    action = request.POST.get("action")
+    prefix = f"e{season}-{episode}"
+    form = None
+    if action == "mark":
+        shows.mark_episode(request.user, found)  # not aired yet: nothing happens
+    elif action == "unmark":
+        shows.unmark_episodes(request.user, [found])
+    elif action == "date":
+        watched_at, unknown, form = _date_from_form(request, prefix)
+        if form is None:
+            shows.mark_episode(request.user, found, watched_at, unknown_date=unknown)
+    else:
+        return HttpResponse(status=400)
+
+    if _is_htmx_fragment_request(request):
+        context = _season_context(request, show, season, {prefix: form} if form else None)
+        context["episode"] = next(e for e in context["season"].episode_rows if e.pk == found.pk)
+        return render(request, "catalog/_episode_response.html", context)
+    if form is not None:
+        messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
+    return redirect(_season_anchor_url(show, season, f"episode-{season}-{episode}"))
+
+
+@require_POST
+def season_watched(request, tmdb_id, season):
+    """Mark all aired episodes of a season (watched ones keep their date), set one date
+    for all of them, or undo the whole season."""
+    show = _show(tmdb_id)
+    found = get_object_or_404(Season, show=show, number=season)
+    action = request.POST.get("action")
+    prefix = f"s{season}"
+    form = None
+    if action == "mark":
+        shows.mark_season(request.user, found)
+    elif action == "unmark":
+        shows.unmark_season(request.user, found)
+    elif action == "date":
+        watched_at, unknown, form = _date_from_form(request, prefix)
+        if form is None:
+            shows.mark_season(
+                request.user, found, watched_at, unknown_date=unknown, keep_existing=False
+            )
+    else:
+        return HttpResponse(status=400)
+
+    if _is_htmx_fragment_request(request):
+        context = _season_context(request, show, season, {prefix: form} if form else None)
+        return render(request, "catalog/_season_response.html", context)
+    if form is not None:
+        messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
+    return redirect(_season_anchor_url(show, season))

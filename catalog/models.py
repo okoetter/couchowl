@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models.functions import Lower
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 
@@ -105,6 +107,9 @@ def status_label(status: str) -> str:
 class UserList(models.Model):
     """A private list of movies and shows, e.g. "Watchlist" or "Watch with family"."""
 
+    # The computed list "Followed shows" (catalog.lists.FollowedShows) is a system list
+    is_system = False
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("user"),
@@ -179,3 +184,177 @@ class WatchedMovie(models.Model):
 
     def __str__(self):
         return f"{self.user} ✓ {self.title}"
+
+
+# --- Seasons and episodes --------------------------------------------------------------------
+
+
+class Season(models.Model):
+    """A season of a show. Number 0 holds TMDB's specials ("Season 0")."""
+
+    show = models.ForeignKey(
+        Title,
+        verbose_name=_("TV show"),
+        on_delete=models.CASCADE,
+        related_name="seasons",
+        limit_choices_to={"media_type": MediaType.TV},
+    )
+    number = models.PositiveSmallIntegerField(_("number"))
+    air_date = models.DateField(_("air date"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("season")
+        verbose_name_plural = _("seasons")
+        ordering = ["number"]
+        constraints = [
+            models.UniqueConstraint(fields=["show", "number"], name="unique_season_number")
+        ]
+
+    def __str__(self):
+        return f"{self.show.original_title} S{self.number}"
+
+    @property
+    def is_specials(self) -> bool:
+        return self.number == 0
+
+
+class SeasonTranslation(models.Model):
+    """Name and description of a season in one language (same idea as TitleTranslation)."""
+
+    season = models.ForeignKey(
+        Season, verbose_name=_("season"), on_delete=models.CASCADE, related_name="translations"
+    )
+    language = models.CharField(_("language"), max_length=10)
+    name = models.CharField(_("name"), max_length=500, blank=True)
+    overview = models.TextField(_("description"), blank=True)
+
+    class Meta:
+        verbose_name = _("season translation")
+        verbose_name_plural = _("season translations")
+        constraints = [
+            models.UniqueConstraint(fields=["season", "language"], name="unique_season_language")
+        ]
+
+    def __str__(self):
+        return f"{self.name} [{self.language}]"
+
+
+class Episode(models.Model):
+    season = models.ForeignKey(
+        Season, verbose_name=_("season"), on_delete=models.CASCADE, related_name="episodes"
+    )
+    number = models.PositiveSmallIntegerField(_("number"))
+    # Kept for later imports (e.g. JustWatch); episodes are addressed by their numbers
+    tmdb_id = models.PositiveIntegerField(_("TMDB ID"), null=True, blank=True)
+    # Empty or in the future: not aired yet, can't be marked as watched
+    air_date = models.DateField(_("air date"), null=True, blank=True)
+    runtime = models.PositiveSmallIntegerField(_("runtime (minutes)"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("episode")
+        verbose_name_plural = _("episodes")
+        ordering = ["season__number", "number"]
+        constraints = [
+            models.UniqueConstraint(fields=["season", "number"], name="unique_episode_number")
+        ]
+
+    def __str__(self):
+        return f"{self.season} E{self.number}"
+
+    @property
+    def code(self) -> str:
+        """Short name like "S2 E5"."""
+        return gettext("S%(season)s E%(episode)s") % {
+            "season": self.season.number,
+            "episode": self.number,
+        }
+
+    def has_aired(self, today=None) -> bool:
+        return self.air_date is not None and self.air_date <= (today or timezone.localdate())
+
+
+class EpisodeTranslation(models.Model):
+    episode = models.ForeignKey(
+        Episode, verbose_name=_("episode"), on_delete=models.CASCADE, related_name="translations"
+    )
+    language = models.CharField(_("language"), max_length=10)
+    name = models.CharField(_("name"), max_length=500, blank=True)
+    overview = models.TextField(_("description"), blank=True)
+
+    class Meta:
+        verbose_name = _("episode translation")
+        verbose_name_plural = _("episode translations")
+        constraints = [
+            models.UniqueConstraint(fields=["episode", "language"], name="unique_episode_language")
+        ]
+
+    def __str__(self):
+        return f"{self.name} [{self.language}]"
+
+
+# --- Per-user show state -----------------------------------------------------------------------
+
+
+class UserSeries(models.Model):
+    """What a user does with a show: following it, and whether they are watching it.
+
+    Created when the user follows the show or marks the first episode as watched.
+    """
+
+    class Status(models.TextChoices):
+        WATCHING = "watching", _("Watching")
+        PAUSED = "paused", _("Paused")
+        FINISHED = "finished", _("Finished")
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="series",
+    )
+    # Named "title" like in WatchedMovie and ListItem, so lists can show these rows directly
+    title = models.ForeignKey(
+        Title,
+        verbose_name=_("TV show"),
+        on_delete=models.CASCADE,
+        related_name="user_series",
+        limit_choices_to={"media_type": MediaType.TV},
+    )
+    following = models.BooleanField(_("following"), default=False)
+    followed_at = models.DateTimeField(_("followed since"), null=True, blank=True)
+    # Empty until the first episode is marked as watched; used by the dashboard
+    status = models.CharField(_("status"), max_length=10, choices=Status.choices, blank=True)
+
+    class Meta:
+        verbose_name = _("user show")
+        verbose_name_plural = _("user shows")
+        constraints = [models.UniqueConstraint(fields=["user", "title"], name="unique_user_series")]
+
+    def __str__(self):
+        return f"{self.user} – {self.title}"
+
+
+class WatchedEpisode(models.Model):
+    """An episode the user has seen. Only the last date is kept (no history)."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="watched_episodes",
+    )
+    episode = models.ForeignKey(
+        Episode, verbose_name=_("episode"), on_delete=models.CASCADE, related_name="watched_by"
+    )
+    # Empty = seen, but the date is unknown
+    watched_at = models.DateField(_("watched on"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("watched episode")
+        verbose_name_plural = _("watched episodes")
+        constraints = [
+            models.UniqueConstraint(fields=["user", "episode"], name="unique_watched_episode")
+        ]
+
+    def __str__(self):
+        return f"{self.user} ✓ {self.episode}"

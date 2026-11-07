@@ -36,6 +36,9 @@
     {% block content %}{% endblock %}
   </main>
 
+  {# Short messages after htmx actions, e.g. "S2 E5 watched · Undo" (see catalog/_toast.html) #}
+  <div id="toast" class="toast-region" aria-live="polite"></div>
+
   <footer class="container site-footer">
     <small>watchit {{ WATCHIT_VERSION }}</small>
     {# Required by the TMDB terms of use. The logo is served locally like everything else. #}

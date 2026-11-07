@@ -67,7 +67,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ("email", "region", "theme", "ui_language", "tmdb_language")
+        fields = ("email", "region", "theme", "show_followed_list", "ui_language", "tmdb_language")
         help_texts = {
             "email": _("Optional. Needed if you want to reset a forgotten password yourself."),
         }

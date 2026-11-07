@@ -34,7 +34,9 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
   fixture `fake_tmdb` (`conftest.py`, saved responses in `catalog/tests/fixtures/`)
   (marker `live` for real API checks, `e2e` for Playwright; both skipped by default).
 - TMDB code lives in the `catalog` app: `tmdb.py` (HTTP client), `services.py` (search, DB cache,
-  language fallback), `posters.py` (poster proxy), `lists.py` (lists and "watched" rules).
+  language fallback, seasons/episodes), `posters.py` (poster proxy), `lists.py` (lists, watched
+  movies, system list "Followed shows"), `shows.py` (follow, watched episodes, progress, next episode).
+  Fake shows in tests: `fake_tmdb.add_show()` (details and season requests share a path).
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.
 - UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at

@@ -1,0 +1,318 @@
+{
+  "id": 70523,
+  "season/0": {
+    "season_number": 0,
+    "name": "Specials",
+    "overview": "",
+    "air_date": "2017-12-11",
+    "poster_path": "/sbuYWNhmLrzaTyeCL9jLKQ7dqyc.jpg",
+    "episodes": [
+      {
+        "id": 1463575,
+        "season_number": 0,
+        "episode_number": 1,
+        "name": "Aftershow | Time Travel",
+        "overview": "Time travel. Changing the course of things. Is that even possible? Friedemann Karig, the …",
+        "air_date": "2017-12-11",
+        "runtime": 20
+      },
+      {
+        "id": 1463576,
+        "season_number": 0,
+        "episode_number": 2,
+        "name": "Aftershow | Relationships",
+        "overview": "Love, betrayal and complex relationships are central topics in DARK. In our aftershow …",
+        "air_date": "2017-12-12",
+        "runtime": 18
+      },
+      {
+        "id": 1463577,
+        "season_number": 0,
+        "episode_number": 3,
+        "name": "Aftershow | Showrunner",
+        "overview": "DARK leaves a couple of questions open. In our Aftershow host Friedemann Karig talks to …",
+        "air_date": "2017-12-13",
+        "runtime": 18
+      },
+      {
+        "id": 1463578,
+        "season_number": 0,
+        "episode_number": 4,
+        "name": "Aftershow | Small Town Secrets",
+        "overview": "The fictive small town Winden represents a lot of places. Everyone hates their town, but …",
+        "air_date": "2017-12-14",
+        "runtime": 14
+      },
+      {
+        "id": 5412591,
+        "season_number": 0,
+        "episode_number": 5,
+        "name": "The big DARK farewell show",
+        "overview": "",
+        "air_date": "2020-07-05",
+        "runtime": 36
+      }
+    ]
+  },
+  "season/1": {
+    "season_number": 1,
+    "name": "Season 1",
+    "overview": "A missing child sets four families on a frantic hunt for answers as they unearth a …",
+    "air_date": "2017-12-01",
+    "poster_path": "/spN6icwSwuAuOcuZLC9bKjK6N2i.jpg",
+    "episodes": [
+      {
+        "id": 1279454,
+        "season_number": 1,
+        "episode_number": 1,
+        "name": "Secrets",
+        "overview": "In 2019, a local boy's disappearance stokes fear in the residents of Winden, a small …",
+        "air_date": "2017-12-01",
+        "runtime": 52
+      },
+      {
+        "id": 1375781,
+        "season_number": 1,
+        "episode_number": 2,
+        "name": "Lies",
+        "overview": "When a grim discovery leaves the police baffled, Ulrich seeks a search warrant for the …",
+        "air_date": "2017-12-01",
+        "runtime": 45
+      },
+      {
+        "id": 1375782,
+        "season_number": 1,
+        "episode_number": 3,
+        "name": "Past and Present",
+        "overview": "It's 1986, and Ulrich's brother, Mads, has been missing for a month. Confusion reigns as …",
+        "air_date": "2017-12-01",
+        "runtime": 46
+      },
+      {
+        "id": 1375783,
+        "season_number": 1,
+        "episode_number": 4,
+        "name": "Double Lives",
+        "overview": "Bizarre occurrences give Charlotte a sense of déjà vu, and she suspects Peter is hiding …",
+        "air_date": "2017-12-01",
+        "runtime": 48
+      },
+      {
+        "id": 1375784,
+        "season_number": 1,
+        "episode_number": 5,
+        "name": "Truths",
+        "overview": "Hannah takes her obsession with Ulrich too far. The stranger asks Regina to deliver an …",
+        "air_date": "2017-12-01",
+        "runtime": 46
+      },
+      {
+        "id": 1375785,
+        "season_number": 1,
+        "episode_number": 6,
+        "name": "Sic Mundus Creatus Est",
+        "overview": "Ulrich looks to the past for answers and dredges up disturbing family secrets. Armed with …",
+        "air_date": "2017-12-01",
+        "runtime": 51
+      },
+      {
+        "id": 1375786,
+        "season_number": 1,
+        "episode_number": 7,
+        "name": "Crossroads",
+        "overview": "Ulrich questions a frail and frightened Helge in the nursing home. Jonas searches for …",
+        "air_date": "2017-12-01",
+        "runtime": 52
+      },
+      {
+        "id": 1375787,
+        "season_number": 1,
+        "episode_number": 8,
+        "name": "As You Sow, So You Shall Reap",
+        "overview": "In 1953, the disfigured bodies of two boys are exhumed at a construction site, the future …",
+        "air_date": "2017-12-01",
+        "runtime": 51
+      },
+      {
+        "id": 1375788,
+        "season_number": 1,
+        "episode_number": 9,
+        "name": "Everything Is Now",
+        "overview": "Ulrich runs afoul of the law, Helge tries to dodge Egon Tiedemann, Claudia harnesses the …",
+        "air_date": "2017-12-01",
+        "runtime": 56
+      },
+      {
+        "id": 1375789,
+        "season_number": 1,
+        "episode_number": 10,
+        "name": "Alpha and Omega",
+        "overview": "Peter gets a shock. Jonas learns the truth about his family, but there are more surprises …",
+        "air_date": "2017-12-01",
+        "runtime": 57
+      }
+    ]
+  },
+  "season/2": {
+    "season_number": 2,
+    "name": "Season 2",
+    "overview": "Six months after the disappearances of Mikkel, Jonas and Ulrich, Winden's web of …",
+    "air_date": "2019-06-21",
+    "poster_path": "/x39GoVVHsmkz4RHZMDejUN3DDBG.jpg",
+    "episodes": [
+      {
+        "id": 1793851,
+        "season_number": 2,
+        "episode_number": 1,
+        "name": "Beginnings and Endings",
+        "overview": "Six months after the disappearances, the police form a task force. In 2052, Jonas learns …",
+        "air_date": "2019-06-21",
+        "runtime": 54
+      },
+      {
+        "id": 1829343,
+        "season_number": 2,
+        "episode_number": 2,
+        "name": "Dark Matter",
+        "overview": "Clausen and Charlotte interview Regina. The Stranger takes Hannah to 1987, where Claudia …",
+        "air_date": "2019-06-21",
+        "runtime": 55
+      },
+      {
+        "id": 1829344,
+        "season_number": 2,
+        "episode_number": 3,
+        "name": "Ghosts",
+        "overview": "In 1954, a missing Helge returns, but he'll only speak to Noah. In 1987, Claudia brings …",
+        "air_date": "2019-06-21",
+        "runtime": 57
+      },
+      {
+        "id": 1829345,
+        "season_number": 2,
+        "episode_number": 4,
+        "name": "The Travelers",
+        "overview": "Jonas meets an ominous figure. While the kids comb the cave for answers, the adults …",
+        "air_date": "2019-06-21",
+        "runtime": 61
+      },
+      {
+        "id": 1829346,
+        "season_number": 2,
+        "episode_number": 5,
+        "name": "Lost and Found",
+        "overview": "In 1987, Ulrich seizes an opportunity. The kids return to the cave with the time machine, …",
+        "air_date": "2019-06-21",
+        "runtime": 57
+      },
+      {
+        "id": 1829347,
+        "season_number": 2,
+        "episode_number": 6,
+        "name": "An Endless Cycle",
+        "overview": "Armed with a plan to prevent the apocalypse, Jonas travels to 2019. During the Nielsens' …",
+        "air_date": "2019-06-21",
+        "runtime": 55
+      },
+      {
+        "id": 1829348,
+        "season_number": 2,
+        "episode_number": 7,
+        "name": "The White Devil",
+        "overview": "Martha meets the Stranger and learns his true identity. Claudia tries to prevent Egon's …",
+        "air_date": "2019-06-21",
+        "runtime": 59
+      },
+      {
+        "id": 1829349,
+        "season_number": 2,
+        "episode_number": 8,
+        "name": "Endings and Beginnings",
+        "overview": "On the day of the apocalypse, Clausen executes a search warrant at the power plant as …",
+        "air_date": "2019-06-21",
+        "runtime": 58
+      }
+    ]
+  },
+  "season/3": {
+    "season_number": 3,
+    "name": "Season 3",
+    "overview": "The time-twisting madness reaches its conclusion in a strange new world, where some …",
+    "air_date": "2020-06-27",
+    "poster_path": "/mShsToB19ZATeOuSzrVCkmuf7sS.jpg",
+    "episodes": [
+      {
+        "id": 2284012,
+        "season_number": 3,
+        "episode_number": 1,
+        "name": "Deja-vu",
+        "overview": "In 2019, Jonas emerges from the cave into a strange but familiar world: the town of …",
+        "air_date": "2020-06-27",
+        "runtime": 63
+      },
+      {
+        "id": 2284013,
+        "season_number": 3,
+        "episode_number": 2,
+        "name": "The Survivors",
+        "overview": "Martha travels to 1888 to warn her friends about the 2020 disaster. Winden residents past …",
+        "air_date": "2020-06-27",
+        "runtime": 60
+      },
+      {
+        "id": 2284014,
+        "season_number": 3,
+        "episode_number": 3,
+        "name": "Adam and Eva",
+        "overview": "Charlotte and Ulrich try to piece together what happened in the bunker. In different …",
+        "air_date": "2020-06-27",
+        "runtime": 57
+      },
+      {
+        "id": 2284015,
+        "season_number": 3,
+        "episode_number": 4,
+        "name": "The Origin",
+        "overview": "Martha and Jonas travel to 2052 and get a glimpse of a grim future. In 1954, two …",
+        "air_date": "2020-06-27",
+        "runtime": 65
+      },
+      {
+        "id": 2284016,
+        "season_number": 3,
+        "episode_number": 5,
+        "name": "Life and Death",
+        "overview": "In 2020, a visitor delivers a warning to Claudia. The day before the apocalypse, Jonas …",
+        "air_date": "2020-06-27",
+        "runtime": 65
+      },
+      {
+        "id": 2284017,
+        "season_number": 3,
+        "episode_number": 6,
+        "name": "Light and Shadow",
+        "overview": "Adam holds Martha captive. On the day of the apocalypse, an increasingly frantic Martha …",
+        "air_date": "2020-06-27",
+        "runtime": 59
+      },
+      {
+        "id": 2284018,
+        "season_number": 3,
+        "episode_number": 7,
+        "name": "Between the Time",
+        "overview": "Across three centuries, Winden's residents continue their desperate quest to alter their …",
+        "air_date": "2020-06-27",
+        "runtime": 70
+      },
+      {
+        "id": 2284019,
+        "season_number": 3,
+        "episode_number": 8,
+        "name": "The Paradise",
+        "overview": "Claudia reveals to Adam how everything is connected — and how he can destroy the knot.",
+        "air_date": "2020-06-27",
+        "runtime": 74
+      }
+    ]
+  }
+}

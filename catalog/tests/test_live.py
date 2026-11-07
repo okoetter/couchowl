@@ -42,3 +42,18 @@ def test_poster_download():
 
     assert content_type == "image/jpeg"
     assert len(content) > 1000
+
+
+@pytest.mark.django_db
+def test_episodes_with_language_fallback():
+    # TMDB only has placeholders ("Folge 1") for "de-AT"; the German texts must be used
+    from catalog.models import EpisodeTranslation
+
+    show = services.get_title("tv", 70523, "de-AT").title
+
+    first = EpisodeTranslation.objects.get(
+        episode__season__show=show, episode__season__number=1, episode__number=1, language="de-AT"
+    )
+    assert first.name == "Geheimnisse"
+    assert first.overview
+    assert show.seasons.filter(number__gt=0).count() == 3

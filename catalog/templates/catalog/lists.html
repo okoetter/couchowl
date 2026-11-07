@@ -6,8 +6,17 @@
 {% block content %}
   <h1>{% translate "Lists" %}</h1>
 
-  {% if lists %}
+  {% if lists or followed.item_count %}
     <ul class="list-index">
+      {% if followed.item_count %}
+        {# System list, computed from the followed shows (can be hidden in the profile) #}
+        <li class="list-index-system">
+          <a href="{{ followed.get_absolute_url }}">
+            <strong>{{ followed.name }}</strong>
+            <small>{% blocktranslate count counter=followed.item_count %}{{ counter }} show{% plural %}{{ counter }} shows{% endblocktranslate %}</small>
+          </a>
+        </li>
+      {% endif %}
       {% for user_list in lists %}
         <li>
           <a href="{{ user_list.get_absolute_url }}">

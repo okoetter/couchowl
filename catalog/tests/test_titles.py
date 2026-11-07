@@ -36,12 +36,13 @@ def test_movie_detail_page(auth_client, fake_tmdb):
     assert fake_tmdb.requests[0].url.params["language"] == "de-DE"
 
 
-def test_show_detail_page_has_no_watched_button(auth_client, show):
+def test_show_detail_page_tracks_episodes_instead_of_the_show(auth_client, show):
     content = auth_client.get(show.get_absolute_url()).content.decode()
 
     assert "<h1>Dark</h1>" in content
     assert "Serie · 2017 · Beendet" in content
-    assert "Als gesehen markieren" not in content
+    assert 'id="watched"' not in content  # the movie's watched section
+    assert "Staffeln</h2>" in content
     assert "Zu Liste hinzufügen" in content
 
 
@@ -197,3 +198,20 @@ def test_search_marks_watched_movies_and_links_to_details(auth_client, user, mov
     assert 'href="/movie/155/"' in content
     assert 'href="/tv/70523/"' in content
     assert 'hx-get="/tv/70523/lists/"' in content
+
+
+def test_search_marks_completely_watched_shows(auth_client, user, show, fake_tmdb):
+    from catalog import shows
+
+    fake_tmdb.add("/3/search/multi", json=load_tmdb_fixture("search_multi"))
+    shows.mark_season(user, show.seasons.get(number=1))
+
+    content = auth_client.get(reverse("catalog:search"), {"q": "dark"}).content.decode()
+    assert "✓ Gesehen" not in content  # seasons 2 and 3 are still missing
+
+    for season in show.seasons.all():
+        shows.mark_season(user, season)
+
+    content = auth_client.get(reverse("catalog:search"), {"q": "dark"}).content.decode()
+    row = content.split('id="result-tv-70523"')[1].split("</li>")[0]
+    assert "✓ Gesehen" in row

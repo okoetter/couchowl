@@ -1,2 +1,2 @@
-{% load i18n %}{# "✓ Watched" in the compact view; `oob`: htmx updates it by its id #}
-<span id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>{% if item.watched %} · <span class="watched-badge">✓ {% translate "Watched" %}</span>{% endif %}</span>
+{% load i18n %}{# Compact view: "✓ Watched", or the next episode of a show ("Next: S1 E3"), which phones can't show on hover. `oob`: htmx updates it by its id #}
+<span id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>{% if item.watched %} · <span class="watched-badge">✓ {% translate "Watched" %}</span>{% elif item.progress.next_episode %} · <span class="nowrap">{% translate "Next:" %} {{ item.progress.next_episode.code }}</span>{% endif %}</span>

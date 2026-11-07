@@ -35,6 +35,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Detail pages for movies and shows (poster, description, status)
 - Mark movies as watched with a date (default today; changeable or "unknown");
   search results and lists show watched movies
+- Seasons and episodes on show pages, loaded from TMDB with language fallback for
+  episode texts (e.g. de-AT → de → English); other seasons load when opened
+- Mark single episodes or whole seasons as watched, with a date (changeable or
+  "unknown"); progress and next episode on the show page; specials don't count
+- "Follow" button for shows and the system list "Followed shows" (can be hidden in
+  the profile)
+- Shows in lists: progress button ("12/26") that marks the next episode, with "Undo";
+  completely watched shows count as watched in filters and search
+- Dates are formatted for the user's region (e.g. 01/12/2017 in the UK, 12/01/2017 in
+  the US)
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

@@ -1,0 +1,8 @@
+{% comment %}
+  Answer to a season action on the detail page: the season button replaces itself; the
+  season info, its episodes and the progress line are updated by their ids.
+{% endcomment %}
+{% include "catalog/_seasons.html#season-toggle" %}
+{% include "catalog/_seasons.html#season-info" with oob=True %}
+{% include "catalog/_seasons.html#season-episodes" with oob=True %}
+{% include "catalog/title_detail.html#show-progress" with oob=True %}

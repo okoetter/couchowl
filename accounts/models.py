@@ -55,6 +55,11 @@ class User(AbstractUser):
     list_layout = models.CharField(
         _("list layout"), max_length=10, choices=ListLayout.choices, default=ListLayout.GRID
     )
+    show_followed_list = models.BooleanField(
+        _("show “Followed shows” list"),
+        default=True,
+        help_text=_("A list of all shows you follow, shown on the “Lists” page."),
+    )
 
     @property
     def effective_region(self) -> str:

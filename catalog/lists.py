@@ -1,9 +1,41 @@
 """Lists and "watched" state of a user. Views stay thin; the rules live here."""
 
 from django.db import IntegrityError, transaction
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
+from . import shows
 from .models import ListItem, Title, UserList, WatchedMovie
+
+
+class FollowedShows:
+    """The system list "Followed shows": computed from the followed shows, not stored.
+
+    Behaves like a UserList where the list page needs it (`pk`, `name`, `items`, URL),
+    so the same views and templates show it. It can't be renamed, deleted or edited.
+    """
+
+    pk = "followed"  # used in URLs: /lists/followed/
+    is_system = True
+
+    def __init__(self, user):
+        self.user = user
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def name(self) -> str:
+        return _("Followed shows")
+
+    @property
+    def items(self):
+        """UserSeries rows; like ListItem they have `pk` and `title`."""
+        return shows.followed_shows(self.user)
+
+    def get_absolute_url(self):
+        return reverse("catalog:list_detail", args=[self.pk])
 
 
 def lists_for_title(user, title: Title | None) -> list[UserList]:

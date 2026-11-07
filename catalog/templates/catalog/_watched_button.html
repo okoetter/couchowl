@@ -1,9 +1,42 @@
 {% load i18n %}
 {% comment %}
-  "Watched" toggle for a movie on the list page. Sends `watched=1` to mark (today),
-  nothing to undo. `corner`: round button on the poster (grid view).
+  "Watched" button on the list page. `corner`: on the poster (grid view).
   The server answers with just this button (see catalog.views._item_response).
+  - Movies: a toggle. Sends `watched=1` to mark (today), nothing to undo.
+  - Shows: shows the progress ("12/26"); a click marks the next episode as watched.
+    On hover or keyboard focus the button shows that episode instead ("S1 E3"); both
+    labels share one grid cell, so the button keeps its width.
+    Nothing to click when all aired episodes are watched or nothing has aired yet.
 {% endcomment %}
+{% if not item.title.is_movie %}
+  {% if item.progress.aired %}
+    <form method="post" id="watched-toggle-{{ item.pk }}"
+          class="watched-toggle progress-toggle{% if corner %} watched-toggle-corner{% endif %}"
+          action="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
+          hx-post="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
+          hx-target="this" hx-swap="outerHTML">
+      {% csrf_token %}
+      {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
+      {% if item.progress.complete %}
+        <span class="progress-button is-complete" title="{{ progress_label }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span class="visually-hidden">{{ progress_label }}</span>
+        </span>
+      {% else %}
+        <button type="submit" name="next" value="1"
+                class="progress-button{% if item.progress.started %} is-started{% endif %}"
+                aria-label="{% blocktranslate with code=item.progress.next_episode.code %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %} ({{ progress_label }})"
+                title="{% blocktranslate with code=item.progress.next_episode.code %}Mark {{ code }} as watched{% endblocktranslate %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span class="progress-labels">
+            <span class="progress-count">{{ item.progress.watched }}/{{ item.progress.aired }}</span>
+            <span class="progress-next">{{ item.progress.next_episode.code }}</span>
+          </span>
+        </button>
+      {% endif %}
+    </form>
+  {% endif %}
+{% else %}
 <form method="post" class="watched-toggle{% if corner %} watched-toggle-corner{% endif %}"
       action="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
       hx-post="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
@@ -21,3 +54,4 @@
     <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
   </button>
 </form>
+{% endif %}

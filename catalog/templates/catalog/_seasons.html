@@ -1,0 +1,186 @@
+{% load i18n %}
+{% comment %}
+  Seasons and episodes of a show (detail page). The partials are also rendered alone as
+  htmx answers (see catalog/views.py); `oob` marks a piece that htmx puts in place by its
+  id ("out of band"), next to the main answer.
+
+  Only the open season comes with its episodes; the others load them when opened
+  ("toggle" event of <details>). Without JavaScript the link ?season=N opens that season.
+{% endcomment %}
+<section class="seasons" aria-labelledby="seasons-heading">
+  <h2 id="seasons-heading">{% translate "Seasons" %}</h2>
+  {% for season in seasons %}
+    <div class="season" id="season-{{ season.number }}">
+      {% partialdef season-toggle inline %}
+        {# Round button: mark all aired episodes of the season, or undo the whole season #}
+        <form id="season-{{ season.number }}-toggle" class="check-toggle season-toggle" method="post"
+              action="{% url 'catalog:season_watched' title.tmdb_id season.number %}"
+              hx-post="{% url 'catalog:season_watched' title.tmdb_id season.number %}"
+              hx-target="this" hx-swap="outerHTML"
+              {% if season.complete %}hx-confirm="{% blocktranslate with name=season.name %}Mark all episodes of “{{ name }}” as not watched?{% endblocktranslate %}"{% endif %}
+              {% if oob %}hx-swap-oob="true"{% endif %}>
+          {% csrf_token %}
+          {% if season.complete %}
+            <input type="hidden" name="action" value="unmark">
+            <button type="submit" class="check-button" aria-pressed="true"
+                    aria-label="{% blocktranslate with name=season.name %}Mark “{{ name }}” as not watched{% endblocktranslate %}"
+                    title="{% translate 'Watched – click to undo' %}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </button>
+          {% elif season.aired_count %}
+            <input type="hidden" name="action" value="mark">
+            <button type="submit" class="check-button" aria-pressed="false"
+                    aria-label="{% blocktranslate with name=season.name %}Mark “{{ name }}” as watched{% endblocktranslate %}"
+                    title="{% translate 'Mark all aired episodes as watched' %}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            </button>
+          {% else %}
+            <span class="check-button check-button-upcoming" title="{% translate 'Not aired yet' %}"></span>
+          {% endif %}
+        </form>
+      {% endpartialdef %}
+
+      <details{% if season.number == open_season %} open{% endif %}>
+        <summary>
+          <strong>{{ season.name }}</strong>
+          {% partialdef season-info inline %}
+            <small id="season-{{ season.number }}-info" class="season-info"{% if oob %} hx-swap-oob="true"{% endif %}>
+              {% blocktranslate count counter=season.episode_count %}{{ counter }} episode{% plural %}{{ counter }} episodes{% endblocktranslate %}{% if season.air_date %} · {{ season.air_date.year }}{% endif %}
+              {% if season.complete %}
+                · <span class="watched-badge">✓ {% translate "Watched" %}</span>
+              {% elif season.started %}
+                · {% blocktranslate with watched=season.watched_count aired=season.aired_count %}{{ watched }}/{{ aired }} watched{% endblocktranslate %}
+              {% endif %}
+              {% if season.last_watched %}
+                · {% blocktranslate with date=season.last_watched|date:"SHORT_DATE_FORMAT" %}last on {{ date }}{% endblocktranslate %}
+              {% endif %}
+            </small>
+          {% endpartialdef %}
+        </summary>
+
+        {% partialdef season-episodes inline %}
+          <div id="season-{{ season.number }}-episodes" class="season-episodes"
+               {% if oob %}hx-swap-oob="true"{% endif %}
+               {% if season.episode_rows is None %}hx-get="{% url 'catalog:season_episodes' title.tmdb_id season.number %}" hx-trigger="toggle once from:closest details" hx-swap="outerHTML"{% endif %}>
+            {% if season.episode_rows is None %}
+              <a href="?season={{ season.number }}#season-{{ season.number }}">{% translate "Show episodes" %}</a>
+            {% else %}
+              {% if season.overview %}<p class="season-overview">{{ season.overview }}</p>{% endif %}
+              {% partialdef season-date inline %}
+                {# Date of a fully watched season; changing it applies to all its episodes #}
+                <div id="season-{{ season.number }}-date"{% if oob %} hx-swap-oob="true"{% endif %}>
+                  {% if season.complete %}
+                    <details class="watched-edit"{% if season.date_form.errors %} open{% endif %}>
+                      <summary>
+                        <span class="watched-badge">✓ {% translate "Season watched" %}</span>
+                        {% if season.last_watched %}
+                          {% blocktranslate with date=season.last_watched|date:"SHORT_DATE_FORMAT" %}on {{ date }}{% endblocktranslate %}
+                        {% else %}
+                          {% translate "Date unknown" %}
+                        {% endif %}
+                        <span class="muted">({% translate "change" %})</span>
+                      </summary>
+                      <form method="post" action="{% url 'catalog:season_watched' title.tmdb_id season.number %}"
+                            hx-post="{% url 'catalog:season_watched' title.tmdb_id season.number %}"
+                            hx-target="#season-{{ season.number }}-toggle" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="date">
+                        {{ season.date_form.watched_at.as_field_group }}
+                        <label>{{ season.date_form.unknown }} {{ season.date_form.unknown.label }}</label>
+                        <p class="helptext">{% translate "Applies to all episodes of this season." %}</p>
+                        <button type="submit">{% translate "Save date" %}</button>
+                      </form>
+                    </details>
+                  {% endif %}
+                </div>
+              {% endpartialdef %}
+
+              <ol class="episodes">
+                {% for episode in season.episode_rows %}
+                  {% partialdef episode inline %}
+                    <li id="episode-{{ season.number }}-{{ episode.number }}" class="episode">
+                      {% if episode.aired %}
+                        <form method="post" class="check-toggle"
+                              action="{% url 'catalog:episode_watched' title.tmdb_id season.number episode.number %}"
+                              hx-post="{% url 'catalog:episode_watched' title.tmdb_id season.number episode.number %}"
+                              hx-target="closest li" hx-swap="outerHTML">
+                          {% csrf_token %}
+                          {% if episode.watched %}
+                            <input type="hidden" name="action" value="unmark">
+                            <button type="submit" class="check-button" aria-pressed="true"
+                                    aria-label="{% blocktranslate with code=episode.code %}Mark {{ code }} as not watched{% endblocktranslate %}"
+                                    title="{% translate 'Watched – click to undo' %}">
+                          {% else %}
+                            <input type="hidden" name="action" value="mark">
+                            <button type="submit" class="check-button" aria-pressed="false"
+                                    aria-label="{% blocktranslate with code=episode.code %}Mark {{ code }} as watched{% endblocktranslate %}"
+                                    title="{% translate 'Mark as watched' %}">
+                          {% endif %}
+                            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                          </button>
+                        </form>
+                      {% else %}
+                        <span class="check-button check-button-upcoming" title="{% translate 'Not aired yet' %}"></span>
+                      {% endif %}
+
+                      <div class="episode-body">
+                        {# The description may contain spoilers: it opens on click #}
+                        {% if episode.overview %}
+                          <details class="episode-info">
+                            <summary><span class="episode-number">{{ episode.number }}</span> {{ episode.name }}</summary>
+                            <p>{{ episode.overview }}</p>
+                          </details>
+                        {% else %}
+                          <div class="episode-info"><span class="episode-number">{{ episode.number }}</span> {{ episode.name }}</div>
+                        {% endif %}
+                        {% comment %}
+                          One line: air date, runtime and (if watched) the watched date. The
+                          date opens the form below the line, so marking an episode doesn't
+                          change the height of the row. Short date formats: fit on phones.
+                        {% endcomment %}
+                        <div class="episode-meta">
+                          {% if not episode.air_date %}
+                            {% translate "Air date unknown" %}
+                          {% elif episode.aired %}
+                            {{ episode.air_date|date:"SHORT_DATE_FORMAT" }}
+                          {% else %}
+                            {% blocktranslate with date=episode.air_date|date:"SHORT_DATE_FORMAT" %}Airs on {{ date }}{% endblocktranslate %}
+                          {% endif %}
+                          {% if episode.runtime %} · {% blocktranslate with minutes=episode.runtime %}{{ minutes }} min{% endblocktranslate %}{% endif %}
+                          {% if episode.watched %}
+                            ·
+                            <details class="episode-watched"{% if episode.date_form.errors %} open{% endif %}>
+                              <summary title="{% translate 'Change date' %}">
+                                <span class="watched-badge">✓</span>
+                                {% if episode.watched.watched_at %}
+                                  {{ episode.watched.watched_at|date:"SHORT_DATE_FORMAT" }}
+                                {% else %}
+                                  {% translate "Date unknown" %}
+                                {% endif %}
+                                <span class="visually-hidden">({% translate "change" %})</span>
+                              </summary>
+                              <form method="post"
+                                    action="{% url 'catalog:episode_watched' title.tmdb_id season.number episode.number %}"
+                                    hx-post="{% url 'catalog:episode_watched' title.tmdb_id season.number episode.number %}"
+                                    hx-target="closest li.episode" hx-swap="outerHTML">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="date">
+                                {{ episode.date_form.watched_at.as_field_group }}
+                                <label>{{ episode.date_form.unknown }} {{ episode.date_form.unknown.label }}</label>
+                                <button type="submit">{% translate "Save date" %}</button>
+                              </form>
+                            </details>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </li>
+                  {% endpartialdef %}
+                {% endfor %}
+              </ol>
+            {% endif %}
+          </div>
+        {% endpartialdef %}
+      </details>
+    </div>
+  {% endfor %}
+</section>

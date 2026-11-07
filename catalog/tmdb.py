@@ -21,6 +21,8 @@ MAX_IMAGE_BYTES = 5 * 1024 * 1024
 # How often a request is retried when TMDB answers "429 Too Many Requests"
 MAX_RETRIES = 2
 MAX_RETRY_WAIT_SECONDS = 10
+# TMDB allows up to 20 items in append_to_response
+MAX_APPENDED_SEASONS = 20
 
 
 class TMDBError(Exception):
@@ -71,6 +73,18 @@ class TMDBClient:
         return self.get(
             f"/{media_type}/{int(tmdb_id)}", language=language, append_to_response="translations"
         )
+
+    def seasons(self, tmdb_id: int, numbers: list[int], language: str) -> dict[int, dict]:
+        """Seasons of a show with their episodes, as {season number: TMDB season}.
+
+        Several seasons come in one request (`append_to_response=season/1,season/2,…`),
+        at most MAX_APPENDED_SEASONS at a time.
+        """
+        if len(numbers) > MAX_APPENDED_SEASONS:
+            raise ValueError(f"At most {MAX_APPENDED_SEASONS} seasons per request")
+        appended = ",".join(f"season/{int(number)}" for number in numbers)
+        data = self.get(f"/tv/{int(tmdb_id)}", language=language, append_to_response=appended)
+        return {n: data[f"season/{n}"] for n in numbers if f"season/{n}" in data}
 
     # --- Images -----------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@ import pytest
 
 from accounts.models import User
 from catalog import services
-from conftest import PASSWORD, load_tmdb_fixture
+from conftest import PASSWORD, dark_seasons, load_tmdb_fixture
 
 
 @pytest.fixture
@@ -15,8 +15,9 @@ def movie(db):
 
 @pytest.fixture
 def show(db):
-    """ "Dark", stored in German."""
-    return services.save_title("tv", load_tmdb_fixture("tv_70523"), "de-DE").title
+    """ "Dark" with its seasons and episodes, stored in German."""
+    data = load_tmdb_fixture("tv_70523")
+    return services.save_title("tv", data, "de-DE", seasons=dark_seasons("de-DE")).title
 
 
 @pytest.fixture

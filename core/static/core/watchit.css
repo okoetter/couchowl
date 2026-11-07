@@ -236,6 +236,11 @@ textarea + .errorlist {
   color: var(--pico-muted-color);
 }
 
+/* Keeps a short phrase together, e.g. "Next: S1 E3" */
+.nowrap {
+  white-space: nowrap;
+}
+
 /* ---- Search ------------------------------------------------------------------- */
 
 /* While htmx loads new results, the old ones fade a little */
@@ -686,4 +691,362 @@ details.dropdown.list-dropdown-compact > summary + ul {
   .title-detail-info > :not(hgroup) {
     grid-column: 1 / -1;
   }
+}
+
+/* ---- Shows: progress line, follow button ----------------------------------------- */
+
+.title-detail-actions > form {
+  margin: 0;
+}
+
+.title-detail-actions > form button {
+  margin: 0;
+}
+
+.show-progress {
+  margin-bottom: var(--pico-spacing);
+}
+
+/* ---- Seasons and episodes -------------------------------------------------------- */
+
+.seasons {
+  margin-top: calc(var(--pico-spacing) * 2);
+}
+
+.seasons h2 {
+  font-size: 1.25rem;
+}
+
+/* A round check button on the left, the collapsible season next to it */
+.season {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.75rem;
+  align-items: start;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  padding: 0.5rem 0;
+}
+
+.season > details {
+  margin: 0;
+  min-width: 0;
+}
+
+.season > details > summary {
+  position: relative;
+  padding-right: 1.5rem;
+  line-height: 2rem;
+}
+
+/* Pico mutes the summary of an open <details> (same selector plus .season, so this
+   wins); season names stay readable */
+.season > details[open] > summary:not([role]):not(:focus),
+.season > details > summary {
+  color: var(--pico-color);
+}
+
+/* Pico's chevron floats right and dropped below the info line: pin it to the top */
+.season > details > summary::after {
+  position: absolute;
+  top: 0.5rem;
+  right: 0;
+  float: none;
+}
+
+/* Info below the name: wraps cleanly on phones */
+.season-info {
+  display: block;
+  margin-top: -0.35rem;
+  line-height: 1.4;
+  color: var(--pico-muted-color);
+}
+
+.season-overview {
+  color: var(--pico-muted-color);
+  font-size: 0.9em;
+}
+
+.season-episodes {
+  padding-top: 0.5rem;
+}
+
+.check-toggle {
+  margin: 0;
+}
+
+/* Round check button for seasons and episodes (same look as on the posters).
+   "button.check-button" beats Pico's `button[type="submit"] { width: 100% }`;
+   with just the class the button was squeezed into an oval. */
+.check-button,
+button.check-button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  --pico-background-color: transparent;
+  --pico-border-color: var(--pico-secondary-border);
+  --pico-color: var(--pico-secondary);
+}
+
+.check-button[aria-pressed="true"] {
+  --pico-background-color: var(--pico-ins-color);
+  --pico-border-color: var(--pico-ins-color);
+  --pico-color: #fff;
+}
+
+/* Not aired yet: a dashed circle, nothing to click */
+.check-button-upcoming {
+  border: 1px dashed var(--pico-muted-border-color);
+}
+
+.episodes {
+  margin: 0;
+  padding: 0;
+}
+
+.episodes li {
+  list-style: none;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 0.75rem;
+  align-items: start;
+  padding: 0.4rem 0;
+}
+
+.episodes li + li {
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.episode-body {
+  min-width: 0;
+}
+
+.episode-info {
+  margin: 0;
+  line-height: 2rem;
+}
+
+/* Episode names open the description (spoilers); no chevron, they look like text */
+.episode-info > summary {
+  list-style: none;
+  color: var(--pico-color);
+}
+
+.episode-info > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.episode-info > summary::after {
+  display: none;
+}
+
+.episode-info > summary:hover {
+  text-decoration: underline;
+}
+
+.episode-info p {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.episode-number {
+  display: inline-block;
+  min-width: 1.5em;
+  color: var(--pico-muted-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.episode-meta {
+  color: var(--pico-muted-color);
+  font-size: 0.875em;
+}
+
+/* The watched date sits inline in the meta line; its form (a block) opens below it */
+.episode-meta details.episode-watched {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.episode-meta details.episode-watched > summary {
+  display: inline;
+  white-space: nowrap; /* "✓ 20.01.2024" never breaks apart */
+  line-height: inherit;
+  color: var(--pico-color);
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+}
+
+.episode-meta details.episode-watched > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.episode-watched > summary::after {
+  display: none;
+}
+
+.episode-meta details.episode-watched form {
+  max-width: 20rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* ---- Shows in lists: progress button ("12/26") ------------------------------------ */
+
+.progress-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  border-radius: 1rem;
+  --pico-background-color: transparent;
+  --pico-border-color: var(--pico-secondary-border);
+  --pico-color: var(--pico-secondary);
+}
+
+.progress-button .icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+/* Explicit colors (not Pico's button variables) so it looks like the movie buttons */
+.watched-toggle .progress-button {
+  border: 1px solid var(--pico-border-color);
+  background-color: var(--pico-background-color);
+  color: var(--pico-color);
+  box-shadow: none;
+}
+
+.progress-button.is-complete {
+  --pico-background-color: var(--pico-ins-color);
+  --pico-border-color: var(--pico-ins-color);
+  --pico-color: #fff;
+}
+
+/* "12/26" and "S1 E3" in the same grid cell: the button is as wide as the longer one
+   and doesn't jump when the label changes on hover */
+.progress-labels {
+  display: inline-grid;
+}
+
+.progress-labels > span {
+  grid-area: 1 / 1;
+  text-align: center;
+}
+
+.progress-next {
+  visibility: hidden;
+}
+
+button.progress-button:focus-visible .progress-count {
+  visibility: hidden;
+}
+
+button.progress-button:focus-visible .progress-next {
+  visibility: visible;
+}
+
+/* Only with a mouse: touch devices keep :hover after a tap, which would stick */
+@media (hover: hover) {
+  button.progress-button:hover .progress-count {
+    visibility: hidden;
+  }
+
+  button.progress-button:hover .progress-next {
+    visibility: visible;
+  }
+}
+
+/* Grid: a pill on the poster instead of the round movie button
+   (repeats the selectors of the round button so these rules win) */
+.watched-toggle-corner button.progress-button,
+.watched-toggle-corner span.progress-button {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  border-radius: 1rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border: none;
+  box-shadow: none;
+  --pico-background-color: rgb(0 0 0 / 65%);
+  --pico-color: #fff;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+
+.watched-toggle-corner span.progress-button.is-complete {
+  width: 2rem;
+  padding: 0;
+  justify-content: center;
+  background: var(--pico-ins-color);
+}
+
+.poster-grid .watched-toggle-corner button.progress-button:is(:hover, :focus-visible) {
+  width: auto;
+  margin: 0;
+  --pico-background-color: rgb(95 95 95 / 90%);
+  box-shadow: none;
+}
+
+/* Like the movie button: not started yet = only visible on hover (with a mouse) */
+@media (hover: hover) {
+  .watched-toggle-corner .progress-button:not(.is-started, .is-complete) {
+    opacity: 0;
+  }
+
+  .poster-grid li:hover .watched-toggle-corner .progress-button,
+  .poster-grid li:focus-within .watched-toggle-corner .progress-button {
+    opacity: 1;
+  }
+}
+
+/* ---- Toast: short message with "Undo" --------------------------------------------- */
+
+.toast-region {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 20;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 2rem);
+}
+
+@media (max-width: 767px) {
+  .toast-region {
+    bottom: calc(var(--watchit-nav-height) + env(safe-area-inset-bottom) + 0.75rem);
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-contrast-background);
+  color: var(--pico-contrast-inverse);
+  box-shadow: var(--pico-card-box-shadow);
+}
+
+.toast form {
+  margin: 0;
+}
+
+.toast button {
+  margin: 0;
+  padding: 0.3rem 0.75rem;
+  color: var(--pico-contrast-inverse);
+  border-color: currentColor;
+  font-weight: 600;
 }

@@ -64,10 +64,23 @@ def default_region() -> str:
 
 
 @cache
+def language_with_region(language: str, region: str) -> str:
+    """Language code plus country, e.g. ("en", "GB") -> "en-gb".
+
+    Django takes texts from the "en" translation and date formats from the country's
+    format module where it has one (en_GB: 01/12/2017); otherwise the language's.
+    """
+    if "-" in language or not region:
+        return language
+    return f"{language}-{region.lower()}"
+
+
 def country_choices(language: str) -> list[tuple[str, str]]:
     """All countries as (code, name) with names in the given language, sorted by name."""
+    # Only the language: Babel doesn't know every combination (e.g. "de-us")
+    language = language.split("-")[0]
     try:
-        names = Locale.parse(language.replace("-", "_")).territories
+        names = Locale.parse(language).territories
     except UnknownLocaleError, ValueError:
         names = Locale("en").territories
     choices = [(code, names.get(code, code)) for code in COUNTRY_CODES]

@@ -6,10 +6,13 @@
 {% block content %}
   <div class="list-header">
     <h1>{{ list.name }}</h1>
-    <div class="list-header-links">
-      <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
-      <a href="{% url 'catalog:list_delete' list.pk %}">{% translate "Delete" %}</a>
-    </div>
+    {# System lists ("Followed shows") are computed: nothing to rename or delete #}
+    {% if not list.is_system %}
+      <div class="list-header-links">
+        <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
+        <a href="{% url 'catalog:list_delete' list.pk %}">{% translate "Delete" %}</a>
+      </div>
+    {% endif %}
   </div>
 
   <div id="list-content">
@@ -27,13 +30,15 @@
                  {% if filters.status == value %}aria-current="true"{% endif %}>{{ label }}</a>
             {% endfor %}
           </div>
-          <div role="group" class="list-filter" aria-label="{% translate 'Type' %}">
-            {% for value, label, query in type_filters %}
-              <a href="{{ list.get_absolute_url }}{{ query }}" role="button" class="outline secondary"
-                 hx-get="{{ list.get_absolute_url }}{{ query }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true"
-                 {% if filters.type == value %}aria-current="true"{% endif %}>{{ label }}</a>
-            {% endfor %}
-          </div>
+          {% if not list.is_system %}{# "Followed shows" only contains shows #}
+            <div role="group" class="list-filter" aria-label="{% translate 'Type' %}">
+              {% for value, label, query in type_filters %}
+                <a href="{{ list.get_absolute_url }}{{ query }}" role="button" class="outline secondary"
+                   hx-get="{{ list.get_absolute_url }}{{ query }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true"
+                   {% if filters.type == value %}aria-current="true"{% endif %}>{{ label }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
 
           {# Poster grid or compact list; the choice is saved per user #}
           <form method="post" action="{% url 'catalog:list_layout' list.pk %}{{ filter_query }}"
@@ -79,9 +84,8 @@
                       </small>
                     </div>
                   </a>
-                  {% if item.title.is_movie %}
-                    {% include "catalog/_watched_button.html" %}
-                  {% endif %}
+                  {% include "catalog/_watched_button.html" %}
+                  {% if not list.is_system %}
                   <form method="post" action="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
                         hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
                         hx-target="closest li" hx-swap="outerHTML">
@@ -92,6 +96,7 @@
                       <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 6l12 12M18 6L6 18"/></svg>
                     </button>
                   </form>
+                  {% endif %}
                 </li>
               {% endwith %}
             {% endfor %}
@@ -114,9 +119,7 @@
                     <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}</small>
                   </a>
                   {# Outside the link (a button inside a link is invalid), placed on the poster #}
-                  {% if item.title.is_movie %}
-                    {% include "catalog/_watched_button.html" with corner=True %}
-                  {% endif %}
+                  {% include "catalog/_watched_button.html" with corner=True %}
                 </li>
               {% endwith %}
             {% endfor %}
@@ -127,6 +130,8 @@
           {% translate "No titles match this filter." %}
           <a href="{{ list.get_absolute_url }}" hx-get="{{ list.get_absolute_url }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true">{% translate "Show all" %}</a>
         </p>
+      {% elif list.is_system %}
+        <p class="muted">{% translate "You don't follow any shows. Use the “Follow” button on a show's page." %}</p>
       {% else %}
         <p class="muted">
           {% url 'catalog:search' as search_url %}

@@ -27,7 +27,47 @@
 
       <div class="title-detail-actions">
         {% include "catalog/_list_dropdown.html" with name=translation.name %}
+        {% if not title.is_movie %}
+          {% partialdef follow inline %}
+            {# Follow / Following: followed shows appear in the system list "Followed shows" #}
+            <form id="follow" method="post" action="{% url 'catalog:show_follow' title.tmdb_id %}"
+                  hx-post="{% url 'catalog:show_follow' title.tmdb_id %}" hx-target="this" hx-swap="outerHTML">
+              {% csrf_token %}
+              {% if following %}
+                <button type="submit" class="secondary" aria-pressed="true"
+                        title="{% translate 'Click to unfollow' %}">✓ {% translate "Following" %}</button>
+              {% else %}
+                <input type="hidden" name="following" value="1">
+                <button type="submit" class="secondary outline" aria-pressed="false">{% translate "Follow" %}</button>
+              {% endif %}
+            </form>
+          {% endpartialdef %}
+        {% endif %}
       </div>
+
+      {% if not title.is_movie %}
+        {% partialdef show-progress inline %}
+          {# "12 of 26 episodes watched · Next: S2 E5 …"; updated after every change below #}
+          <p id="show-progress" class="show-progress"{% if oob %} hx-swap-oob="true"{% endif %}>
+            {% if progress.aired %}
+              {% if progress.complete %}
+                <span class="watched-badge">✓ {% translate "All episodes watched" %}</span>
+              {% else %}
+                {% blocktranslate trimmed with watched=progress.watched aired=progress.aired %}
+                  {{ watched }} of {{ aired }} episodes watched
+                {% endblocktranslate %}
+                {% if progress.next_episode %}
+                  <br>{% translate "Next:" %}
+                  <a href="?season={{ progress.next_episode.season.number }}#episode-{{ progress.next_episode.season.number }}-{{ progress.next_episode.number }}">
+                    <strong>{{ progress.next_episode.code }}</strong>{% if next_name %} {{ next_name }}{% endif %}</a>
+                {% endif %}
+              {% endif %}
+            {% else %}
+              <span class="muted">{% translate "No episodes have aired yet." %}</span>
+            {% endif %}
+          </p>
+        {% endpartialdef %}
+      {% endif %}
 
       {% if title.is_movie %}
         {% partialdef watched inline %}
@@ -85,4 +125,8 @@
       {% endif %}
     </div>
   </div>
+
+  {% if not title.is_movie and seasons %}
+    {% include "catalog/_seasons.html" %}
+  {% endif %}
 {% endblock %}

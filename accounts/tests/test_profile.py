@@ -44,7 +44,7 @@ def test_new_language_applies_after_saving(auth_client):
 
     content = auth_client.get(reverse("accounts:profile")).content.decode()
 
-    assert '<html lang="en"' in content
+    assert '<html lang="en-de"' in content
     assert "Your profile has been saved." in content
 
 
@@ -64,7 +64,7 @@ def test_changing_region_changes_automatic_languages(auth_client, user):
     assert user.effective_ui_language == "en"
     assert user.effective_tmdb_language == "en-US"
     content = auth_client.get(reverse("accounts:profile")).content.decode()
-    assert '<html lang="en"' in content
+    assert '<html lang="en-us"' in content
     assert "Automatic (English)" in content
     assert "Automatic (en-US)" in content
 
@@ -98,3 +98,16 @@ def test_email_can_be_removed(auth_client, user):
 
     user.refresh_from_db()
     assert user.email == ""
+
+
+def test_followed_shows_list_can_be_switched_off_and_on(auth_client, user):
+    content = auth_client.get(reverse("accounts:profile")).content.decode()
+    assert 'id="id_show_followed_list" checked' in content
+
+    save_profile(auth_client)  # unchecked checkboxes are not sent
+    user.refresh_from_db()
+    assert not user.show_followed_list
+
+    save_profile(auth_client, show_followed_list="on")
+    user.refresh_from_db()
+    assert user.show_followed_list

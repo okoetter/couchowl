@@ -497,14 +497,80 @@ def test_watched_button_keeps_an_existing_date(auth_client, user, movie):
     assert user.watched_movies.get(title=movie).watched_at == date(2020, 5, 1)
 
 
-def test_shows_have_no_watched_button_yet(auth_client, user, show):
+def test_shows_show_their_progress(auth_client, user, show):
+    from catalog import shows
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+    first = show.seasons.get(number=1).episodes.get(number=1)
+    shows.mark_episode(user, first)
+
+    content = auth_client.get(user_list.get_absolute_url()).content.decode()
+
+    assert url in content
+    assert "1/26" in content
+    assert "S1 E2 von „Dark“ als gesehen markieren" in content
+
+
+def test_show_button_marks_the_next_episode_with_undo(auth_client, user, show):
     user_list = user.lists.create(name="Watchlist")
     list_rules.add_to_list(user_list, show)
     item = user_list.items.get()
     url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
 
-    assert url not in auth_client.get(user_list.get_absolute_url()).content.decode()
-    assert auth_client.post(url, {"watched": "1"}).status_code == 404
+    content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
+
+    watched = user.watched_episodes.get()
+    assert watched.episode.code == "S1 E1"
+    assert "1/26" in content
+    assert "<img" not in content
+    # Message with "undo" in the toast region
+    assert 'id="toast" hx-swap-oob="innerHTML"' in content
+    assert "S1 E1 gesehen" in content
+    assert f'name="undo" value="{watched.episode.pk}"' in content
+
+    content = auth_client.post(url, {"undo": watched.episode.pk}, headers=HTMX).content.decode()
+
+    assert not user.watched_episodes.exists()
+    assert "0/26" in content  # the whole list content, with the button as before
+    assert "S1 E1 gesehen" not in content
+
+
+def test_show_button_without_javascript(auth_client, user, show):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, user_list.items.get().pk])
+
+    response = auth_client.post(url, {"next": "1"}, follow=True)
+
+    assert "S1 E1 gesehen." in response.content.decode()
+
+
+def test_undo_only_accepts_episodes_of_this_show(auth_client, user, show, movie):
+    from catalog.models import Episode
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, user_list.items.get().pk])
+
+    response = auth_client.post(url, {"undo": Episode.objects.latest("pk").pk + 1})
+
+    assert response.status_code == 404
+
+
+def test_completely_watched_show_counts_as_watched(auth_client, user, mixed_list, show):
+    from catalog import shows
+
+    for season in show.seasons.all():
+        shows.mark_season(user, season)
+
+    content = auth_client.get(mixed_list.get_absolute_url(), {"status": "watched"}).content
+    content = content.decode()
+
+    assert shown_names(content) == ["Dark", "The Dark Knight"]
+    assert "26 von 26 Folgen gesehen" in content  # the button is a plain check mark now
 
 
 def test_watched_button_on_other_users_list_is_404(auth_client, user, other_user, movie):
@@ -584,3 +650,116 @@ def test_last_entry_leaving_the_filter_shows_the_filter_message(auth_client, use
 
     assert response["HX-Retarget"] == "#list-content"
     assert "Keine Titel für diesen Filter." in response.content.decode()
+
+
+# --- System list "Followed shows" -----------------------------------------------------------------
+
+
+FOLLOWED = reverse("catalog:list_detail", args=["followed"])
+
+
+def test_followed_shows_appear_once_the_user_follows_a_show(auth_client, user, show):
+    from catalog import shows
+
+    assert "Gefolgte Serien" not in auth_client.get(LISTS).content.decode()
+
+    shows.set_following(user, show, True)
+
+    content = auth_client.get(LISTS).content.decode()
+    assert f'href="{FOLLOWED}"' in content
+    assert "1 Serie" in content
+
+
+def test_followed_shows_can_be_hidden_in_the_profile(auth_client, user, show):
+    from catalog import shows
+
+    shows.set_following(user, show, True)
+    user.show_followed_list = False
+    user.save()
+
+    assert "Gefolgte Serien" not in auth_client.get(LISTS).content.decode()
+
+
+def test_followed_shows_list(auth_client, user, other_user, show):
+    from catalog import shows
+
+    shows.set_following(user, show, True)
+
+    content = auth_client.get(FOLLOWED).content.decode()
+
+    assert "<h1>Gefolgte Serien</h1>" in content
+    assert shown_names(content) == ["Dark"]
+    assert "0/26" in content  # progress button as in other lists
+    # Computed list: nothing to rename, delete or remove; only shows, so no type filter
+    assert "Umbenennen" not in content
+    assert "aus der Liste entfernen" not in content
+    assert "?type=movie" not in content
+    # Every user sees their own followed shows
+    auth_client.force_login(other_user)
+    content = auth_client.get(FOLLOWED).content.decode()
+    assert shown_names(content) == []
+    assert "Du folgst keiner Serie" in content
+
+
+def test_followed_shows_progress_button_works(auth_client, user, show):
+    from catalog import shows
+
+    shows.set_following(user, show, True)
+    series = shows.followed_shows(user).get()
+    url = reverse("catalog:list_item_watched", args=["followed", series.pk])
+    assert url in auth_client.get(FOLLOWED).content.decode()
+
+    auth_client.post(url, {"next": "1"}, headers=HTMX)
+
+    assert user.watched_episodes.get().episode.code == "S1 E1"
+
+
+def test_followed_shows_cannot_be_edited(auth_client, user, show):
+    from catalog import shows
+
+    shows.set_following(user, show, True)
+    series = shows.followed_shows(user).get()
+
+    remove = reverse("catalog:list_item_remove", args=["followed", series.pk])
+    assert auth_client.post(remove).status_code == 404
+    assert auth_client.get("/lists/followed/rename/").status_code == 404
+    assert auth_client.get("/lists/followed/delete/").status_code == 404
+    assert shows.is_following(user, show)
+
+
+def test_followed_shows_of_other_users_are_not_reachable(auth_client, other_user, show):
+    from catalog import shows
+
+    shows.set_following(other_user, show, True)
+    series = shows.followed_shows(other_user).get()
+
+    url = reverse("catalog:list_item_watched", args=["followed", series.pk])
+    assert auth_client.post(url, {"next": "1"}).status_code == 404
+
+
+def test_show_button_names_the_next_episode_for_hover(auth_client, user, show):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+
+    content = auth_client.get(user_list.get_absolute_url()).content.decode()
+
+    # Both labels are rendered; CSS shows "S1 E1" instead of "0/26" on hover
+    assert '<span class="progress-count">0/26</span>' in content
+    assert '<span class="progress-next">S1 E1</span>' in content
+
+
+def test_compact_view_shows_the_next_episode(auth_client, user, show):
+    user.list_layout = "compact"
+    user.save()
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
+
+    content = auth_client.get(user_list.get_absolute_url()).content.decode()
+    assert "Als Nächstes: S1 E1" in content
+
+    # After a click the text is updated too ("out of band")
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+    content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
+    badge = content.split(f'id="watched-badge-{item.pk}" hx-swap-oob="true"')[1]
+    assert badge.startswith('> · <span class="nowrap">Als Nächstes: S1 E2')

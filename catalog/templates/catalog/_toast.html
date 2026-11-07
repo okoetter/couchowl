@@ -1,0 +1,19 @@
+{% load i18n %}
+{% comment %}
+  Short message after "next episode watched" on the list page, with "Undo".
+  Replaces the contents of the #toast region in base.html ("out of band"); without an
+  episode it empties the region. Alpine removes the message after a few seconds.
+{% endcomment %}
+<div id="toast" hx-swap-oob="innerHTML">
+  {% if episode %}
+    <div class="toast" x-data x-init="setTimeout(() => $el.remove(), 6000)">
+      <span>{% blocktranslate with code=episode.code %}{{ code }} watched{% endblocktranslate %}</span>
+      <form method="post" action="{{ undo_url }}"
+            hx-post="{{ undo_url }}" hx-target="#list-content" hx-swap="morph:innerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="undo" value="{{ episode.pk }}">
+        <button type="submit" class="secondary outline">{% translate "Undo" %}</button>
+      </form>
+    </div>
+  {% endif %}
+</div>

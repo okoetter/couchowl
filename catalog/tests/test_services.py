@@ -184,8 +184,13 @@ def test_movies_use_the_title_field():
 
 @pytest.fixture
 def dark(fake_tmdb):
-    fake_tmdb.add("/3/tv/70523", json=load_tmdb_fixture("tv_70523"))
+    fake_tmdb.add_show()
     return fake_tmdb
+
+
+def details_requests(fake):
+    """Requests for the details of a title (shows also send requests for their seasons)."""
+    return [r for r in fake.requests if r.url.params["append_to_response"] == "translations"]
 
 
 @pytest.mark.django_db
@@ -220,7 +225,7 @@ def test_fresh_data_comes_from_the_database(dark):
     services.get_title("tv", 70523, "de-AT")
     services.get_title("tv", 70523, "de-AT")
 
-    assert len(dark.requests) == 1
+    assert len(details_requests(dark)) == 1
 
 
 @pytest.mark.django_db
@@ -228,7 +233,7 @@ def test_each_language_is_loaded_separately(dark):
     services.get_title("tv", 70523, "de-AT")
     english = services.get_title("tv", 70523, "en-US")
 
-    assert len(dark.requests) == 2
+    assert len(details_requests(dark)) == 2
     assert english.overview.startswith("A missing child")
     assert Title.objects.count() == 1
     assert TitleTranslation.objects.count() == 2
@@ -243,7 +248,7 @@ def test_outdated_data_is_reloaded(dark):
 
     services.get_title("tv", 70523, "de-AT")
 
-    assert len(dark.requests) == 2
+    assert len(details_requests(dark)) == 2
     assert TitleTranslation.objects.count() == 1
 
 
@@ -252,7 +257,7 @@ def test_force_reloads_fresh_data(dark):
     services.get_title("tv", 70523, "de-AT")
     services.get_title("tv", 70523, "de-AT", force=True)
 
-    assert len(dark.requests) == 2
+    assert len(details_requests(dark)) == 2
 
 
 @pytest.mark.django_db

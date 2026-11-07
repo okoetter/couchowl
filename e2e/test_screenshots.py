@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import load_tmdb_fixture, tiny_png
+from conftest import dark_seasons, load_tmdb_fixture, tiny_png
 from e2e.conftest import LOCALE, login
 
 pytestmark = pytest.mark.e2e
@@ -92,6 +92,13 @@ def show_list_grid_hover_watched(page, url):
     page.wait_for_timeout(300)
 
 
+def show_list_grid_hover_show(page, url):
+    """The show's progress button names the next episode on hover."""
+    show_list_grid(page, url)
+    page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").hover()
+    page.wait_for_timeout(300)
+
+
 def show_list_compact(page, url):
     show_list_grid(page, url)
     page.get_by_role("button", name="Kompakte Liste").click()
@@ -116,7 +123,28 @@ def show_movie(page, url):
 def show_show(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/tv/70523/")
-    page.get_by_role("button", name="Zu Liste hinzufügen").click()
+    page.wait_for_load_state("networkidle")
+
+
+def show_show_details(page, url):
+    """An episode description and a date form opened, season 1 loaded on demand."""
+    show_show(page, url)
+    page.get_by_text("Anfänge und Enden").click()
+    page.locator("#episode-2-1 .episode-watched > summary").click()
+    page.get_by_text("Staffel 1", exact=True).click()
+    page.locator("#episode-1-1").wait_for()
+    page.wait_for_timeout(300)
+
+
+def show_list_toast(page, url):
+    show_list_grid(page, url)
+    page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").click()
+    page.locator(".toast").wait_for()
+
+
+def show_followed(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/lists/followed/")
     page.wait_for_load_state("networkidle")
 
 
@@ -132,10 +160,14 @@ PAGES = {
     "list-grid": show_list_grid,
     "list-grid-hover": show_list_grid_hover,
     "list-grid-hover-watched": show_list_grid_hover_watched,
+    "list-grid-hover-show": show_list_grid_hover_show,
     "list-compact": show_list_compact,
     "list-filtered": show_list_filtered,
     "movie": show_movie,
     "show": show_show,
+    "show-details": show_show_details,
+    "list-toast": show_list_toast,
+    "followed": show_followed,
 }
 
 
@@ -159,7 +191,7 @@ def sample_lists(fake_tmdb, user):
     from datetime import date
 
     from catalog import lists as list_rules
-    from catalog import services
+    from catalog import services, shows
 
     colors = [(26, 43, 74), (120, 40, 40), (40, 100, 60), (90, 70, 20), (30, 90, 110)]
     names = ["The Dark Knight", "Ein sehr langer Filmtitel, der umbricht", "Arrival", "Heat"]
@@ -178,8 +210,15 @@ def sample_lists(fake_tmdb, user):
         titles.append(services.save_title("movie", data, "de-DE").title)
     show = load_tmdb_fixture("tv_70523")
     show["poster_path"] = "/sample9.jpg"
-    titles.append(services.save_title("tv", show, "de-DE").title)
-    fake_tmdb.add("/3/tv/70523", json=show)
+    dark = services.save_title("tv", show, "de-DE", seasons=dark_seasons("de-DE")).title
+    titles.append(dark)
+    fake_tmdb.add_show(show)
+    # Season 1 and two episodes of season 2 watched, the last episode not aired yet
+    shows.mark_season(user, dark.seasons.get(number=1), date(2024, 1, 20))
+    for number in (1, 2):
+        shows.mark_episode(user, dark.seasons.get(number=2).episodes.get(number=number))
+    dark.seasons.get(number=3).episodes.filter(number=8).update(air_date=date(2099, 1, 1))
+    shows.set_following(user, dark, True)
     for title in titles:
         list_rules.add_to_list(watchlist, title)
     list_rules.mark_watched(user, titles[0], date(2024, 3, 15))
