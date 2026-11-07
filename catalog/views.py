@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
@@ -112,23 +113,124 @@ def lists(request):
 
 @require_GET
 def list_detail(request, pk):
+    """A list's titles. Filters come from the URL (?status=unwatched&type=movie)."""
     user_list = _user_list(request, pk)
-    return render(request, "catalog/list_detail.html", _list_context(request, user_list))
+    return _render_list(request, user_list, full_page=not _is_htmx_fragment_request(request))
+
+
+# Filter values in the URL; the first one of each is the default ("all")
+LIST_STATUS_FILTERS = ("all", "unwatched", "watched")
+LIST_TYPE_FILTERS = ("all", MediaType.MOVIE, MediaType.TV)
+
+
+def _list_filters(request) -> dict:
+    """Current filters from the query string; unknown values fall back to "all".
+
+    Also read on POST (layout, watched, remove), whose form actions keep the query string,
+    so the list keeps its filters after an action.
+    """
+    status = request.GET.get("status", "all")
+    media_type = request.GET.get("type", "all")
+    return {
+        "status": status if status in LIST_STATUS_FILTERS else "all",
+        "type": media_type if media_type in LIST_TYPE_FILTERS else "all",
+    }
+
+
+def _filter_query(filters: dict) -> str:
+    """'?status=…&type=…' without default values ('' if nothing is filtered)."""
+    params = {key: value for key, value in filters.items() if value != "all"}
+    return f"?{urlencode(params)}" if params else ""
 
 
 def _list_context(request, user_list: UserList) -> dict:
-    items = list(user_list.items.select_related("title"))
-    titles = [item.title for item in items]
+    filters = _list_filters(request)
+    all_items = list(user_list.items.select_related("title"))
+    titles = [item.title for item in all_items]
     translations = services.best_translations(titles, request.user.effective_tmdb_language)
     watched = set(
         WatchedMovie.objects.filter(user=request.user, title__in=titles).values_list(
             "title_id", flat=True
         )
     )
-    for item in items:
+    for item in all_items:
         item.translation = translations.get(item.title_id)
         item.watched = item.title_id in watched
-    return {"list": user_list, "items": items, "layouts": User.ListLayout}
+
+    # Lists are small, so filtering in Python is simple and fast enough.
+    # Shows count as unwatched until episode tracking exists (milestone 4).
+    items = [
+        item
+        for item in all_items
+        if (filters["type"] == "all" or item.title.media_type == filters["type"])
+        and (filters["status"] == "all" or item.watched == (filters["status"] == "watched"))
+    ]
+    query = _filter_query(filters)
+    return {
+        "list": user_list,
+        "items": items,
+        "has_items": bool(all_items),
+        "filters": filters,
+        "filter_query": query,
+        "status_filters": [
+            ("all", _("All"), _filter_query({**filters, "status": "all"})),
+            ("unwatched", _("Unwatched"), _filter_query({**filters, "status": "unwatched"})),
+            ("watched", _("Watched"), _filter_query({**filters, "status": "watched"})),
+        ],
+        "type_filters": [
+            ("all", _("All"), _filter_query({**filters, "type": "all"})),
+            (MediaType.MOVIE, _("Movies"), _filter_query({**filters, "type": MediaType.MOVIE})),
+            (MediaType.TV, _("TV shows"), _filter_query({**filters, "type": MediaType.TV})),
+        ],
+        "layouts": User.ListLayout,
+    }
+
+
+def _render_list(request, user_list: UserList, *, full_page: bool):
+    template = "catalog/list_detail.html"
+    if not full_page:
+        template += "#list-content"
+    response = render(request, template, _list_context(request, user_list))
+    patch_vary_headers(response, ["HX-Request"])
+    return response
+
+
+def _list_response(request, user_list: UserList):
+    """After an action on the list page: the updated content (htmx) or back to the list."""
+    if _is_htmx_fragment_request(request):
+        return _render_list(request, user_list, full_page=False)
+    return redirect(user_list.get_absolute_url() + _filter_query(_list_filters(request)))
+
+
+def _item_response(request, user_list: UserList, item_pk: int):
+    """After an action on one entry: update as little as possible (htmx).
+
+    Replacing the whole list would rebuild every poster image, which flickers. So:
+    - entry still shown: only its watched button (and the compact view's "watched" text)
+    - entry gone (removed, or no longer matching the filter): only this entry disappears
+    - nothing left to show: the whole content, with the "empty" message
+    """
+    if not _is_htmx_fragment_request(request):
+        return redirect(user_list.get_absolute_url() + _filter_query(_list_filters(request)))
+    context = _list_context(request, user_list)
+    item = next((item for item in context["items"] if item.pk == item_pk), None)
+    if not context["items"]:
+        response = _render_list(request, user_list, full_page=False)
+        response["HX-Retarget"] = "#list-content"
+        response["HX-Reswap"] = "innerHTML"
+    elif item is None:
+        response = HttpResponse("")
+        response["HX-Retarget"] = "closest li"
+        response["HX-Reswap"] = "outerHTML"
+    else:
+        context.update(
+            item=item,
+            name=item.translation.name if item.translation else item.title.original_title,
+            corner=request.user.list_layout == User.ListLayout.GRID,
+        )
+        response = render(request, "catalog/_watched_toggle_response.html", context)
+    patch_vary_headers(response, ["HX-Request"])
+    return response
 
 
 def list_rename(request, pk):
@@ -167,23 +269,33 @@ def list_layout(request, pk):
     if layout in User.ListLayout.values:
         request.user.list_layout = layout
         request.user.save(update_fields=["list_layout"])
-    if _is_htmx_fragment_request(request):
-        return render(
-            request, "catalog/list_detail.html#list-content", _list_context(request, user_list)
-        )
-    return redirect(user_list)
+    return _list_response(request, user_list)
 
 
 @require_POST
 def list_item_remove(request, pk, item_pk):
     user_list = _user_list(request, pk)
-    item = get_object_or_404(user_list.items, pk=item_pk)
-    item.delete()
-    if _is_htmx_fragment_request(request):
-        return render(
-            request, "catalog/list_detail.html#list-content", _list_context(request, user_list)
-        )
-    return redirect(user_list)
+    get_object_or_404(user_list.items, pk=item_pk).delete()
+    return _item_response(request, user_list, item_pk)
+
+
+@require_POST
+def list_item_watched(request, pk, item_pk):
+    """Watched button on a list entry: `watched` present = mark (today), missing = undo.
+
+    Only movies for now; shows get "next episode watched" with milestone 4.
+    """
+    user_list = _user_list(request, pk)
+    item = get_object_or_404(
+        user_list.items.select_related("title"), pk=item_pk, title__media_type=MediaType.MOVIE
+    )
+    if request.POST.get("watched"):
+        # Already watched: keep the date that may have been set on the detail page
+        if not WatchedMovie.objects.filter(user=request.user, title=item.title).exists():
+            list_rules.mark_watched(request.user, item.title)
+    else:
+        list_rules.unmark_watched(request.user, item.title)
+    return _item_response(request, user_list, item.pk)
 
 
 # --- Movies and shows ------------------------------------------------------------------------

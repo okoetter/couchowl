@@ -6,7 +6,7 @@
 - [x] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
 - [x] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
 - [x] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
-- [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile)
+- [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile); shows in lists: progress, "next episode watched" button with undo, watched filter
 - [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months, configurable via `ANNOUNCEMENT_MONTHS`)
 - [ ] **6 – Sync and "Upcoming":** daily/manual TMDB sync, streaming providers, upcoming page
 - [ ] **7 – Production and open source:** security behind proxy, backups, docs, license, CI, 1.0.0
@@ -18,7 +18,8 @@
   - match via IMDb ID (TMDB `/find`), else title + year; report unmatched entries
   - open question: how to obtain the export (no official export; GDPR data request?)
 - [ ] Data export (JSON) and self-service account deletion; later imports (Trakt, TV Time, Letterboxd)
-- [ ] Lists: sort and filter; "already on list X" in search; note per list entry
+- [ ] Lists: sort (date added, title, year); "already on list X" in search; note per list entry
+- [ ] Lists: multi-select with bulk actions (select all/none, mark as watched, remove)
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
 - [ ] Ratings

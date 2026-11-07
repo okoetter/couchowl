@@ -14,31 +14,54 @@
 
   <div id="list-content">
     {% partialdef list-content inline %}
-      {% if items %}
-        {# Poster grid or compact list; the choice is saved per user #}
-        <form method="post" action="{% url 'catalog:list_layout' list.pk %}"
-              hx-post="{% url 'catalog:list_layout' list.pk %}" hx-target="#list-content"
-              class="layout-toggle" role="group" aria-label="{% translate 'View' %}">
-          {% csrf_token %}
-          <button type="submit" name="layout" value="{{ layouts.GRID }}"
-                  class="outline secondary" aria-pressed="{% if user.list_layout == layouts.GRID %}true{% else %}false{% endif %}"
-                  title="{{ layouts.GRID.label }}">
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            <span class="visually-hidden">{{ layouts.GRID.label }}</span>
-          </button>
-          <button type="submit" name="layout" value="{{ layouts.COMPACT }}"
-                  class="outline secondary" aria-pressed="{% if user.list_layout == layouts.COMPACT %}true{% else %}false{% endif %}"
-                  title="{{ layouts.COMPACT.label }}">
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-            <span class="visually-hidden">{{ layouts.COMPACT.label }}</span>
-          </button>
-        </form>
+      {% if has_items %}
+        <div class="list-toolbar">
+          {% comment %}
+            Filters are links (?status=…&type=…): bookmarkable, "back" works.
+            "morph" keeps entries that stay visible, so their posters don't flicker.
+          {% endcomment %}
+          <div role="group" class="list-filter" aria-label="{% translate 'Show' %}">
+            {% for value, label, query in status_filters %}
+              <a href="{{ list.get_absolute_url }}{{ query }}" role="button" class="outline secondary"
+                 hx-get="{{ list.get_absolute_url }}{{ query }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true"
+                 {% if filters.status == value %}aria-current="true"{% endif %}>{{ label }}</a>
+            {% endfor %}
+          </div>
+          <div role="group" class="list-filter" aria-label="{% translate 'Type' %}">
+            {% for value, label, query in type_filters %}
+              <a href="{{ list.get_absolute_url }}{{ query }}" role="button" class="outline secondary"
+                 hx-get="{{ list.get_absolute_url }}{{ query }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true"
+                 {% if filters.type == value %}aria-current="true"{% endif %}>{{ label }}</a>
+            {% endfor %}
+          </div>
 
+          {# Poster grid or compact list; the choice is saved per user #}
+          <form method="post" action="{% url 'catalog:list_layout' list.pk %}{{ filter_query }}"
+                hx-post="{% url 'catalog:list_layout' list.pk %}{{ filter_query }}" hx-target="#list-content"
+                class="layout-toggle" role="group" aria-label="{% translate 'View' %}">
+            {% csrf_token %}
+            <button type="submit" name="layout" value="{{ layouts.GRID }}"
+                    class="outline secondary" aria-pressed="{% if user.list_layout == layouts.GRID %}true{% else %}false{% endif %}"
+                    title="{{ layouts.GRID.label }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+              <span class="visually-hidden">{{ layouts.GRID.label }}</span>
+            </button>
+            <button type="submit" name="layout" value="{{ layouts.COMPACT }}"
+                    class="outline secondary" aria-pressed="{% if user.list_layout == layouts.COMPACT %}true{% else %}false{% endif %}"
+                    title="{{ layouts.COMPACT.label }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+              <span class="visually-hidden">{{ layouts.COMPACT.label }}</span>
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+      {% if items %}
         {% if user.list_layout == layouts.COMPACT %}
           <ul class="compact-list">
             {% for item in items %}
               {% with name=item.translation.name|default:item.title.original_title %}
-                <li>
+                <li id="item-{{ item.pk }}">
                   <a class="result-link" href="{{ item.title.get_absolute_url }}">
                     {% poster item.translation.poster_path "w92" as thumb %}
                     {% if thumb %}
@@ -52,13 +75,16 @@
                       <strong>{{ name }}</strong>
                       <small>
                         {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}
-                        {% if item.watched %} · <span class="watched-badge">✓ {% translate "Watched" %}</span>{% endif %}
+                        {% include "catalog/_watched_badge.html" %}
                       </small>
                     </div>
                   </a>
-                  <form method="post" action="{% url 'catalog:list_item_remove' list.pk item.pk %}"
-                        hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}"
-                        hx-target="#list-content">
+                  {% if item.title.is_movie %}
+                    {% include "catalog/_watched_button.html" %}
+                  {% endif %}
+                  <form method="post" action="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
+                        hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
+                        hx-target="closest li" hx-swap="outerHTML">
                     {% csrf_token %}
                     <button type="submit" class="outline secondary icon-button"
                             aria-label="{% blocktranslate %}Remove “{{ name }}” from the list{% endblocktranslate %}"
@@ -74,7 +100,7 @@
           <ul class="poster-grid">
             {% for item in items %}
               {% with name=item.translation.name|default:item.title.original_title %}
-                <li>
+                <li id="item-{{ item.pk }}">
                   <a href="{{ item.title.get_absolute_url }}">
                     {% poster item.translation.poster_path "w185" as thumb %}
                     {% if thumb %}
@@ -84,17 +110,23 @@
                     {% else %}
                       <span class="poster-missing" aria-hidden="true"></span>
                     {% endif %}
-                    {% if item.watched %}
-                      <span class="watched-corner" title="{% translate 'Watched' %}">✓<span class="visually-hidden"> {% translate "Watched" %}</span></span>
-                    {% endif %}
                     <strong>{{ name }}</strong>
                     <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}</small>
                   </a>
+                  {# Outside the link (a button inside a link is invalid), placed on the poster #}
+                  {% if item.title.is_movie %}
+                    {% include "catalog/_watched_button.html" with corner=True %}
+                  {% endif %}
                 </li>
               {% endwith %}
             {% endfor %}
           </ul>
         {% endif %}
+      {% elif has_items %}
+        <p class="muted">
+          {% translate "No titles match this filter." %}
+          <a href="{{ list.get_absolute_url }}" hx-get="{{ list.get_absolute_url }}" hx-target="#list-content" hx-swap="morph:innerHTML" hx-push-url="true">{% translate "Show all" %}</a>
+        </p>
       {% else %}
         <p class="muted">
           {% url 'catalog:search' as search_url %}

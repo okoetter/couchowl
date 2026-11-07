@@ -33,6 +33,11 @@ urlpatterns = [
         views.list_item_remove,
         name="list_item_remove",
     ),
+    path(
+        "lists/<int:pk>/items/<int:item_pk>/watched/",
+        views.list_item_watched,
+        name="list_item_watched",
+    ),
     # Movies and shows
     path("<media:media_type>/<int:tmdb_id>/", views.title_detail, name="title_detail"),
     path("<media:media_type>/<int:tmdb_id>/lists/", views.title_lists, name="title_lists"),

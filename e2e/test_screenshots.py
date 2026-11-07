@@ -80,10 +80,29 @@ def show_list_grid(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_list_grid_hover(page, url):
+    show_list_grid(page, url)
+    page.get_by_role("button", name="„Heat“ als gesehen markieren").hover()
+    page.wait_for_timeout(300)  # let the transition finish
+
+
+def show_list_grid_hover_watched(page, url):
+    show_list_grid(page, url)
+    page.get_by_role("button", name="„Arrival“ als nicht gesehen markieren").hover()
+    page.wait_for_timeout(300)
+
+
 def show_list_compact(page, url):
     show_list_grid(page, url)
     page.get_by_role("button", name="Kompakte Liste").click()
     page.locator(".compact-list").wait_for()
+    page.wait_for_load_state("networkidle")
+
+
+def show_list_filtered(page, url):
+    show_list_compact(page, url)
+    page.get_by_role("button", name="Ungesehen").click()
+    page.wait_for_url("**status=unwatched")
     page.wait_for_load_state("networkidle")
 
 
@@ -111,7 +130,10 @@ PAGES = {
     "search-menu": show_search_menu,
     "lists": show_lists,
     "list-grid": show_list_grid,
+    "list-grid-hover": show_list_grid_hover,
+    "list-grid-hover-watched": show_list_grid_hover_watched,
     "list-compact": show_list_compact,
+    "list-filtered": show_list_filtered,
     "movie": show_movie,
     "show": show_show,
 }
@@ -179,7 +201,11 @@ def test_screenshot(live_server, member, browser, fake_tmdb, name, device, schem
     sample_lists(fake_tmdb, member)
     if name == "search-error":
         fake_tmdb.add("/3/search/multi", json={}, status=503)
-    context = browser.new_context(locale=LOCALE, viewport=VIEWPORTS[device], color_scheme=scheme)
+    # Phones are touch devices: no hover, so hover-only elements must stay visible there
+    touch = {"is_mobile": True, "has_touch": True} if device == "phone" else {}
+    context = browser.new_context(
+        locale=LOCALE, viewport=VIEWPORTS[device], color_scheme=scheme, **touch
+    )
     page = context.new_page()
 
     PAGES[name](page, live_server.url)

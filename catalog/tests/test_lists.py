@@ -102,10 +102,12 @@ def test_list_shows_titles_newest_first_as_poster_grid(auth_client, user, movie,
     content = auth_client.get(user_list.get_absolute_url()).content.decode()
 
     assert 'class="poster-grid"' in content
+    assert "{#" not in content  # no template comment leaked into the page
     assert content.index("Dark</strong>") < content.index("The Dark Knight</strong>")
     assert "/posters/w185/54WAzARB0rTp5L7gvCcfZ49AgkX.jpg" in content
     assert movie.get_absolute_url() in content
-    assert "watched-corner" in content
+    assert "watched-toggle-corner" in content
+    assert "„The Dark Knight“ als nicht gesehen markieren" in content
     assert "Serie · 2017" in content
 
 
@@ -369,3 +371,216 @@ def test_find_or_create_list_normalizes_whitespace(user):
 
     assert created.name == "Mit Familie"
     assert list_rules.find_or_create_list(user, "mit familie") == created
+
+
+# --- Filters -----------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def mixed_list(user, movie, show):
+    """Watchlist with a watched movie, an unwatched movie and a show."""
+    from catalog import services
+
+    data = load_tmdb_fixture("movie_155")
+    data.update(id=156, original_title="Heat")
+    for translation in data["translations"]["translations"]:
+        translation["data"]["title"] = ""
+    heat = services.save_title("movie", data, "de-DE").title
+    user_list = user.lists.create(name="Watchlist")
+    for title in (movie, heat, show):
+        list_rules.add_to_list(user_list, title)
+    list_rules.mark_watched(user, movie)
+    return user_list
+
+
+def shown_names(content):
+    return re.findall(r"<strong>([^<]+)</strong>", content.split('id="list-content"')[-1])
+
+
+@pytest.mark.parametrize(
+    ("query", "names"),
+    [
+        ({}, ["Dark", "Heat", "The Dark Knight"]),
+        ({"status": "watched"}, ["The Dark Knight"]),
+        # Shows count as unwatched until episode tracking exists
+        ({"status": "unwatched"}, ["Dark", "Heat"]),
+        ({"type": "movie"}, ["Heat", "The Dark Knight"]),
+        ({"type": "tv"}, ["Dark"]),
+        ({"status": "unwatched", "type": "movie"}, ["Heat"]),
+        ({"status": "nonsense", "type": "person"}, ["Dark", "Heat", "The Dark Knight"]),
+    ],
+)
+def test_filters(auth_client, mixed_list, query, names):
+    content = auth_client.get(mixed_list.get_absolute_url(), query).content.decode()
+
+    assert shown_names(content) == names
+
+
+def test_filter_links_keep_the_other_filter(auth_client, mixed_list):
+    url = mixed_list.get_absolute_url()
+
+    content = auth_client.get(url, {"type": "movie"}).content.decode()
+
+    assert f'href="{url}?status=unwatched&amp;type=movie"' in content
+    assert f'href="{url}"' in content  # "All" + "All" = no filter
+    assert f'href="{url}?type=movie" role="button"' in content
+
+
+def test_filter_with_htmx_returns_only_the_content(auth_client, mixed_list):
+    response = auth_client.get(mixed_list.get_absolute_url(), {"type": "tv"}, headers=HTMX)
+
+    content = response.content.decode()
+    assert "<html" not in content
+    assert shown_names(content) == ["Dark"]
+    assert "HX-Request" in response["Vary"]
+
+
+def test_empty_filter_result_offers_all(auth_client, user, show):
+    user_list = user.lists.create(name="Serien")
+    list_rules.add_to_list(user_list, show)
+
+    content = auth_client.get(user_list.get_absolute_url(), {"status": "watched"}).content
+    content = content.decode()
+
+    assert "Keine Titel für diesen Filter." in content
+    assert "Alle anzeigen" in content
+
+
+def test_actions_keep_the_filter(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+    url = reverse("catalog:list_item_watched", args=[mixed_list.pk, item.pk])
+
+    content = auth_client.get(mixed_list.get_absolute_url(), {"status": "unwatched"}).content
+    assert f'{url}?status=unwatched"' in content.decode()
+
+    # Marking an unwatched movie as watched hides it in the "unwatched" view:
+    # htmx removes just this entry
+    response = auth_client.post(f"{url}?status=unwatched", {"watched": "1"}, headers=HTMX)
+    assert response.content == b""
+    assert response["HX-Retarget"] == "closest li"
+    assert response["HX-Reswap"] == "outerHTML"
+
+    # Without JavaScript: back to the filtered list
+    response = auth_client.post(f"{url}?status=unwatched", {})
+    assert response["Location"] == f"{mixed_list.get_absolute_url()}?status=unwatched"
+
+
+# --- Watched button on the list page -------------------------------------------------------------
+
+
+def test_watched_button_marks_today_and_undoes(auth_client, user, movie):
+    from django.utils import timezone
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, movie)
+    item = user_list.items.get()
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+
+    response = auth_client.post(url, {"watched": "1"}, headers=HTMX)
+    assert user.watched_movies.get(title=movie).watched_at == timezone.localdate()
+    assert 'aria-pressed="true"' in response.content.decode()
+
+    auth_client.post(url, {}, headers=HTMX)
+    assert not user.watched_movies.exists()
+
+
+def test_watched_button_keeps_an_existing_date(auth_client, user, movie):
+    from datetime import date
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, movie)
+    list_rules.mark_watched(user, movie, date(2020, 5, 1))
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, user_list.items.get().pk])
+
+    auth_client.post(url, {"watched": "1"}, headers=HTMX)
+
+    assert user.watched_movies.get(title=movie).watched_at == date(2020, 5, 1)
+
+
+def test_shows_have_no_watched_button_yet(auth_client, user, show):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+
+    assert url not in auth_client.get(user_list.get_absolute_url()).content.decode()
+    assert auth_client.post(url, {"watched": "1"}).status_code == 404
+
+
+def test_watched_button_on_other_users_list_is_404(auth_client, user, other_user, movie):
+    foreign = other_user.lists.create(name="Geheim")
+    item = ListItem.objects.create(user_list=foreign, title=movie)
+
+    response = auth_client.post(
+        reverse("catalog:list_item_watched", args=[foreign.pk, item.pk]), {"watched": "1"}
+    )
+
+    assert response.status_code == 404
+    assert not user.watched_movies.exists()
+
+
+# --- Small htmx updates (no flicker) ------------------------------------------------------------
+
+
+def test_watched_button_answer_is_only_the_button(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+    url = reverse("catalog:list_item_watched", args=[mixed_list.pk, item.pk])
+
+    content = auth_client.post(url, {"watched": "1"}, headers=HTMX).content.decode()
+
+    # No poster images are sent again (rebuilding them makes the list flicker)
+    assert "<img" not in content
+    assert content.count("<form") == 1
+    assert "watched-toggle-corner" in content
+    assert "„Heat“ als nicht gesehen markieren" in content
+    assert "hx-swap-oob" not in content
+
+
+def test_compact_view_also_updates_the_watched_text(auth_client, user, mixed_list):
+    user.list_layout = "compact"
+    user.save()
+    item = mixed_list.items.get(title__original_title="Heat")
+    url = reverse("catalog:list_item_watched", args=[mixed_list.pk, item.pk])
+
+    content = auth_client.post(url, {"watched": "1"}, headers=HTMX).content.decode()
+
+    assert "watched-toggle-corner" not in content
+    assert f'id="watched-badge-{item.pk}" hx-swap-oob="true"' in content
+    assert "✓ Gesehen" in content
+
+
+def test_removing_an_entry_removes_only_that_entry(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+
+    response = auth_client.post(
+        reverse("catalog:list_item_remove", args=[mixed_list.pk, item.pk]), headers=HTMX
+    )
+
+    assert response.content == b""
+    assert response["HX-Retarget"] == "closest li"
+
+
+def test_removing_the_last_entry_shows_the_empty_list(auth_client, user, movie):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, movie)
+    item = user_list.items.get()
+
+    response = auth_client.post(
+        reverse("catalog:list_item_remove", args=[user_list.pk, item.pk]), headers=HTMX
+    )
+
+    assert response["HX-Retarget"] == "#list-content"
+    assert response["HX-Reswap"] == "innerHTML"
+    assert "Diese Liste ist leer" in response.content.decode()
+
+
+def test_last_entry_leaving_the_filter_shows_the_filter_message(auth_client, user, movie):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, movie)
+    item = user_list.items.get()
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+
+    response = auth_client.post(f"{url}?status=unwatched", {"watched": "1"}, headers=HTMX)
+
+    assert response["HX-Retarget"] == "#list-content"
+    assert "Keine Titel für diesen Filter." in response.content.decode()

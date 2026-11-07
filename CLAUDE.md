@@ -24,6 +24,9 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - Config only via environment variables (`config/settings.py`, documented in `.env.example`).
 - Email: Django 6.1 `MAILERS` setting, built from `EMAIL_URL` (`config/mail.py`).
 - HTMX endpoints return HTML fragments (Django template partials). CSRF header is set on `<body>`.
+  Replace only what changes (rebuilt `<img>` elements flicker): target the smallest element,
+  use `hx-swap-oob` for extra spots, and `hx-swap="morph:innerHTML"` (Idiomorph) when a
+  region is refreshed but most entries stay; morphed entries need a stable `id`.
 - No external resources at runtime (no CDN): vendored libs in `core/static/vendor/`.
   The browser must never talk to TMDB directly (texts cached in DB, posters via proxy).
 - Custom user model `accounts.User` (`ui_language`, `tmdb_language`, `region`, `theme`).

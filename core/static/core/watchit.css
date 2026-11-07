@@ -445,10 +445,8 @@ details.dropdown.list-dropdown-compact > summary + ul {
   gap: var(--pico-spacing);
 }
 
-.layout-toggle {
-  width: auto;
+.list-toolbar > .layout-toggle {
   margin-left: auto;
-  margin-bottom: var(--pico-spacing);
 }
 
 .layout-toggle button {
@@ -456,11 +454,6 @@ details.dropdown.list-dropdown-compact > summary + ul {
   line-height: 1;
 }
 
-.layout-toggle button[aria-pressed="true"] {
-  background-color: var(--pico-secondary-background);
-  border-color: var(--pico-secondary-background);
-  color: var(--pico-secondary-inverse);
-}
 
 /* Poster grid: as many columns as fit (3 on a phone) */
 .poster-grid {
@@ -516,21 +509,114 @@ details.dropdown.list-dropdown-compact > summary + ul {
   text-decoration: underline;
 }
 
-/* Check mark in the poster corner for watched movies */
-.watched-corner {
+/* ---- Watched toggle on the list page ------------------------------------------ */
+
+.watched-toggle {
+  margin: 0;
+}
+
+.watched-toggle button {
+  --pico-background-color: transparent;
+  --pico-border-color: var(--pico-secondary-border);
+  --pico-color: var(--pico-secondary);
+}
+
+.watched-toggle button[aria-pressed="true"] {
+  --pico-background-color: var(--pico-ins-color);
+  --pico-border-color: var(--pico-ins-color);
+  --pico-color: #fff;
+}
+
+/* Grid: round button in the poster corner */
+.poster-grid li {
+  position: relative;
+}
+
+.watched-toggle-corner {
   position: absolute;
   top: 0.35rem;
   right: 0.35rem;
+}
+
+/* No border: the background alone shows the state. No transform: scaling makes the
+   edges look soft. */
+.watched-toggle-corner button {
+  --size: 2rem;
   display: grid;
   place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: var(--size);
+  height: var(--size);
+  /* Grow around the center: shift by half of the extra size */
+  margin: calc((2rem - var(--size)) / 2);
+  padding: 0;
+  border: none;
   border-radius: 50%;
-  background: var(--pico-ins-color);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+  box-shadow: none;
+  transition: width 0.15s, height 0.15s, margin 0.15s, background-color 0.15s,
+    border-color 0.15s, opacity 0.15s;
+}
+
+/* Unwatched: dimmed check, so it differs from a watched one even without color */
+.watched-toggle-corner button[aria-pressed="false"] {
+  --pico-background-color: rgb(0 0 0 / 55%);
+  --pico-color: rgb(255 255 255 / 55%);
+}
+
+/* Hovering the button itself: a bit larger and lighter, in its current state */
+.poster-grid .watched-toggle-corner button:is(:hover, :focus-visible) {
+  --size: 2.25rem;
+  box-shadow: none;
+}
+
+.poster-grid .watched-toggle-corner button[aria-pressed="false"]:is(:hover, :focus-visible) {
+  /* Lighter than normal, but still dark enough for the white check on light posters */
+  --pico-background-color: rgb(95 95 95 / 85%);
+  --pico-color: #fff;
+}
+
+.poster-grid .watched-toggle-corner button[aria-pressed="true"]:is(:hover, :focus-visible) {
+  --pico-background-color: color-mix(in srgb, var(--pico-ins-color) 75%, #fff);
+}
+
+/* With a mouse, the empty circle only appears on hover (calmer grid); watched movies
+   always show their check mark. Touch devices have no hover, so they always show it.
+   Keyboard users see it when the entry has focus. */
+@media (hover: hover) {
+  .watched-toggle-corner button[aria-pressed="false"] {
+    opacity: 0;
+  }
+
+  .poster-grid li:hover .watched-toggle-corner button,
+  .poster-grid li:focus-within .watched-toggle-corner button {
+    opacity: 1;
+  }
+}
+
+/* ---- List toolbar: filters and layout toggle ----------------------------------- */
+
+.list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+
+.list-toolbar > [role="group"] {
+  width: auto;
+  margin: 0;
+}
+
+.list-filter a {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9em;
+}
+
+.list-filter a[aria-current="true"],
+.layout-toggle button[aria-pressed="true"] {
+  background-color: var(--pico-secondary-background);
+  border-color: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
 }
 
 /* ---- Detail page (movie / show) ---------------------------------------------------- */

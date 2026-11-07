@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: watchit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 16:45+0100\n"
+"POT-Creation-Date: 2026-11-07 17:38+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -647,6 +647,25 @@ msgstr "Name der neuen Liste"
 msgid "Create list"
 msgstr "Liste anlegen"
 
+#: catalog/templates/catalog/_watched_button.html:13
+#, python-format
+msgid "Mark “%(name)s” as not watched"
+msgstr "„%(name)s“ als nicht gesehen markieren"
+
+#: catalog/templates/catalog/_watched_button.html:14
+msgid "Watched – click to undo"
+msgstr "Gesehen – zum Rückgängigmachen klicken"
+
+#: catalog/templates/catalog/_watched_button.html:17
+#, python-format
+msgid "Mark “%(name)s” as watched"
+msgstr "„%(name)s“ als gesehen markieren"
+
+#: catalog/templates/catalog/_watched_button.html:18
+#: catalog/templates/catalog/title_detail.html:74
+msgid "Mark as watched"
+msgstr "Als gesehen markieren"
+
 #: catalog/templates/catalog/list_delete.html:4
 #: catalog/templates/catalog/list_delete.html:8
 #: catalog/templates/catalog/list_delete.html:17
@@ -677,32 +696,49 @@ msgstr "Umbenennen"
 msgid "Delete"
 msgstr "Löschen"
 
-#: catalog/templates/catalog/list_detail.html:21
+#: catalog/templates/catalog/list_detail.html:20
+msgid "Show"
+msgstr "Anzeigen"
+
+#: catalog/templates/catalog/list_detail.html:27
+msgid "Type"
+msgstr "Art"
+
+#: catalog/templates/catalog/list_detail.html:38
 msgid "View"
 msgstr "Ansicht"
 
-#: catalog/templates/catalog/list_detail.html:55
-#: catalog/templates/catalog/list_detail.html:88
+#: catalog/templates/catalog/list_detail.html:75
 #: catalog/templates/catalog/search.html:44
-#: catalog/templates/catalog/title_detail.html:37
+#: catalog/templates/catalog/title_detail.html:37 catalog/views.py:178
 msgid "Watched"
 msgstr "Gesehen"
 
-#: catalog/templates/catalog/list_detail.html:64
+#: catalog/templates/catalog/list_detail.html:87
 #, python-format
 msgid "Remove “%(name)s” from the list"
 msgstr "„%(name)s“ von der Liste entfernen"
 
-#: catalog/templates/catalog/list_detail.html:65
+#: catalog/templates/catalog/list_detail.html:88
 msgid "Remove from list"
 msgstr "Von der Liste entfernen"
 
-#: catalog/templates/catalog/list_detail.html:101
+#: catalog/templates/catalog/list_detail.html:124
+msgid "No titles match this filter."
+msgstr "Keine Titel für diesen Filter."
+
+#: catalog/templates/catalog/list_detail.html:125
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+#: catalog/templates/catalog/list_detail.html:130
 #, python-format
 msgid ""
 "This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
 "movies and TV shows."
-msgstr "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du Filme und Serien hinzu."
+msgstr ""
+"Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du "
+"Filme und Serien hinzu."
 
 #: catalog/templates/catalog/list_rename.html:4
 #: catalog/templates/catalog/list_rename.html:8
@@ -725,7 +761,9 @@ msgstr[1] "%(counter)s Titel"
 msgid ""
 "You don't have any lists yet. Create one below, or add a title from the "
 "search: a “Watchlist” is created for you."
-msgstr "Du hast noch keine Listen. Lege unten eine an oder füge einen Titel über die Suche hinzu: Dann wird automatisch eine „Watchlist“ angelegt."
+msgstr ""
+"Du hast noch keine Listen. Lege unten eine an oder füge einen Titel über die "
+"Suche hinzu: Dann wird automatisch eine „Watchlist“ angelegt."
 
 #: catalog/templates/catalog/lists.html:29
 msgid "Create"
@@ -770,10 +808,6 @@ msgstr "Datum speichern"
 msgid "Mark as not watched"
 msgstr "Als nicht gesehen markieren"
 
-#: catalog/templates/catalog/title_detail.html:74
-msgid "Mark as watched"
-msgstr "Als gesehen markieren"
-
 #: catalog/templates/catalog/title_detail.html:84
 msgid "No description available."
 msgstr "Keine Beschreibung vorhanden."
@@ -787,40 +821,56 @@ msgstr "Nicht verfügbar"
 msgid "Back to search"
 msgstr "Zurück zur Suche"
 
-#: catalog/views.py:41
+#: catalog/views.py:43
 msgid "Too many searches in a short time. Please wait a moment."
 msgstr "Zu viele Suchanfragen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:46
+#: catalog/views.py:48
 msgid "Search is not available: the administrator has not set up TMDB yet."
 msgstr ""
 "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
 "eingerichtet."
 
-#: catalog/views.py:49 catalog/views.py:202
+#: catalog/views.py:51 catalog/views.py:283
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
 "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
 
-#: catalog/views.py:103
+#: catalog/views.py:105
 #, python-format
 msgid "List “%(name)s” created."
 msgstr "Liste „%(name)s“ angelegt."
 
-#: catalog/views.py:139
+#: catalog/views.py:176 catalog/views.py:181
+msgid "All"
+msgstr "Alle"
+
+#: catalog/views.py:177
+msgid "Unwatched"
+msgstr "Ungesehen"
+
+#: catalog/views.py:182
+msgid "Movies"
+msgstr "Filme"
+
+#: catalog/views.py:183
+msgid "TV shows"
+msgstr "Serien"
+
+#: catalog/views.py:212
 msgid "List renamed."
 msgstr "Liste umbenannt."
 
-#: catalog/views.py:151
+#: catalog/views.py:224
 #, python-format
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:199
+#: catalog/views.py:280
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
-#: catalog/views.py:272
+#: catalog/views.py:353
 #, python-format
 msgid "Please enter a name (at most %(max)s characters)."
 msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."

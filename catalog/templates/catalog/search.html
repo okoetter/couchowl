@@ -8,13 +8,13 @@
 
   {# Without JavaScript the form reloads the page; with htmx only the results are replaced #}
   <form role="search" action="{% url 'catalog:search' %}" method="get"
-        hx-get="{% url 'catalog:search' %}" hx-target="#search-results"
+        hx-get="{% url 'catalog:search' %}" hx-target="#search-results" hx-swap="morph:innerHTML"
         hx-replace-url="true" hx-sync="this:replace">
     <input type="search" name="q" value="{{ query }}" id="search-q"
            placeholder="{% translate 'Movie or TV show' %}"
            aria-label="{% translate 'Search for movies and TV shows' %}"
            autocomplete="off" autofocus
-           hx-get="{% url 'catalog:search' %}" hx-target="#search-results"
+           hx-get="{% url 'catalog:search' %}" hx-target="#search-results" hx-swap="morph:innerHTML"
            hx-trigger="input changed delay:300ms, search" hx-replace-url="true"
            hx-sync="closest form:replace" hx-indicator="#search-results">
   </form>
@@ -26,7 +26,8 @@
       {% elif results %}
         <ul class="search-results">
           {% for result in results %}
-            <li>
+            {# The id lets "morph" recognize entries that stay, so their posters aren't reloaded #}
+            <li id="result-{{ result.media_type }}-{{ result.tmdb_id }}">
               <a class="result-link" href="{% url 'catalog:title_detail' result.media_type result.tmdb_id %}">
                 {% poster result.poster_path "w92" as thumb %}
                 {% if thumb %}

@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Add to list" menu on detail pages and as a "+" button in search results, including
   creating a new list right from the menu
 - List view as poster grid or compact list (remembered per user)
+- Watched button for movies right on the list page; filters "all / unwatched / watched"
+  and "all / movies / TV shows"
 - Detail pages for movies and shows (poster, description, status)
 - Mark movies as watched with a date (default today; changeable or "unknown");
   search results and lists show watched movies

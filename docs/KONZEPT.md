@@ -70,6 +70,22 @@
   - **Gesehen-Datum** nur als Tag (ohne Uhrzeit), nicht in der Zukunft. Das Datum lässt sich auch ohne JavaScript ändern (aufklappbares `<details>`).
   - **Status von TMDB übersetzt** (z. B. „Released“ → „Veröffentlicht“, „Ended“ → „Beendet“).
 
+- **2026-11-07 – Nachtrag Meilenstein 3 (Listenansicht):**
+  - **Gesehen-Button direkt in der Liste** (für Filme): im Raster als runder Button im Poster-Eck, in der kompakten Ansicht neben „×“. Ein Klick setzt das heutige Datum, ein zweiter nimmt es zurück. War der Film schon gesehen, bleibt ein vorhandenes Datum erhalten.
+    - Im Raster erscheint der leere Kreis (ungesehen) mit Maus nur beim Überfahren, damit das Raster ruhig bleibt; der grüne Haken ist immer sichtbar. Auf Touch-Geräten (kein Hover) bleibt der Kreis immer sichtbar, bei Tastaturbedienung erscheint er mit dem Fokus. Die kompakte Ansicht zeigt den Button weiterhin immer.
+    - Der Kreis im Raster hat keinen Rand: Ungesehen ist er dunkel mit gedämpftem Haken, gesehen grün mit hellem Haken. Beim Überfahren wird er etwas größer und heller (ohne `transform: scale`, das macht die Kanten unscharf).
+    - **Kleine htmx-Antworten statt ganzer Liste:** Gesehen-Button und Entfernen ersetzen nur den Button bzw. entfernen nur den Eintrag. Die ganze Liste neu zu laden baut alle Poster neu auf und lässt sie kurz aufblitzen. Nur wenn danach nichts mehr angezeigt wird, kommt der ganze Inhalt mit dem Hinweistext.
+    - **Idiomorph** (htmx-Erweiterung vom htmx-Team, 0BSD, lokal ausgeliefert) für Live-Suche und Listenfilter: Statt das HTML auszutauschen, gleicht es alt und neu ab und ändert nur die Unterschiede. Einträge, die sichtbar bleiben, behalten ihr Poster und blitzen nicht. Einträge brauchen dafür eine feste `id`.
+    - **Prüfung aller htmx-Stellen:** Gesehen-Button, Entfernen, Menü öffnen und „Gesehen“ auf der Detailseite ersetzen schon nur das Nötige. Der Ansichtswechsel ersetzt den ganzen Inhalt, weil sich das Layout komplett ändert. Ein Häkchen im Listen-Menü ersetzt das ganze (kleine, bilderlose) Menü; das bleibt bewusst so (vernachlässigbar, einfachere Fehleranzeige).
+    - Das Menü „Zu Liste hinzufügen“ in der Suche wird bei jedem Öffnen neu geladen (kostet keine TMDB-Anfrage), damit es nach einer Aktualisierung der Ergebnisse immer stimmt.
+  - **Filter** „Alle / Ungesehen / Gesehen“ und „Alle / Filme / Serien“. Sie stehen in der URL (`?status=unwatched&type=movie`): lesezeichenfähig, „Zurück“ funktioniert. Der Filter wird nicht gespeichert, jede Liste startet bei „Alle“. Aktionen (gesehen, entfernen, Ansicht) behalten den Filter; wer unter „Ungesehen“ etwas abhakt, sieht es verschwinden.
+  - **Serien zählen bis Meilenstein 4 als ungesehen** und haben noch keinen Gesehen-Button.
+  - **Mehrfachauswahl** mit Sammelaktionen (alle markieren, als gesehen markieren, entfernen) kommt in den Backlog: Mit dem Gesehen-Button ist der häufigste Fall abgedeckt, und am Handy bräuchte es einen eigenen Auswahlmodus. Neu bewerten, wenn Listen groß werden (z. B. nach dem JustWatch-Import).
+  - **Für Meilenstein 4 beschlossen:**
+    - Eine Serie gilt als **gesehen, wenn alle bereits ausgestrahlten Folgen gesehen sind** (ohne Specials/„Staffel 0“). Erscheint eine neue Folge, ist sie wieder ungesehen.
+    - Der Button in der Liste zeigt bei Serien den **Fortschritt** (z. B. „12/20“). Ein Klick hakt die **nächste Folge** ab: die erste ungesehene, schon ausgestrahlte Folge ohne Specials. Dieselbe Regel nutzt das Dashboard („S2 E5 als Nächstes“, Meilenstein 5).
+    - Da ein zweiter Klick die nächste Folge abhakt statt rückgängig zu machen, erscheint danach kurz **„S2 E5 gesehen · Rückgängig“**.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -96,7 +112,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
      - Abhaken rückgängig machen entfernt das Datum
      - Beim Abhaken wird sofort das heutige Datum gespeichert. Ein Klick aufs Datum öffnet die Bearbeitung: anderes Datum oder „unbekannt“ (`watched_at` leer, aber gesehen). Bei einer Staffel gilt die Änderung für alle Folgen dieser Staffel.
 - **Datenschutz:**
-  - Keine externen Ressourcen: HTMX, Pico, Alpine.js und Schriften werden selbst ausgeliefert, kein CDN
+  - Keine externen Ressourcen: HTMX (mit Idiomorph), Pico, Alpine.js und Schriften werden selbst ausgeliefert, kein CDN
   - **Alles läuft über den Server, der Browser kontaktiert TMDB nie direkt:**
     - **Texte und Metadaten** (Titel, Beschreibungen, Staffeln, Folgen, Anbieter): Der Server fragt TMDB ab und speichert die Ergebnisse pro Sprache in der Datenbank; angezeigt wird immer aus der Datenbank
     - **Poster und Bilder:** Der Server lädt sie von TMDB und cacht sie auf der Platte (Volume, nur erlaubte Bildgrößen)
@@ -309,6 +325,7 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
    - Seriendetailseite mit Staffeln und Folgen
    - Folge bzw. Staffel abhaken per HTMX, mit Anzeige des Gesehen-Datums
    - „Folgen“ (Flag pro Serie) und Systemliste „Gefolgte Serien“
+   - Serien in Listen: Fortschritt und „nächste Folge gesehen“ per Klick (mit „Rückgängig“), Serien im Gesehen-Filter
 5. **Dashboard**
    - Serien, die ich gerade schaue, mit der nächsten Folge
    - Ankündigungen für die nächsten 3 Monate (`ANNOUNCEMENT_MONTHS`)
@@ -333,7 +350,8 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
   - Vorher klären: wie Oliver seine Daten aus JustWatch bekommt. JustWatch hat keine offizielle Export-Funktion; möglich sind eine DSGVO-Datenauskunft (Art. 15/20), ein Export über Drittanbieter-Tools oder das eigene Profil. Format erst prüfen, wenn ein echter Export vorliegt.
 - Datenexport als JSON und Konto selbst löschen; später Import aus Trakt, TV Time oder Letterboxd (gemeinsame Import-Infrastruktur mit dem JustWatch-Import)
 - Listen-Komfort:
-  - Sortieren und Filtern (Hinzufügedatum, Titel, Jahr, Film/Serie)
+  - Sortieren (Hinzufügedatum, Titel, Jahr); Filter nach gesehen/ungesehen und Film/Serie gibt es seit Meilenstein 3
+  - Mehrfachauswahl mit Sammelaktionen: alle markieren/entmarkieren, auf einmal als gesehen markieren oder von der Liste entfernen
   - in der Suche „ist schon auf Liste X“ anzeigen
   - Listen per Ziehen sortieren (bis dahin alphabetisch)
   - Notiz pro Listeneintrag

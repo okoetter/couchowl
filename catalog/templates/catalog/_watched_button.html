@@ -1,0 +1,23 @@
+{% load i18n %}
+{% comment %}
+  "Watched" toggle for a movie on the list page. Sends `watched=1` to mark (today),
+  nothing to undo. `corner`: round button on the poster (grid view).
+  The server answers with just this button (see catalog.views._item_response).
+{% endcomment %}
+<form method="post" class="watched-toggle{% if corner %} watched-toggle-corner{% endif %}"
+      action="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
+      hx-post="{% url 'catalog:list_item_watched' list.pk item.pk %}{{ filter_query }}"
+      hx-target="this" hx-swap="outerHTML">
+  {% csrf_token %}
+  {% if item.watched %}
+    <button type="submit" class="icon-button" aria-pressed="true"
+            aria-label="{% blocktranslate %}Mark “{{ name }}” as not watched{% endblocktranslate %}"
+            title="{% translate 'Watched – click to undo' %}">
+  {% else %}
+    <button type="submit" name="watched" value="1" class="icon-button" aria-pressed="false"
+            aria-label="{% blocktranslate %}Mark “{{ name }}” as watched{% endblocktranslate %}"
+            title="{% translate 'Mark as watched' %}">
+  {% endif %}
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  </button>
+</form>

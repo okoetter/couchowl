@@ -19,10 +19,12 @@
   <link rel="stylesheet" href="{% static 'vendor/pico.min.css' %}">
   <link rel="stylesheet" href="{% static 'core/watchit.css' %}">
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+  {# "morph" swaps change only what differs, so unchanged posters don't flicker #}
+  <script src="{% static 'vendor/idiomorph-ext.min.js' %}" defer></script>
   <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
 </head>
 {# Every htmx request sends the CSRF token automatically #}
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-ext="morph">
   {% include "core/_nav.html" %}
 
   <main class="container">

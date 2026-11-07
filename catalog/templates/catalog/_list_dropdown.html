@@ -1,13 +1,14 @@
 {% load i18n %}
 {% comment %}
-  "Add to list" dropdown. With `lazy`, the menu is loaded when the dropdown is first
-  opened (search results: no database work for results nobody opens).
+  "Add to list" dropdown. With `lazy`, the menu is loaded each time the dropdown is
+  opened (search results: no database work for results nobody opens; always current,
+  also after the live search has updated the results).
   Alpine.js closes it on a click outside or with Escape.
 {% endcomment %}
 <details class="dropdown list-dropdown{% if compact %} list-dropdown-compact{% endif %}"
          x-data @click.outside="$el.open = false" @keydown.escape="$el.open = false"
          {% if lazy %}hx-get="{% url 'catalog:title_lists' media_type tmdb_id %}"
-         hx-trigger="toggle once" hx-target="find ul" hx-swap="outerHTML"{% endif %}>
+         hx-trigger="toggle[this.open]" hx-target="find ul" hx-swap="outerHTML"{% endif %}>
   {% if compact %}
     <summary role="button" class="outline secondary"
              aria-label="{% blocktranslate %}Add “{{ name }}” to a list{% endblocktranslate %}"
