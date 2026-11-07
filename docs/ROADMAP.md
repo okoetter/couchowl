@@ -7,7 +7,7 @@
 - [ ] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
 - [ ] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
 - [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile)
-- [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months)
+- [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months, configurable via `ANNOUNCEMENT_MONTHS`)
 - [ ] **6 – Sync and "Upcoming":** daily/manual TMDB sync, streaming providers, upcoming page
 - [ ] **7 – Production and open source:** security behind proxy, backups, docs, license, CI, 1.0.0
 
@@ -22,5 +22,6 @@
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
 - [ ] Ratings
 - [ ] Notifications (e-mail/push) for new seasons
+- [ ] Per-user announcement window in the profile (1/3/6/12 months; empty = `ANNOUNCEMENT_MONTHS`)
 - [ ] Public JSON API (e.g. django-ninja)
 - [ ] More UI languages

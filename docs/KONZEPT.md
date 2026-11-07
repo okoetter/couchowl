@@ -39,6 +39,11 @@
   - `DEFAULT_TMDB_LANGUAGE` entfällt (ergibt sich aus der Region).
   - Einladungsmails gehen in der Sprache des einladenden Admins raus.
 
+- **2026-11-07 – Zeitraum der Ankündigungen konfigurierbar:**
+  - Das Dashboard zeigt neue Staffeln gefolgter Serien für die nächsten `ANNOUNCEMENT_MONTHS` Monate (Umgebungsvariable, Standard 3). In Monaten statt Tagen, weil man so darüber denkt und es so auf dem Dashboard steht.
+  - Später (Backlog) zusätzlich pro Nutzer im Profil überschreibbar (z. B. 1/3/6/12 Monate, leer = Serverstandard), nach demselben Muster wie Sprache und Region.
+  - Die Seite „Demnächst“ zeigt weiterhin alle bekannten Termine ohne Zeitlimit; das Dashboard ist nur eine Vorschau.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -55,7 +60,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   2. **Serien-Dashboard:** Serien, die ich gerade schaue, jeweils mit der nächsten Folge (z. B. „S2 E5 als Nächstes“)
   3. **Folgen-Tracking:** jede Folge einzeln abhaken oder eine ganze Staffel auf einmal als gesehen markieren
   4. **„Folgen“** pro Serie (Button „Folgen“/„Gefolgt“)
-  5. **Ankündigungen auf dem Dashboard:** neue Staffeln gefolgter Serien in den nächsten 3 Monaten, sobald das Datum feststeht, mit Quelle (TMDB `networks`, z. B. Netflix oder ZDF, plus deutsche Streaming-Anbieter, soweit bekannt)
+  5. **Ankündigungen auf dem Dashboard:** neue Staffeln gefolgter Serien in den nächsten 3 Monaten (über `ANNOUNCEMENT_MONTHS` einstellbar), sobald das Datum feststeht, mit Quelle (TMDB `networks`, z. B. Netflix oder ZDF, plus deutsche Streaming-Anbieter, soweit bekannt)
   6. **Menü „Demnächst“:** alle kommenden Staffeln gefolgter Serien mit bekanntem Datum
   7. **Filme als „gesehen“ markieren**; die Suche zeigt an, ob ein Titel schon gesehen wurde
   8. **Gesehen-Datum:**
@@ -280,7 +285,7 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
    - „Folgen“ (Flag pro Serie) und Systemliste „Gefolgte Serien“
 5. **Dashboard**
    - Serien, die ich gerade schaue, mit der nächsten Folge
-   - Ankündigungen für die nächsten 3 Monate
+   - Ankündigungen für die nächsten 3 Monate (`ANNOUNCEMENT_MONTHS`)
 6. **Sync und „Demnächst“**
    - `sync_tmdb`-Befehl für gefolgte und gerade geschaute Serien, eingebunden über supercronic im Container
    - Streaming-Anbieter pro Region
@@ -309,6 +314,7 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - Bewertungen
 - Benachrichtigungen per E-Mail oder Push bei neuen Staffeln
 - Öffentliche JSON-API (z. B. django-ninja)
+- Zeitraum der Ankündigungen pro Nutzer im Profil einstellbar (1/3/6/12 Monate, leer = `ANNOUNCEMENT_MONTHS`)
 - Weitere UI-Sprachen
 
 ## Später zu entscheiden
