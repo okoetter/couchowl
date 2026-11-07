@@ -5,8 +5,8 @@
 - [x] **0 – Project skeleton:** Django, i18n, base layout with navigation, PWA, Docker, tests, pre-commit
 - [x] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
 - [ ] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
-- [ ] **3 – Lists and movies:** private lists, grid/compact view, movie "watched" with date
-- [ ] **4 – Shows and episodes:** season/episode tracking with dates, "follow" flag
+- [ ] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
+- [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile)
 - [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months)
 - [ ] **6 – Sync and "Upcoming":** daily/manual TMDB sync, streaming providers, upcoming page
 - [ ] **7 – Production and open source:** security behind proxy, backups, docs, license, CI, 1.0.0

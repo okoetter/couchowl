@@ -25,6 +25,11 @@
   - **E2E-Tests mit Playwright jetzt eingerichtet** (`e2e/`, Marker `e2e`): Ablauf Einladung → Registrierung → Login sowie Screenshots wichtiger Seiten (hell/dunkel, Desktop/Handy), damit Claude die Optik selbst prüfen kann, bevor Oliver testet.
   - **django-axes 9.0.0** (erste Version mit offiziellem Django-6.1-Support): sperrt die Kombination aus Nutzername **und** IP nach 5 Fehlversuchen für 60 Minuten. Nur nach IP zu sperren wäre hinter dem Reverse Proxy gefährlich, weil dort alle Anfragen dieselbe IP haben (echte Client-IP über Proxy-Header folgt in Meilenstein 7).
 
+- **2026-11-07 – Listen und „Folgen“:**
+  - **Listen** können beliebig viele angelegt werden und enthalten jeweils Filme **und** Serien gemischt.
+  - **„Folgen“ statt „verfolgen“:** Der Button auf der Serienseite heißt „Folgen“ (aktiv: „Gefolgt“), englisch „Follow“/„Following“. „Folgen“ ist der gängige Begriff (wie bei sozialen Netzwerken), „verfolgen“ klingt nach Hinterherjagen.
+  - **Systemliste „Gefolgte Serien“** („Followed shows“): erscheint unter „Listen“ automatisch, sobald der Nutzer mindestens einer Serie folgt, und zeigt alle gefolgten Serien. Sie wird nicht gespeichert, sondern per Abfrage berechnet, ist nicht löschbar oder umbenennbar und lässt sich im Profil ein- und ausblenden (Standard: an). Umsetzung mit Meilenstein 3/4.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -36,12 +41,13 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
 - **Nutzer:** mehrere Konten, **nur auf Einladung** (keine offene Registrierung); die App ist aus dem Internet erreichbar
 - **Datenquelle:** TMDB-API. JustWatch scheidet aus: keine offizielle API, und die Nutzungsbedingungen verbieten die inoffizielle Nutzung. Streaming-Anbieter kommen über TMDB `/watch/providers` (Daten von JustWatch, mit Attribution).
 - **MVP-Features:**
-  1. **Eigene Listen (immer privat):** beliebig viele, z. B. „Meine Watchlist“ oder „Mit Familie sehen“; Filme und Serien werden über die TMDB-Suche hinzugefügt
+  1. **Eigene Listen (immer privat):** beliebig viele, z. B. „Meine Watchlist“ oder „Mit Familie sehen“; jede Liste kann Filme und Serien gemischt enthalten, hinzugefügt über die TMDB-Suche
+     - zusätzlich die **Systemliste „Gefolgte Serien“**: automatisch, sobald man mindestens einer Serie folgt; nicht löschbar; im Profil ein-/ausblendbar (Standard: an)
   2. **Serien-Dashboard:** Serien, die ich gerade schaue, jeweils mit der nächsten Folge (z. B. „S2 E5 als Nächstes“)
   3. **Folgen-Tracking:** jede Folge einzeln abhaken oder eine ganze Staffel auf einmal als gesehen markieren
-  4. **Flag „verfolgen“** pro Serie
-  5. **Ankündigungen auf dem Dashboard:** neue Staffeln verfolgter Serien in den nächsten 3 Monaten, sobald das Datum feststeht, mit Quelle (TMDB `networks`, z. B. Netflix oder ZDF, plus deutsche Streaming-Anbieter, soweit bekannt)
-  6. **Menü „Demnächst“:** alle kommenden Staffeln verfolgter Serien mit bekanntem Datum
+  4. **„Folgen“** pro Serie (Button „Folgen“/„Gefolgt“)
+  5. **Ankündigungen auf dem Dashboard:** neue Staffeln gefolgter Serien in den nächsten 3 Monaten, sobald das Datum feststeht, mit Quelle (TMDB `networks`, z. B. Netflix oder ZDF, plus deutsche Streaming-Anbieter, soweit bekannt)
+  6. **Menü „Demnächst“:** alle kommenden Staffeln gefolgter Serien mit bekanntem Datum
   7. **Filme als „gesehen“ markieren**; die Suche zeigt an, ob ein Titel schon gesehen wurde
   8. **Gesehen-Datum:**
      - Beim Abhaken einer Folge, einer Staffel oder eines Films wird das Datum gespeichert und angezeigt
@@ -85,7 +91,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Listen
   - Demnächst
   - Suche (Suchfeld immer sichtbar, Live-Ergebnisse)
-  - Detailseiten für Filme und Serien (Staffeln und Folgen abhaken, „verfolgen“, „Aktualisieren“, „Zu Liste hinzufügen“)
+  - Detailseiten für Filme und Serien (Staffeln und Folgen abhaken, „Folgen“, „Aktualisieren“, „Zu Liste hinzufügen“)
   - Profil
   - Django-Admin für Nutzer und Einladungen
 - **Navigation:** auf dem Handy eine Leiste unten (Dashboard, Listen, Demnächst, Suche, Profil), auf dem Desktop oben
@@ -100,7 +106,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
 - **CSS:** Pico CSS (klassenlos, ohne Build-Schritt; responsiv für die Nutzung am Handy)
 - **TMDB-Datenabruf (drei Wege):**
   1. **Bei Bedarf:** beim Öffnen einer Film- oder Seriendetailseite und beim Hinzufügen zu einer Liste werden die Daten von TMDB geladen, wenn sie fehlen oder älter als 24 h sind
-  2. **Täglich automatisch:** für alle verfolgten und gerade geschauten Serien (neue Staffeln/Folgen, Air-Dates, Anbieter)
+  2. **Täglich automatisch:** für alle gefolgten und gerade geschauten Serien (neue Staffeln/Folgen, Air-Dates, Anbieter)
   3. **Manuell erzwungen:**
      - Button „Jetzt aktualisieren“ auf der Detailseite (eine Serie)
      - Button „Alle aktualisieren“ (z. B. auf „Demnächst“)
@@ -144,17 +150,17 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Git ab dem ersten Schritt
 
 ## Datenmodell (Entwurf)
-- `User` (eigenes User-Modell von Anfang an): `ui_language`, `tmdb_language`, `region`
+- `User` (eigenes User-Modell von Anfang an): `ui_language`, `tmdb_language`, `region`; ab Meilenstein 3/4 `show_followed_list` (Systemliste „Gefolgte Serien“ anzeigen, Standard an)
 - `Invitation`: Token, E-Mail (optional), `created_by`, `expires_at`, `used_by`
 - `Title`: `tmdb_id` + `media_type` (Film/Serie) sowie sprachneutrale Daten (Poster, Daten, Status, Networks)
 - `TitleTranslation`: Titel, Sprache, Name, Beschreibung (Cache pro Sprache)
 - `Season` und `Episode`: Nummer, Air-Date; sprachabhängige Texte jeweils in Übersetzungstabellen
 - `UserList` (Nutzer, Name, Reihenfolge) und `ListItem` (Liste, Titel, hinzugefügt am)
-- `UserSeries`: Nutzer, Serie, `following`, Status (schaue gerade / pausiert / fertig); wird beim ersten Abhaken automatisch auf „schaue gerade“ gesetzt
+- `UserSeries`: Nutzer, Serie, `following` (Button „Folgen“), Status (schaue gerade / pausiert / fertig); wird beim ersten Abhaken automatisch auf „schaue gerade“ gesetzt
 - `WatchedEpisode`: Nutzer, Folge, `watched_at` (nullable = Datum unbekannt; eindeutig pro Nutzer und Folge; nur das letzte Datum)
 - `WatchedMovie`: Nutzer, Film, `watched_at` (nullable; eindeutig pro Nutzer und Film; nur das letzte Datum)
 - `TitleProvider`: Titel, Region, Anbieter, Typ (Abo/Kauf/kostenlos)
-- Ankündigungen werden per Abfrage berechnet (kommende `Season.air_date` verfolgter Serien), nicht gespeichert.
+- Ankündigungen werden per Abfrage berechnet (kommende `Season.air_date` gefolgter Serien), nicht gespeichert.
 
 ## Arbeitsweise
 - **Ablauf pro Meilenstein:**
@@ -261,12 +267,12 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
 4. **Serien und Folgen**
    - Seriendetailseite mit Staffeln und Folgen
    - Folge bzw. Staffel abhaken per HTMX, mit Anzeige des Gesehen-Datums
-   - Flag „verfolgen“
+   - „Folgen“ (Flag pro Serie) und Systemliste „Gefolgte Serien“
 5. **Dashboard**
    - Serien, die ich gerade schaue, mit der nächsten Folge
    - Ankündigungen für die nächsten 3 Monate
 6. **Sync und „Demnächst“**
-   - `sync_tmdb`-Befehl für verfolgte und gerade geschaute Serien, eingebunden über supercronic im Container
+   - `sync_tmdb`-Befehl für gefolgte und gerade geschaute Serien, eingebunden über supercronic im Container
    - Streaming-Anbieter pro Region
    - Seite „Demnächst“
 7. **Produktionsreife und Open Source**
@@ -280,7 +286,7 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
 ## Backlog (ToDo, nach dem MVP)
 Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - **JustWatch-Import (CLI, kein GUI):** `manage.py import_justwatch <datei> --user <name> [--dry-run]`
-  - übernimmt Watchlist(s), gesehene Filme und Folgen sowie verfolgte Serien
+  - übernimmt Watchlist(s), gesehene Filme und Folgen sowie gefolgte Serien
   - Abgleich mit TMDB über IMDb-ID (TMDB `/find`) oder sonst über Titel und Jahr
   - nicht zuordenbare Einträge landen in einem Bericht
   - Vorher klären: wie Oliver seine Daten aus JustWatch bekommt. JustWatch hat keine offizielle Export-Funktion; möglich sind eine DSGVO-Datenauskunft (Art. 15/20), ein Export über Drittanbieter-Tools oder das eigene Profil. Format erst prüfen, wenn ein echter Export vorliegt.

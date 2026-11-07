@@ -9,7 +9,8 @@ A self-hosted watchlist for movies and TV shows.
 - Your own private lists ("My watchlist", "Watch with family", …), filled via TMDB search
 - Track TV shows episode by episode, or mark whole seasons as watched
 - Dashboard with the next episode of every show you are watching
-- Follow shows and see announcements for new seasons, including where they stream
+- Follow shows (automatic "Followed shows" list) and see announcements for new seasons,
+  including where they stream
 - Invite-only accounts, interface in multiple languages (German first)
 - Privacy-friendly: no CDNs, your browser never talks to third parties
 - Installable on your phone (PWA); runs as a single small Docker container (SQLite by default)
