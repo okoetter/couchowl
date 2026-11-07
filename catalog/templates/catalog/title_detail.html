@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n catalog %}
+
+{% block title %}{{ translation.name }}{% endblock %}
+
+{% block content %}
+  <div class="title-detail">
+    <div class="title-detail-poster">
+      {% poster translation.poster_path "w342" as poster_url %}
+      {% if poster_url %}
+        {% poster translation.poster_path "w500" as poster_2x %}
+        <img src="{{ poster_url }}" srcset="{{ poster_url }} 1x, {{ poster_2x }} 2x"
+             alt="" width="342" height="513">
+      {% else %}
+        <span class="poster-missing" aria-hidden="true"></span>
+      {% endif %}
+    </div>
+
+    <div class="title-detail-info">
+      <hgroup>
+        <h1>{{ translation.name }}</h1>
+        <p>
+          {{ title.get_media_type_display }}{% if title.year %} · {{ title.year }}{% endif %}{% if title.status %} · {{ title.status_label }}{% endif %}
+          {% if title.original_title != translation.name %}<br>{{ title.original_title }}{% endif %}
+        </p>
+      </hgroup>
+
+      <div class="title-detail-actions">
+        {% include "catalog/_list_dropdown.html" with name=translation.name %}
+      </div>
+
+      {% if title.is_movie %}
+        {% partialdef watched inline %}
+          <div id="watched" class="watched">
+            {% if watched %}
+              <p>
+                <span class="watched-badge">✓ {% translate "Watched" %}</span>
+              </p>
+              {# Click on the date to change it; works without JavaScript (<details>) #}
+              <details class="watched-edit"{% if date_form.errors %} open{% endif %}>
+                <summary>
+                  {% if watched.watched_at %}
+                    {% blocktranslate with date=watched.watched_at|date %}on {{ date }}{% endblocktranslate %}
+                  {% else %}
+                    {% translate "Date unknown" %}
+                  {% endif %}
+                  <span class="muted">({% translate "change" %})</span>
+                </summary>
+                <form method="post" action="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                      hx-post="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                      hx-target="#watched" hx-swap="outerHTML">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="date">
+                  {{ date_form.non_field_errors }}
+                  {{ date_form.watched_at.as_field_group }}
+                  <label>{{ date_form.unknown }} {{ date_form.unknown.label }}</label>
+                  {{ date_form.unknown.errors }}
+                  <button type="submit">{% translate "Save date" %}</button>
+                </form>
+              </details>
+              <form method="post" action="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                    hx-post="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                    hx-target="#watched" hx-swap="outerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="unmark">
+                <button type="submit" class="secondary outline">{% translate "Mark as not watched" %}</button>
+              </form>
+            {% else %}
+              <form method="post" action="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                    hx-post="{% url 'catalog:movie_watched' title.tmdb_id %}"
+                    hx-target="#watched" hx-swap="outerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mark">
+                <button type="submit">{% translate "Mark as watched" %}</button>
+              </form>
+            {% endif %}
+          </div>
+        {% endpartialdef %}
+      {% endif %}
+
+      {% if translation.overview %}
+        <p class="title-detail-overview">{{ translation.overview|linebreaksbr }}</p>
+      {% else %}
+        <p class="muted">{% translate "No description available." %}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -143,6 +143,25 @@ def get_title(
     return save_title(media_type, data, language)
 
 
+def best_translations(titles, language: str) -> dict[int, TitleTranslation]:
+    """The best stored translation per title (by title id), without asking TMDB.
+
+    Lists show many titles at once; loading each from TMDB would be slow. So lists show
+    what is in the database: the user's language if available, otherwise the closest one
+    (same fallback order as `localize`, then any). Titles without any translation are
+    missing from the result (templates then show the original title).
+    """
+    best: dict[int, tuple[int, TitleTranslation]] = {}
+    for translation in TitleTranslation.objects.filter(title__in=titles):
+        lang, _sep, country = translation.language.partition("-")
+        rank = _language_rank({"iso_639_1": lang, "iso_3166_1": country}, language)
+        rank = 5 if rank is None else rank
+        current = best.get(translation.title_id)
+        if current is None or rank < current[0]:
+            best[translation.title_id] = (rank, translation)
+    return {title_id: translation for title_id, (_rank, translation) in best.items()}
+
+
 def is_outdated(translation: TitleTranslation) -> bool:
     return translation.fetched_at < timezone.now() - settings.TMDB_MAX_AGE
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: watchit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:48+0100\n"
+"POT-Creation-Date: 2026-11-07 16:45+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -28,7 +28,7 @@ msgstr "Link zum Zurücksetzen des Passworts erzeugen"
 msgid "Password reset link for %(user)s"
 msgstr "Link zum Zurücksetzen des Passworts für %(user)s"
 
-#: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:25
+#: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:28
 msgid "status"
 msgstr "Status"
 
@@ -148,57 +148,69 @@ msgstr "TMDB-Sprachcode, z. B. de-DE oder en-US."
 msgid "color scheme"
 msgstr "Farbschema"
 
-#: accounts/models.py:84
+#: accounts/models.py:51
+msgid "Poster grid"
+msgstr "Poster-Raster"
+
+#: accounts/models.py:52
+msgid "Compact list"
+msgstr "Kompakte Liste"
+
+#: accounts/models.py:56
+msgid "list layout"
+msgstr "Listenansicht"
+
+#: accounts/models.py:93
 msgid "token"
 msgstr "Token"
 
-#: accounts/models.py:87
+#: accounts/models.py:96
 msgid "e-mail"
 msgstr "E-Mail"
 
-#: accounts/models.py:89
+#: accounts/models.py:98
 msgid "Optional. Pre-fills the registration form and is used to send the link."
 msgstr ""
 "Optional. Wird im Registrierungsformular vorausgefüllt und zum Versenden des "
 "Links verwendet."
 
-#: accounts/models.py:92
+#: accounts/models.py:101
 msgid "note"
 msgstr "Notiz"
 
-#: accounts/models.py:92
+#: accounts/models.py:101
 msgid "Only visible to admins."
 msgstr "Nur für Admins sichtbar."
 
-#: accounts/models.py:96
+#: accounts/models.py:105
 msgid "created by"
 msgstr "erstellt von"
 
-#: accounts/models.py:103
+#: accounts/models.py:112 catalog/models.py:115
 msgid "created at"
 msgstr "erstellt am"
 
-#: accounts/models.py:104
+#: accounts/models.py:113
 msgid "expires at"
 msgstr "gültig bis"
 
-#: accounts/models.py:107
+#: accounts/models.py:116
 msgid "used by"
 msgstr "benutzt von"
 
-#: accounts/models.py:114
+#: accounts/models.py:123
 msgid "used at"
 msgstr "benutzt am"
 
-#: accounts/models.py:119
+#: accounts/models.py:128
 msgid "invitation"
 msgstr "Einladung"
 
-#: accounts/models.py:120
+#: accounts/models.py:129
 msgid "invitations"
 msgstr "Einladungen"
 
-#: accounts/models.py:124
+#: accounts/models.py:133
 #, python-format
 msgid "Invitation #%(id)s"
 msgstr "Einladung #%(id)s"
@@ -386,6 +398,7 @@ msgid "Advanced"
 msgstr "Erweitert"
 
 #: accounts/templates/accounts/profile.html:21
+#: catalog/templates/catalog/list_rename.html:14
 msgid "Save"
 msgstr "Speichern"
 
@@ -434,73 +447,289 @@ msgstr "Dein Passwort wurde geändert."
 msgid "Movies and shows"
 msgstr "Filme und Serien"
 
-#: catalog/models.py:7
+#: catalog/forms.py:19
+msgid "e.g. Watch with family"
+msgstr "z. B. Mit Familie sehen"
+
+#: catalog/forms.py:27
+msgid "You already have a list with this name."
+msgstr "Du hast schon eine Liste mit diesem Namen."
+
+#: catalog/forms.py:39
+msgid "Watched on"
+msgstr "Gesehen am"
+
+#: catalog/forms.py:43 catalog/templates/catalog/title_detail.html:45
+msgid "Date unknown"
+msgstr "Datum unbekannt"
+
+#: catalog/forms.py:55
+msgid "Enter a date or choose “Date unknown”."
+msgstr "Gib ein Datum ein oder wähle „Datum unbekannt“."
+
+#: catalog/forms.py:57
+msgid "The date can't be in the future."
+msgstr "Das Datum darf nicht in der Zukunft liegen."
+
+#: catalog/models.py:10
 msgid "Movie"
 msgstr "Film"
 
-#: catalog/models.py:8
+#: catalog/models.py:11
 msgid "TV show"
 msgstr "Serie"
 
-#: catalog/models.py:18
+#: catalog/models.py:21
 msgid "type"
 msgstr "Typ"
 
-#: catalog/models.py:19
+#: catalog/models.py:22
 msgid "TMDB ID"
 msgstr "TMDB-ID"
 
-#: catalog/models.py:20
+#: catalog/models.py:23
 msgid "original title"
 msgstr "Originaltitel"
 
-#: catalog/models.py:21
+#: catalog/models.py:24
 msgid "original language"
 msgstr "Originalsprache"
 
-#: catalog/models.py:23
+#: catalog/models.py:26
 msgid "release date"
 msgstr "Erscheinungsdatum"
 
-#: catalog/models.py:26
+#: catalog/models.py:29
 msgid "updated at"
 msgstr "aktualisiert am"
 
-#: catalog/models.py:29 catalog/models.py:51
+#: catalog/models.py:32 catalog/models.py:65 catalog/models.py:138
 msgid "title"
 msgstr "Titel"
 
-#: catalog/models.py:30
+#: catalog/models.py:33
 msgid "titles"
 msgstr "Titel"
 
-#: catalog/models.py:54
+#: catalog/models.py:68
 msgid "language"
 msgstr "Sprache"
 
-#: catalog/models.py:55
+#: catalog/models.py:69 catalog/models.py:114
 msgid "name"
 msgstr "Name"
 
-#: catalog/models.py:56
+#: catalog/models.py:70
 msgid "description"
 msgstr "Beschreibung"
 
-#: catalog/models.py:58
+#: catalog/models.py:72
 msgid "poster"
 msgstr "Poster"
 
-#: catalog/models.py:59
+#: catalog/models.py:73
 msgid "loaded from TMDB at"
 msgstr "von TMDB geladen am"
 
-#: catalog/models.py:62
+#: catalog/models.py:76
 msgid "translation"
 msgstr "Übersetzung"
 
-#: catalog/models.py:63
+#: catalog/models.py:77
 msgid "translations"
 msgstr "Übersetzungen"
+
+#: catalog/models.py:88
+msgid "Released"
+msgstr "Veröffentlicht"
+
+#: catalog/models.py:89
+msgid "Rumored"
+msgstr "Gerücht"
+
+#: catalog/models.py:90
+msgid "Planned"
+msgstr "Geplant"
+
+#: catalog/models.py:91
+msgid "In production"
+msgstr "In Produktion"
+
+#: catalog/models.py:92
+msgid "Post-production"
+msgstr "Postproduktion"
+
+#: catalog/models.py:93
+msgid "Canceled"
+msgstr "Abgesetzt"
+
+#: catalog/models.py:94
+msgid "Returning series"
+msgstr "Wird fortgesetzt"
+
+#: catalog/models.py:95
+msgid "Ended"
+msgstr "Beendet"
+
+#: catalog/models.py:96
+msgid "Pilot"
+msgstr "Pilotfolge"
+
+#: catalog/models.py:110 catalog/models.py:159
+msgid "user"
+msgstr "Benutzer"
+
+#: catalog/models.py:118 catalog/models.py:135
+msgid "list"
+msgstr "Liste"
+
+#: catalog/models.py:119
+msgid "lists"
+msgstr "Listen"
+
+#: catalog/models.py:140
+msgid "added at"
+msgstr "hinzugefügt am"
+
+#: catalog/models.py:143
+msgid "list entry"
+msgstr "Listeneintrag"
+
+#: catalog/models.py:144
+msgid "list entries"
+msgstr "Listeneinträge"
+
+#: catalog/models.py:165
+msgid "movie"
+msgstr "Film"
+
+#: catalog/models.py:171
+msgid "watched on"
+msgstr "gesehen am"
+
+#: catalog/models.py:174
+msgid "watched movie"
+msgstr "gesehener Film"
+
+#: catalog/models.py:175
+msgid "watched movies"
+msgstr "gesehene Filme"
+
+#: catalog/templates/catalog/_list_dropdown.html:13
+#, python-format
+msgid "Add “%(name)s” to a list"
+msgstr "„%(name)s“ zu einer Liste hinzufügen"
+
+#: catalog/templates/catalog/_list_dropdown.html:14
+#: catalog/templates/catalog/_list_dropdown.html:18
+msgid "Add to list"
+msgstr "Zu Liste hinzufügen"
+
+#: catalog/templates/catalog/_list_dropdown.html:21
+msgid "Loading…"
+msgstr "Lädt …"
+
+#: catalog/templates/catalog/_list_menu.html:23
+msgid "Watchlist"
+msgstr "Watchlist"
+
+#: catalog/templates/catalog/_list_menu.html:39
+#: catalog/templates/catalog/lists.html:26
+msgid "New list"
+msgstr "Neue Liste"
+
+#: catalog/templates/catalog/_list_menu.html:40
+msgid "Name of the new list"
+msgstr "Name der neuen Liste"
+
+#: catalog/templates/catalog/_list_menu.html:41
+#: catalog/templates/catalog/_list_menu.html:42
+msgid "Create list"
+msgstr "Liste anlegen"
+
+#: catalog/templates/catalog/list_delete.html:4
+#: catalog/templates/catalog/list_delete.html:8
+#: catalog/templates/catalog/list_delete.html:17
+msgid "Delete list"
+msgstr "Liste löschen"
+
+#: catalog/templates/catalog/list_delete.html:10
+#, python-format
+msgid "Delete the list “%(name)s” with %(counter)s title?"
+msgid_plural "Delete the list “%(name)s” with %(counter)s titles?"
+msgstr[0] "Liste „%(name)s“ mit %(counter)s Titel löschen?"
+msgstr[1] "Liste „%(name)s“ mit %(counter)s Titeln löschen?"
+
+#: catalog/templates/catalog/list_delete.html:12
+msgid "Movies you marked as watched stay watched."
+msgstr "Als gesehen markierte Filme bleiben gesehen."
+
+#: catalog/templates/catalog/list_delete.html:16
+#: catalog/templates/catalog/list_rename.html:13
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: catalog/templates/catalog/list_detail.html:10
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: catalog/templates/catalog/list_detail.html:11
+msgid "Delete"
+msgstr "Löschen"
+
+#: catalog/templates/catalog/list_detail.html:21
+msgid "View"
+msgstr "Ansicht"
+
+#: catalog/templates/catalog/list_detail.html:55
+#: catalog/templates/catalog/list_detail.html:88
+#: catalog/templates/catalog/search.html:44
+#: catalog/templates/catalog/title_detail.html:37
+msgid "Watched"
+msgstr "Gesehen"
+
+#: catalog/templates/catalog/list_detail.html:64
+#, python-format
+msgid "Remove “%(name)s” from the list"
+msgstr "„%(name)s“ von der Liste entfernen"
+
+#: catalog/templates/catalog/list_detail.html:65
+msgid "Remove from list"
+msgstr "Von der Liste entfernen"
+
+#: catalog/templates/catalog/list_detail.html:101
+#, python-format
+msgid ""
+"This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
+"movies and TV shows."
+msgstr "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du Filme und Serien hinzu."
+
+#: catalog/templates/catalog/list_rename.html:4
+#: catalog/templates/catalog/list_rename.html:8
+msgid "Rename list"
+msgstr "Liste umbenennen"
+
+#: catalog/templates/catalog/lists.html:4
+#: catalog/templates/catalog/lists.html:7 core/templates/core/_nav.html:19
+msgid "Lists"
+msgstr "Listen"
+
+#: catalog/templates/catalog/lists.html:15
+#, python-format
+msgid "%(counter)s title"
+msgid_plural "%(counter)s titles"
+msgstr[0] "%(counter)s Titel"
+msgstr[1] "%(counter)s Titel"
+
+#: catalog/templates/catalog/lists.html:21
+msgid ""
+"You don't have any lists yet. Create one below, or add a title from the "
+"search: a “Watchlist” is created for you."
+msgstr "Du hast noch keine Listen. Lege unten eine an oder füge einen Titel über die Suche hinzu: Dann wird automatisch eine „Watchlist“ angelegt."
+
+#: catalog/templates/catalog/lists.html:29
+msgid "Create"
+msgstr "Anlegen"
 
 #: catalog/templates/catalog/search.html:4
 #: catalog/templates/catalog/search.html:7 core/templates/core/_nav.html:31
@@ -515,26 +744,86 @@ msgstr "Film oder Serie"
 msgid "Search for movies and TV shows"
 msgstr "Filme und Serien suchen"
 
-#: catalog/templates/catalog/search.html:49
+#: catalog/templates/catalog/search.html:55
 #, python-format
 msgid "Nothing found for “%(query)s”."
 msgstr "Nichts gefunden für „%(query)s“."
 
-#: catalog/templates/catalog/search.html:51
+#: catalog/templates/catalog/search.html:57
 msgid "Type a title to search movies and TV shows."
 msgstr "Gib einen Titel ein, um Filme und Serien zu suchen."
 
-#: catalog/views.py:35
+#: catalog/templates/catalog/title_detail.html:43
+#, python-format
+msgid "on %(date)s"
+msgstr "am %(date)s"
+
+#: catalog/templates/catalog/title_detail.html:47
+msgid "change"
+msgstr "ändern"
+
+#: catalog/templates/catalog/title_detail.html:58
+msgid "Save date"
+msgstr "Datum speichern"
+
+#: catalog/templates/catalog/title_detail.html:66
+msgid "Mark as not watched"
+msgstr "Als nicht gesehen markieren"
+
+#: catalog/templates/catalog/title_detail.html:74
+msgid "Mark as watched"
+msgstr "Als gesehen markieren"
+
+#: catalog/templates/catalog/title_detail.html:84
+msgid "No description available."
+msgstr "Keine Beschreibung vorhanden."
+
+#: catalog/templates/catalog/title_error.html:4
+#: catalog/templates/catalog/title_error.html:7
+msgid "Not available"
+msgstr "Nicht verfügbar"
+
+#: catalog/templates/catalog/title_error.html:9
+msgid "Back to search"
+msgstr "Zurück zur Suche"
+
+#: catalog/views.py:41
 msgid "Too many searches in a short time. Please wait a moment."
 msgstr "Zu viele Suchanfragen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:40
+#: catalog/views.py:46
 msgid "Search is not available: the administrator has not set up TMDB yet."
-msgstr "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht eingerichtet."
+msgstr ""
+"Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
+"eingerichtet."
 
-#: catalog/views.py:43
+#: catalog/views.py:49 catalog/views.py:202
 msgid "TMDB can't be reached right now. Please try again later."
-msgstr "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
+msgstr ""
+"TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
+
+#: catalog/views.py:103
+#, python-format
+msgid "List “%(name)s” created."
+msgstr "Liste „%(name)s“ angelegt."
+
+#: catalog/views.py:139
+msgid "List renamed."
+msgstr "Liste umbenannt."
+
+#: catalog/views.py:151
+#, python-format
+msgid "List “%(name)s” deleted."
+msgstr "Liste „%(name)s“ gelöscht."
+
+#: catalog/views.py:199
+msgid "The administrator has not set up TMDB yet."
+msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
+
+#: catalog/views.py:272
+#, python-format
+msgid "Please enter a name (at most %(max)s characters)."
+msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."
 
 #: core/templates/core/_nav.html:3
 msgid "Main navigation"
@@ -545,11 +834,7 @@ msgstr "Hauptnavigation"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: core/templates/core/_nav.html:19 core/urls.py:11
-msgid "Lists"
-msgstr "Listen"
-
-#: core/templates/core/_nav.html:25 core/urls.py:12
+#: core/templates/core/_nav.html:25 core/urls.py:11
 msgid "Upcoming"
 msgstr "Demnächst"
 
@@ -582,4 +867,6 @@ msgstr ""
 #: templates/base.html:44
 msgid ""
 "This product uses the TMDB API but is not endorsed or certified by TMDB."
-msgstr "Dieses Produkt nutzt die TMDB-API, wird aber nicht von TMDB unterstützt oder zertifiziert."
+msgstr ""
+"Dieses Produkt nutzt die TMDB-API, wird aber nicht von TMDB unterstützt oder "
+"zertifiziert."

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load i18n catalog %}
+
+{% block title %}{{ list.name }}{% endblock %}
+
+{% block content %}
+  <div class="list-header">
+    <h1>{{ list.name }}</h1>
+    <div class="list-header-links">
+      <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
+      <a href="{% url 'catalog:list_delete' list.pk %}">{% translate "Delete" %}</a>
+    </div>
+  </div>
+
+  <div id="list-content">
+    {% partialdef list-content inline %}
+      {% if items %}
+        {# Poster grid or compact list; the choice is saved per user #}
+        <form method="post" action="{% url 'catalog:list_layout' list.pk %}"
+              hx-post="{% url 'catalog:list_layout' list.pk %}" hx-target="#list-content"
+              class="layout-toggle" role="group" aria-label="{% translate 'View' %}">
+          {% csrf_token %}
+          <button type="submit" name="layout" value="{{ layouts.GRID }}"
+                  class="outline secondary" aria-pressed="{% if user.list_layout == layouts.GRID %}true{% else %}false{% endif %}"
+                  title="{{ layouts.GRID.label }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span class="visually-hidden">{{ layouts.GRID.label }}</span>
+          </button>
+          <button type="submit" name="layout" value="{{ layouts.COMPACT }}"
+                  class="outline secondary" aria-pressed="{% if user.list_layout == layouts.COMPACT %}true{% else %}false{% endif %}"
+                  title="{{ layouts.COMPACT.label }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            <span class="visually-hidden">{{ layouts.COMPACT.label }}</span>
+          </button>
+        </form>
+
+        {% if user.list_layout == layouts.COMPACT %}
+          <ul class="compact-list">
+            {% for item in items %}
+              {% with name=item.translation.name|default:item.title.original_title %}
+                <li>
+                  <a class="result-link" href="{{ item.title.get_absolute_url }}">
+                    {% poster item.translation.poster_path "w92" as thumb %}
+                    {% if thumb %}
+                      {% poster item.translation.poster_path "w185" as thumb_2x %}
+                      <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                           alt="" width="46" height="69" loading="lazy" class="poster">
+                    {% else %}
+                      <span class="poster poster-missing" aria-hidden="true"></span>
+                    {% endif %}
+                    <div>
+                      <strong>{{ name }}</strong>
+                      <small>
+                        {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}
+                        {% if item.watched %} · <span class="watched-badge">✓ {% translate "Watched" %}</span>{% endif %}
+                      </small>
+                    </div>
+                  </a>
+                  <form method="post" action="{% url 'catalog:list_item_remove' list.pk item.pk %}"
+                        hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}"
+                        hx-target="#list-content">
+                    {% csrf_token %}
+                    <button type="submit" class="outline secondary icon-button"
+                            aria-label="{% blocktranslate %}Remove “{{ name }}” from the list{% endblocktranslate %}"
+                            title="{% translate 'Remove from list' %}">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                    </button>
+                  </form>
+                </li>
+              {% endwith %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <ul class="poster-grid">
+            {% for item in items %}
+              {% with name=item.translation.name|default:item.title.original_title %}
+                <li>
+                  <a href="{{ item.title.get_absolute_url }}">
+                    {% poster item.translation.poster_path "w185" as thumb %}
+                    {% if thumb %}
+                      {% poster item.translation.poster_path "w342" as thumb_2x %}
+                      <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                           alt="" width="185" height="278" loading="lazy">
+                    {% else %}
+                      <span class="poster-missing" aria-hidden="true"></span>
+                    {% endif %}
+                    {% if item.watched %}
+                      <span class="watched-corner" title="{% translate 'Watched' %}">✓<span class="visually-hidden"> {% translate "Watched" %}</span></span>
+                    {% endif %}
+                    <strong>{{ name }}</strong>
+                    <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}</small>
+                  </a>
+                </li>
+              {% endwith %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% else %}
+        <p class="muted">
+          {% url 'catalog:search' as search_url %}
+          {% blocktranslate %}This list is empty. Use the <a href="{{ search_url }}">search</a> to add movies and TV shows.{% endblocktranslate %}
+        </p>
+      {% endif %}
+    {% endpartialdef %}
+  </div>
+{% endblock %}

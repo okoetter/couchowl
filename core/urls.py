@@ -7,8 +7,7 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
-    # Placeholders until the real pages exist (milestones 3-6)
-    path("lists/", views.placeholder, {"title": _("Lists")}, name="lists"),
+    # Placeholder until the real page exists (milestone 6)
     path("upcoming/", views.placeholder, {"title": _("Upcoming")}, name="upcoming"),
     path("healthz/", views.health, name="health"),
     path("manifest.webmanifest", views.manifest, name="manifest"),

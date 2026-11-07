@@ -1,0 +1,45 @@
+{% load i18n %}
+{% comment %}
+  Contents of the "add to list" dropdown (<details class="dropdown">), see catalog/views.py.
+  Every change sends a request and replaces this <ul> with the updated menu.
+{% endcomment %}
+<ul class="list-menu" id="list-menu-{{ media_type }}-{{ tmdb_id }}">
+  {% if menu_error %}
+    <li class="list-menu-error" role="alert">{{ menu_error }}</li>
+  {% endif %}
+  {% for user_list in lists %}
+    <li>
+      <label>
+        <input type="checkbox" name="member" value="1"
+               id="list-{{ media_type }}-{{ tmdb_id }}-{{ user_list.pk }}"
+               {% if user_list.contains %}checked{% endif %}
+               hx-post="{% url 'catalog:title_list_membership' media_type tmdb_id user_list.pk %}"
+               hx-target="closest ul" hx-swap="outerHTML">
+        {{ user_list.name }}
+      </label>
+    </li>
+  {% empty %}
+    {# No lists yet: offer a "Watchlist" that is created on the first click #}
+    {% translate "Watchlist" as default_name %}
+    <li>
+      <label>
+        <input type="checkbox" name="name" value="{{ default_name }}"
+               id="list-{{ media_type }}-{{ tmdb_id }}-default"
+               hx-post="{% url 'catalog:title_list_create' media_type tmdb_id %}"
+               hx-target="closest ul" hx-swap="outerHTML">
+        {{ default_name }}
+      </label>
+    </li>
+  {% endfor %}
+  <li>
+    <form class="list-menu-new"
+          hx-post="{% url 'catalog:title_list_create' media_type tmdb_id %}"
+          hx-target="closest ul" hx-swap="outerHTML">
+      <input type="text" name="name" maxlength="100" required
+             placeholder="{% translate 'New list' %}"
+             aria-label="{% translate 'Name of the new list' %}">
+      <button type="submit" class="secondary" aria-label="{% translate 'Create list' %}"
+              title="{% translate 'Create list' %}">+</button>
+    </form>
+  </li>
+</ul>

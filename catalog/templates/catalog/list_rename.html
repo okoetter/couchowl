@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Rename list" %}{% endblock %}
+
+{% block content %}
+  <div class="narrow">
+    <h1>{% translate "Rename list" %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form }}
+      <div class="actions">
+        <a href="{{ list.get_absolute_url }}" role="button" class="secondary outline">{% translate "Cancel" %}</a>
+        <div><button type="submit">{% translate "Save" %}</button></div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

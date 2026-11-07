@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Delete list" %}{% endblock %}
+
+{% block content %}
+  <div class="narrow">
+    <h1>{% translate "Delete list" %}</h1>
+    <p>
+      {% blocktranslate with name=list.name count counter=item_count %}Delete the list “{{ name }}” with {{ counter }} title?{% plural %}Delete the list “{{ name }}” with {{ counter }} titles?{% endblocktranslate %}
+    </p>
+    <p class="muted">{% translate "Movies you marked as watched stay watched." %}</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions">
+        <a href="{{ list.get_absolute_url }}" role="button" class="secondary outline">{% translate "Cancel" %}</a>
+        <div><button type="submit" class="danger">{% translate "Delete list" %}</button></div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Lists" %}{% endblock %}
+
+{% block content %}
+  <h1>{% translate "Lists" %}</h1>
+
+  {% if lists %}
+    <ul class="list-index">
+      {% for user_list in lists %}
+        <li>
+          <a href="{{ user_list.get_absolute_url }}">
+            <strong>{{ user_list.name }}</strong>
+            <small>{% blocktranslate count counter=user_list.item_count %}{{ counter }} title{% plural %}{{ counter }} titles{% endblocktranslate %}</small>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">{% translate "You don't have any lists yet. Create one below, or add a title from the search: a “Watchlist” is created for you." %}</p>
+  {% endif %}
+
+  <form method="post" class="new-list">
+    {% csrf_token %}
+    <label for="{{ form.name.id_for_label }}">{% translate "New list" %}</label>
+    <fieldset role="group">
+      {{ form.name }}
+      <button type="submit">{% translate "Create" %}</button>
+    </fieldset>
+    {{ form.name.errors }}
+  </form>
+{% endblock %}

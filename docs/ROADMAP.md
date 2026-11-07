@@ -5,7 +5,7 @@
 - [x] **0 – Project skeleton:** Django, i18n, base layout with navigation, PWA, Docker, tests, pre-commit
 - [x] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
 - [x] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
-- [ ] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
+- [x] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
 - [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile)
 - [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months, configurable via `ANNOUNCEMENT_MONTHS`)
 - [ ] **6 – Sync and "Upcoming":** daily/manual TMDB sync, streaming providers, upcoming page
@@ -19,6 +19,7 @@
   - open question: how to obtain the export (no official export; GDPR data request?)
 - [ ] Data export (JSON) and self-service account deletion; later imports (Trakt, TV Time, Letterboxd)
 - [ ] Lists: sort and filter; "already on list X" in search; note per list entry
+- [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
 - [ ] Ratings
 - [ ] Notifications (e-mail/push) for new seasons

@@ -277,3 +277,20 @@ def test_errors_without_stored_data_are_raised(fake_tmdb):
         services.get_title("tv", 1, "de-DE")
     with pytest.raises(tmdb.TMDBNotFound):
         services.get_title("tv", 2, "de-DE")
+
+
+# --- Stored translations for lists -----------------------------------------------------------
+
+
+@pytest.mark.django_db
+def test_best_translations_prefers_the_closest_stored_language():
+    data = load_tmdb_fixture("movie_155")
+    for language in ("fr-FR", "en-US", "de-DE"):
+        title = services.save_title("movie", data, language).title
+    dark = services.save_title("tv", load_tmdb_fixture("tv_70523"), "fr-FR").title
+
+    best = services.best_translations([title, dark], "de-AT")
+
+    assert best[title.pk].language == "de-DE"
+    assert best[dark.pk].language == "fr-FR"  # any language is better than none
+    assert services.best_translations([title], "es-ES")[title.pk].language == "en-US"

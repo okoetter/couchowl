@@ -58,6 +58,18 @@
   - **Titel im Django-Admin** nur lesbar (Daten kommen von TMDB).
   - **TMDB-Logo** für die Attribution liegt lokal in `catalog/static/catalog/` (offizielles Logo von themoviedb.org/about/logos-attribution).
 
+- **2026-11-07 – Meilenstein 3 (Listen und Filme):**
+  - **Erste Liste „Watchlist“ automatisch:** Wer noch keine Liste hat, sieht im Menü „Zu Liste hinzufügen“ den Eintrag „Watchlist“; beim ersten Klick wird sie angelegt. Sie ist eine normale Liste (umbenennbar, löschbar). Auf der Seite „Listen“ wird nichts automatisch angelegt, sonst käme eine gelöschte Watchlist sofort zurück.
+  - **Hinzufügen** über die Detailseite und zusätzlich über einen „+“-Button an jedem Suchergebnis. Das Menü zeigt alle Listen mit Häkchen (an/aus) und ein Feld „Neue Liste“. In der Suche wird es erst beim Öffnen geladen. Gibt es den Namen schon (Groß-/Kleinschreibung egal), wird die vorhandene Liste genommen.
+  - **Listennamen** sind pro Nutzer eindeutig, unabhängig von Groß-/Kleinschreibung.
+  - **Listen alphabetisch sortiert;** Sortieren per Ziehen kommt in den Backlog. Einträge einer Liste: zuletzt hinzugefügte zuerst.
+  - **Einfache Serienseite schon jetzt** (Poster, Beschreibung, Status, „Zu Liste hinzufügen“); Staffeln und Folgen folgen in Meilenstein 4.
+  - **Listen fragen TMDB nicht ab:** Sie zeigen die gespeicherten Texte, bei fehlender Sprache die nächstliegende gespeicherte (gleiche Reihenfolge wie der Sprach-Fallback, sonst irgendeine). Viele Titel auf einmal von TMDB zu laden wäre zu langsam. Beim Hinzufügen wird ein Titel bei Bedarf von TMDB geladen.
+  - **Listenansicht** (Raster/kompakt) gilt pro Nutzer für alle Listen (Feld `list_layout`). Entfernen geht in der kompakten Ansicht per „×“ und überall über das Menü „Zu Liste hinzufügen“.
+  - **Liste löschen** mit Bestätigungsseite; gesehene Filme bleiben gesehen.
+  - **Gesehen-Datum** nur als Tag (ohne Uhrzeit), nicht in der Zukunft. Das Datum lässt sich auch ohne JavaScript ändern (aufklappbares `<details>`).
+  - **Status von TMDB übersetzt** (z. B. „Released“ → „Veröffentlicht“, „Ended“ → „Beendet“).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -179,12 +191,12 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Git ab dem ersten Schritt
 
 ## Datenmodell (Entwurf)
-- `User` (eigenes User-Modell von Anfang an): `region`, `ui_language`, `tmdb_language` (leer = aus Region), `theme`; ab Meilenstein 3/4 `show_followed_list` (Systemliste „Gefolgte Serien“ anzeigen, Standard an)
+- `User` (eigenes User-Modell von Anfang an): `region`, `ui_language`, `tmdb_language` (leer = aus Region), `theme`, `list_layout` (Raster/kompakt); ab Meilenstein 3/4 `show_followed_list` (Systemliste „Gefolgte Serien“ anzeigen, Standard an)
 - `Invitation`: Token, E-Mail (optional), `created_by`, `expires_at`, `used_by`
 - `Title`: `tmdb_id` + `media_type` (Film/Serie) sowie sprachneutrale Daten (Poster, Daten, Status, Networks)
 - `TitleTranslation`: Titel, Sprache, Name, Beschreibung (Cache pro Sprache)
 - `Season` und `Episode`: Nummer, Air-Date; sprachabhängige Texte jeweils in Übersetzungstabellen
-- `UserList` (Nutzer, Name, Reihenfolge) und `ListItem` (Liste, Titel, hinzugefügt am)
+- `UserList` (Nutzer, Name; alphabetisch sortiert, Name pro Nutzer eindeutig) und `ListItem` (Liste, Titel, hinzugefügt am)
 - `UserSeries`: Nutzer, Serie, `following` (Button „Folgen“), Status (schaue gerade / pausiert / fertig); wird beim ersten Abhaken automatisch auf „schaue gerade“ gesetzt
 - `WatchedEpisode`: Nutzer, Folge, `watched_at` (nullable = Datum unbekannt; eindeutig pro Nutzer und Folge; nur das letzte Datum)
 - `WatchedMovie`: Nutzer, Film, `watched_at` (nullable; eindeutig pro Nutzer und Film; nur das letzte Datum)
@@ -323,6 +335,7 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - Listen-Komfort:
   - Sortieren und Filtern (Hinzufügedatum, Titel, Jahr, Film/Serie)
   - in der Suche „ist schon auf Liste X“ anzeigen
+  - Listen per Ziehen sortieren (bis dahin alphabetisch)
   - Notiz pro Listeneintrag
 - Barrierefreiheit gezielt prüfen und verbessern (Labels, Tastatur, Kontrast, Screenreader bei HTMX-Updates)
 - Bewertungen

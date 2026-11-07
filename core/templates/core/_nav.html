@@ -14,7 +14,7 @@
       </a>
     </li>
     <li>
-      <a href="{% url 'core:lists' %}" {% if current == "lists" %}aria-current="page"{% endif %}>
+      <a href="{% url 'catalog:lists' %}" {% if current == "lists" or current|slice:":5" == "list_" %}aria-current="page"{% endif %}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
         <span>{% translate "Lists" %}</span>
       </a>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Not available" %}{% endblock %}
+
+{% block content %}
+  <h1>{% translate "Not available" %}</h1>
+  <article class="message message-error" role="alert">{{ error }}</article>
+  <p><a href="{% url 'catalog:search' %}">{% translate "Back to search" %}</a></p>
+{% endblock %}

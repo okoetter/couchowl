@@ -62,6 +62,45 @@ def show_search_error(page, url):
     page.goto(f"{url}/search/?q=fail")
 
 
+def show_search_menu(page, url):
+    show_search(page, url)
+    page.get_by_role("button", name="„The Dark Knight“ zu einer Liste hinzufügen").click()
+    page.get_by_label("Watchlist").wait_for()
+
+
+def show_lists(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/lists/")
+
+
+def show_list_grid(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/lists/")
+    page.get_by_role("link", name="Watchlist").click()
+    page.wait_for_load_state("networkidle")
+
+
+def show_list_compact(page, url):
+    show_list_grid(page, url)
+    page.get_by_role("button", name="Kompakte Liste").click()
+    page.locator(".compact-list").wait_for()
+    page.wait_for_load_state("networkidle")
+
+
+def show_movie(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/movie/155/")
+    page.get_by_text("(ändern)").click()
+    page.wait_for_load_state("networkidle")
+
+
+def show_show(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/tv/70523/")
+    page.get_by_role("button", name="Zu Liste hinzufügen").click()
+    page.wait_for_load_state("networkidle")
+
+
 PAGES = {
     "login-error": show_login_error,
     "register-error": show_register,
@@ -69,6 +108,12 @@ PAGES = {
     "password-change-error": show_password_change,
     "search": show_search,
     "search-error": show_search_error,
+    "search-menu": show_search_menu,
+    "lists": show_lists,
+    "list-grid": show_list_grid,
+    "list-compact": show_list_compact,
+    "movie": show_movie,
+    "show": show_show,
 }
 
 
@@ -87,11 +132,51 @@ def fake_search(fake_tmdb):
                 )
 
 
+def sample_lists(fake_tmdb, user):
+    """Two lists with a few titles (variants of the fixtures), one movie watched."""
+    from datetime import date
+
+    from catalog import lists as list_rules
+    from catalog import services
+
+    colors = [(26, 43, 74), (120, 40, 40), (40, 100, 60), (90, 70, 20), (30, 90, 110)]
+    names = ["The Dark Knight", "Ein sehr langer Filmtitel, der umbricht", "Arrival", "Heat"]
+    watchlist = user.lists.create(name="Watchlist")
+    user.lists.create(name="Mit Familie")
+    user.lists.create(name="Animation")
+    titles = []
+    for index, name in enumerate(names):
+        data = load_tmdb_fixture("movie_155")
+        data.update(id=155 + index, original_title=name, poster_path=f"/sample{index}.jpg")
+        data["release_date"] = f"{2008 + index * 3}-07-16"
+        for translation in data["translations"]["translations"]:
+            translation["data"]["title"] = ""  # use the original title as name
+        if index == 3:
+            data["poster_path"] = None
+        titles.append(services.save_title("movie", data, "de-DE").title)
+    show = load_tmdb_fixture("tv_70523")
+    show["poster_path"] = "/sample9.jpg"
+    titles.append(services.save_title("tv", show, "de-DE").title)
+    fake_tmdb.add("/3/tv/70523", json=show)
+    for title in titles:
+        list_rules.add_to_list(watchlist, title)
+    list_rules.mark_watched(user, titles[0], date(2024, 3, 15))
+    list_rules.mark_watched(user, titles[2])
+    for index, color in zip([0, 1, 2, 9], colors, strict=False):
+        for size in ("w92", "w185", "w342", "w500"):
+            fake_tmdb.add(
+                f"/t/p/{size}/sample{index}.jpg",
+                content=tiny_png(color),
+                headers={"Content-Type": "image/png"},
+            )
+
+
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 @pytest.mark.parametrize("device", VIEWPORTS)
 @pytest.mark.parametrize("name", PAGES)
 def test_screenshot(live_server, member, browser, fake_tmdb, name, device, scheme):
     fake_search(fake_tmdb)
+    sample_lists(fake_tmdb, member)
     if name == "search-error":
         fake_tmdb.add("/3/search/multi", json={}, status=503)
     context = browser.new_context(locale=LOCALE, viewport=VIEWPORTS[device], color_scheme=scheme)

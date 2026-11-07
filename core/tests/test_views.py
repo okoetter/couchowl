@@ -24,7 +24,7 @@ def test_assets_are_served_locally_without_cdn(auth_client):
         assert cdn not in content
 
 
-@pytest.mark.parametrize("name", ["lists", "upcoming"])
+@pytest.mark.parametrize("name", ["upcoming"])
 def test_placeholder_pages_exist(auth_client, name):
     response = auth_client.get(reverse(f"core:{name}"))
 

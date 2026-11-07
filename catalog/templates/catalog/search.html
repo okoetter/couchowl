@@ -27,21 +27,27 @@
         <ul class="search-results">
           {% for result in results %}
             <li>
-              {% poster result.poster_path "w92" as thumb %}
-              {% if thumb %}
-                {% poster result.poster_path "w185" as thumb_2x %}
-                <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
-                     alt="" width="46" height="69" loading="lazy" class="poster">
-              {% else %}
-                <span class="poster poster-missing" aria-hidden="true"></span>
-              {% endif %}
-              <div>
-                <strong>{{ result.title }}</strong>
-                <small>
-                  {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}
-                  {% if result.original_title != result.title %}<br>{{ result.original_title }}{% endif %}
-                </small>
-              </div>
+              <a class="result-link" href="{% url 'catalog:title_detail' result.media_type result.tmdb_id %}">
+                {% poster result.poster_path "w92" as thumb %}
+                {% if thumb %}
+                  {% poster result.poster_path "w185" as thumb_2x %}
+                  <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                       alt="" width="46" height="69" loading="lazy" class="poster">
+                {% else %}
+                  <span class="poster poster-missing" aria-hidden="true"></span>
+                {% endif %}
+                <div>
+                  <strong>{{ result.title }}</strong>
+                  <small>
+                    {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}
+                    {% if result.media_type == "movie" and result.tmdb_id in watched %}
+                      · <span class="watched-badge">✓ {% translate "Watched" %}</span>
+                    {% endif %}
+                    {% if result.original_title != result.title %}<br>{{ result.original_title }}{% endif %}
+                  </small>
+                </div>
+              </a>
+              {% include "catalog/_list_dropdown.html" with media_type=result.media_type tmdb_id=result.tmdb_id name=result.title lazy=True compact=True only %}
             </li>
           {% endfor %}
         </ul>

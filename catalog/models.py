@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.db import models
+from django.db.models.functions import Lower
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
@@ -35,9 +38,20 @@ class Title(models.Model):
     def __str__(self):
         return f"{self.original_title} ({self.year or '?'})"
 
+    def get_absolute_url(self):
+        return reverse("catalog:title_detail", args=[self.media_type, self.tmdb_id])
+
     @property
     def year(self) -> int | None:
         return self.release_date.year if self.release_date else None
+
+    @property
+    def is_movie(self) -> bool:
+        return self.media_type == MediaType.MOVIE
+
+    @property
+    def status_label(self) -> str:
+        return status_label(self.status)
 
 
 class TitleTranslation(models.Model):
@@ -67,3 +81,101 @@ class TitleTranslation(models.Model):
 
     def __str__(self):
         return f"{self.name} [{self.language}]"
+
+
+# TMDB status values are English; these are the ones TMDB documents
+_STATUS_LABELS = {
+    "Released": _("Released"),
+    "Rumored": _("Rumored"),
+    "Planned": _("Planned"),
+    "In Production": _("In production"),
+    "Post Production": _("Post-production"),
+    "Canceled": _("Canceled"),
+    "Returning Series": _("Returning series"),
+    "Ended": _("Ended"),
+    "Pilot": _("Pilot"),
+}
+
+
+def status_label(status: str) -> str:
+    """Translated TMDB status; unknown values are shown as TMDB sends them."""
+    return _STATUS_LABELS.get(status, status)
+
+
+class UserList(models.Model):
+    """A private list of movies and shows, e.g. "Watchlist" or "Watch with family"."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="lists",
+    )
+    name = models.CharField(_("name"), max_length=100)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("list")
+        verbose_name_plural = _("lists")
+        ordering = [Lower("name")]
+        constraints = [
+            # "Watchlist" and "watchlist" would be confusing next to each other
+            models.UniqueConstraint("user", Lower("name"), name="unique_list_name_per_user"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("catalog:list_detail", args=[self.pk])
+
+
+class ListItem(models.Model):
+    user_list = models.ForeignKey(
+        UserList, verbose_name=_("list"), on_delete=models.CASCADE, related_name="items"
+    )
+    title = models.ForeignKey(
+        Title, verbose_name=_("title"), on_delete=models.CASCADE, related_name="list_items"
+    )
+    added_at = models.DateTimeField(_("added at"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("list entry")
+        verbose_name_plural = _("list entries")
+        ordering = ["-added_at", "-pk"]  # newest first
+        constraints = [
+            models.UniqueConstraint(fields=["user_list", "title"], name="unique_title_per_list")
+        ]
+
+    def __str__(self):
+        return f"{self.title} @ {self.user_list}"
+
+
+class WatchedMovie(models.Model):
+    """A movie the user has seen. Only the last date is kept (no history)."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="watched_movies",
+    )
+    title = models.ForeignKey(
+        Title,
+        verbose_name=_("movie"),
+        on_delete=models.CASCADE,
+        related_name="watched_by",
+        limit_choices_to={"media_type": MediaType.MOVIE},
+    )
+    # Empty = seen, but the date is unknown
+    watched_at = models.DateField(_("watched on"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("watched movie")
+        verbose_name_plural = _("watched movies")
+        constraints = [
+            models.UniqueConstraint(fields=["user", "title"], name="unique_watched_movie")
+        ]
+
+    def __str__(self):
+        return f"{self.user} ✓ {self.title}"

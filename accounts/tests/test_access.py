@@ -9,7 +9,7 @@ from django.urls import reverse
     "url_name",
     [
         "core:dashboard",
-        "core:lists",
+        "catalog:lists",
         "core:upcoming",
         "catalog:search",
         "accounts:profile",
@@ -36,7 +36,7 @@ def test_public_pages_are_reachable_without_login(client, url_name):
 def test_navigation_is_hidden_when_logged_out(client, db):
     content = client.get(reverse("accounts:login")).content.decode()
 
-    assert reverse("core:lists") not in content
+    assert reverse("catalog:lists") not in content
 
 
 def test_login_redirects_to_next_page(client, user):
@@ -44,11 +44,11 @@ def test_login_redirects_to_next_page(client, user):
 
     response = client.post(
         reverse("accounts:login"),
-        {"username": "oliver", "password": PASSWORD, "next": reverse("core:lists")},
+        {"username": "oliver", "password": PASSWORD, "next": reverse("catalog:lists")},
     )
 
     assert response.status_code == 302
-    assert response["Location"] == reverse("core:lists")
+    assert response["Location"] == reverse("catalog:lists")
 
 
 def test_logout_requires_post_and_logs_out(auth_client):

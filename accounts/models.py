@@ -47,6 +47,15 @@ class User(AbstractUser):
         _("color scheme"), max_length=10, choices=Theme.choices, default=Theme.AUTO
     )
 
+    class ListLayout(models.TextChoices):
+        GRID = "grid", _("Poster grid")
+        COMPACT = "compact", _("Compact list")
+
+    # Switched on the list page itself, applies to all lists
+    list_layout = models.CharField(
+        _("list layout"), max_length=10, choices=ListLayout.choices, default=ListLayout.GRID
+    )
+
     @property
     def effective_region(self) -> str:
         """Saved region > server default (DEFAULT_REGION) > US."""

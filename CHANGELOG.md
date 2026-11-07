@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poster proxy: posters are downloaded once and served by watchit, so browsers never
   contact TMDB
 - TMDB attribution in the footer
+- Private lists: create, rename and delete as many as you like; each holds movies and
+  shows mixed. A "Watchlist" is created on the first add if you have no list yet
+- "Add to list" menu on detail pages and as a "+" button in search results, including
+  creating a new list right from the menu
+- List view as poster grid or compact list (remembered per user)
+- Detail pages for movies and shows (poster, description, status)
+- Mark movies as watched with a date (default today; changeable or "unknown");
+  search results and lists show watched movies
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

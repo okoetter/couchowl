@@ -248,20 +248,6 @@ textarea + .errorlist {
   padding: 0;
 }
 
-.search-results li {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: var(--pico-spacing);
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--pico-muted-border-color);
-}
-
-.search-results small {
-  display: block;
-  color: var(--pico-muted-color);
-}
-
 /* Poster thumbnails have TMDB's 2:3 aspect ratio */
 .poster {
   flex: none;
@@ -274,4 +260,344 @@ textarea + .errorlist {
 
 .poster-missing {
   display: block;
+}
+
+/* ---- Shared helpers ------------------------------------------------------------ */
+
+/* Text for screen readers only */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+svg.icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Square button with only an icon */
+.icon-button {
+  padding: 0.4rem 0.55rem;
+  margin: 0;
+  line-height: 1;
+}
+
+/* Destructive action (Pico has no "danger" variant) */
+button.danger {
+  --pico-background-color: var(--watchit-error-color);
+  --pico-border-color: var(--watchit-error-color);
+  --pico-color: #fff;
+}
+
+.watched-badge {
+  color: var(--pico-ins-color);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A row with poster thumbnail and text that links to the detail page
+   (search results, compact list), with an action button on the right */
+.search-results li,
+.compact-list li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.result-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  color: inherit;
+  text-decoration: none;
+}
+
+.result-link:hover strong {
+  text-decoration: underline;
+}
+
+.search-results small,
+.compact-list small {
+  display: block;
+  color: var(--pico-muted-color);
+}
+
+.compact-list {
+  padding: 0;
+}
+
+.compact-list form {
+  margin: 0;
+}
+
+/* ---- "Add to list" dropdown ------------------------------------------------------ */
+
+.list-dropdown {
+  margin: 0;
+}
+
+/* Small "+" button in search results: no chevron, menu opens to the left */
+.list-dropdown-compact > summary[role="button"] {
+  padding: 0.4rem 0.55rem;
+  line-height: 1;
+}
+
+/* "details.dropdown" repeats Pico's selector so these rules win over Pico's */
+details.dropdown.list-dropdown-compact > summary::after {
+  display: none;
+}
+
+details.dropdown.list-dropdown > summary + ul {
+  min-width: 16rem;
+}
+
+details.dropdown.list-dropdown-compact > summary + ul {
+  left: auto;
+  right: 0;
+}
+
+.list-menu-new {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.list-menu-new input,
+.list-menu-new button {
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  height: auto;
+}
+
+.list-menu-new input {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-menu-new button {
+  flex: none;
+  width: auto;
+}
+
+.list-menu-error {
+  color: var(--watchit-error-color);
+}
+
+/* ---- Lists --------------------------------------------------------------------- */
+
+.list-index {
+  padding: 0;
+}
+
+.list-index li {
+  list-style: none;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.list-index a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--pico-spacing);
+  padding: 0.75rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.list-index a:hover strong {
+  text-decoration: underline;
+}
+
+.list-index small {
+  color: var(--pico-muted-color);
+  white-space: nowrap;
+}
+
+.new-list {
+  margin-top: calc(var(--pico-spacing) * 2);
+}
+
+.list-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 var(--pico-spacing);
+}
+
+.list-header-links {
+  display: flex;
+  gap: var(--pico-spacing);
+}
+
+.layout-toggle {
+  width: auto;
+  margin-left: auto;
+  margin-bottom: var(--pico-spacing);
+}
+
+.layout-toggle button {
+  padding: 0.35rem 0.6rem;
+  line-height: 1;
+}
+
+.layout-toggle button[aria-pressed="true"] {
+  background-color: var(--pico-secondary-background);
+  border-color: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+
+/* Poster grid: as many columns as fit (3 on a phone) */
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+  gap: var(--pico-spacing);
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .poster-grid {
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  }
+}
+
+.poster-grid li {
+  list-style: none;
+  margin: 0;
+}
+
+.poster-grid a {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.poster-grid img,
+.poster-grid .poster-missing {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-muted-border-color);
+}
+
+.poster-grid strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.9em;
+  line-height: 1.25;
+}
+
+.poster-grid small {
+  display: block;
+  color: var(--pico-muted-color);
+  font-size: 0.8em;
+}
+
+.poster-grid a:hover strong {
+  text-decoration: underline;
+}
+
+/* Check mark in the poster corner for watched movies */
+.watched-corner {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--pico-ins-color);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+}
+
+/* ---- Detail page (movie / show) ---------------------------------------------------- */
+
+.title-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) 1fr;
+  gap: calc(var(--pico-spacing) * 2);
+  align-items: start;
+}
+
+.title-detail-poster img,
+.title-detail-poster .poster-missing {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-muted-border-color);
+}
+
+.title-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+
+.watched {
+  margin-bottom: var(--pico-spacing);
+}
+
+.watched p {
+  margin-bottom: 0.25rem;
+}
+
+.watched-edit {
+  margin-bottom: var(--pico-spacing);
+}
+
+.watched-edit > summary {
+  color: var(--pico-color);
+}
+
+.watched-edit form {
+  margin-top: var(--pico-spacing);
+  max-width: 20rem;
+}
+
+/* Phones: small poster next to the heading, text below */
+@media (max-width: 575px) {
+  .title-detail {
+    grid-template-columns: 7rem 1fr;
+    gap: var(--pico-spacing);
+  }
+
+  .title-detail-info {
+    display: contents;
+  }
+
+  .title-detail-info > hgroup {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .title-detail-info > :not(hgroup) {
+    grid-column: 1 / -1;
+  }
 }
