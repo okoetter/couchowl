@@ -11,7 +11,7 @@ from django.urls import reverse
         "core:dashboard",
         "core:lists",
         "core:upcoming",
-        "core:search",
+        "catalog:search",
         "accounts:profile",
         "accounts:password_change",
     ],

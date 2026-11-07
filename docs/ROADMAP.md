@@ -4,7 +4,7 @@
 
 - [x] **0 – Project skeleton:** Django, i18n, base layout with navigation, PWA, Docker, tests, pre-commit
 - [x] **1 – Accounts:** invitations, login/logout, profile, password reset, admin docs, brute-force protection
-- [ ] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
+- [x] **2 – TMDB:** API client with caching and language fallback, live search, poster proxy
 - [ ] **3 – Lists and movies:** private lists (movies and shows mixed), grid/compact view, movie "watched" with date
 - [ ] **4 – Shows and episodes:** season/episode tracking with dates, "Follow" button, system list "Followed shows" (toggle in profile)
 - [ ] **5 – Dashboard:** currently watching with next episode, announcements (next 3 months, configurable via `ANNOUNCEMENT_MONTHS`)
@@ -25,3 +25,4 @@
 - [ ] Per-user announcement window in the profile (1/3/6/12 months; empty = `ANNOUNCEMENT_MONTHS`)
 - [ ] Public JSON API (e.g. django-ninja)
 - [ ] More UI languages
+- [ ] Clean up the poster cache (posters no longer used by any stored title)

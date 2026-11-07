@@ -1,0 +1,50 @@
+{
+ "id": 70523,
+ "name": "Dark",
+ "original_name": "Dark",
+ "original_language": "de",
+ "first_air_date": "2017-12-01",
+ "overview": "",
+ "poster_path": "/gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg",
+ "status": "Ended",
+ "translations": {
+  "translations": [
+   {
+    "iso_3166_1": "US",
+    "iso_639_1": "en",
+    "name": "English",
+    "data": {
+     "name": "",
+     "overview": "A missing child sets four families on a frantic hunt for answers as they unearth a mind-bending mystery that spans three generations."
+    }
+   },
+   {
+    "iso_3166_1": "FR",
+    "iso_639_1": "fr",
+    "name": "Français",
+    "data": {
+     "name": "",
+     "overview": "Quatre familles affolées par la disparition d'un enfant cherchent des réponses et tombent sur un mystère impliquant trois générations qui finit de les déstabiliser."
+    }
+   },
+   {
+    "iso_3166_1": "DE",
+    "iso_639_1": "de",
+    "name": "Deutsch",
+    "data": {
+     "name": "",
+     "overview": "Nach dem Verschwinden eines Kindes begeben sich vier Familien auf die verzweifelte Suche nach Antworten und der Lösung eines Rätsels, das drei Generationen umspannt."
+    }
+   },
+   {
+    "iso_3166_1": "CA",
+    "iso_639_1": "fr",
+    "name": "Français",
+    "data": {
+     "name": "",
+     "overview": "Après la disparition d'un enfant, quatre familles s'évertuent à découvrir la vérité. Leur quête fait remonter à la surface un mystère s'étendant sur trois générations."
+    }
+   }
+  ]
+ }
+}

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "axes",
     "core",
     "accounts",
+    "catalog",
 ]
 
 MIDDLEWARE = [
@@ -153,8 +154,21 @@ USE_TZ = True
 # Languages for movie/show texts are derived from the region (accounts/regions.py).
 DEFAULT_REGION = env("DEFAULT_REGION", default="")
 
+# --- TMDB -----------------------------------------------------------------------
+# "API Read Access Token" from https://www.themoviedb.org/settings/api (sent as Bearer header)
+
+TMDB_API_TOKEN = env("TMDB_API_TOKEN", default="")
+# Movie/show data older than this is reloaded from TMDB when someone opens it
+TMDB_MAX_AGE = timedelta(hours=24)
+# How long search results are reused for the same query and language
+TMDB_SEARCH_CACHE_SECONDS = 3600
+# Max. searches per user and minute (protects the TMDB quota; live search is debounced)
+SEARCH_RATE_LIMIT = 60
+# Downloaded posters (see catalog/posters.py)
+POSTER_CACHE_DIR = DATA_DIR / "posters"
+
 # --- Cache ----------------------------------------------------------------------
-# File-based, so all gunicorn worker processes share it (used for rate limits).
+# File-based, so all gunicorn worker processes share it (rate limits, TMDB search results).
 
 CACHES = {
     "default": {
@@ -187,4 +201,6 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+    # httpx logs every request at INFO level; only show problems
+    "loggers": {"httpx": {"level": "WARNING"}, "httpcore": {"level": "WARNING"}},
 }

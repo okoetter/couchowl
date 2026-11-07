@@ -67,6 +67,15 @@ uv run pytest -m e2e e2e/test_screenshots.py    # only screenshots
 `e2e/test_screenshots.py` saves screenshots of important pages (light/dark, desktop/phone)
 to `screenshots/` (ignored by git) for a quick visual review. Add `--headed` to watch the browser.
 
+## Checks against the real TMDB API
+
+Tests marked `live` call the real TMDB API to detect changes in its responses. They are
+skipped by default and need `TMDB_API_TOKEN` in your `.env`:
+
+```sh
+uv run pytest -m live
+```
+
 ## Translations
 
 Source strings in code and templates are English. Never hardcode UI text: use
@@ -101,5 +110,8 @@ rsvg-convert -w 512 -h 512 icon-maskable.svg -o icon-maskable-512.png
 - Code, comments, commit messages and docs in English.
 - Configuration only via environment variables; document new ones in `.env.example`.
 - Frontend libraries are vendored in `core/static/vendor/` (no CDNs).
-- Tests never call the real TMDB API (use fixtures/mocks).
+- Tests never call the real TMDB API. The autouse fixture `fake_tmdb` (in `conftest.py`)
+  blocks the network; register the responses a test needs, e.g.
+  `fake_tmdb.add("/3/search/multi", json=load_tmdb_fixture("search_multi"))`.
+  Saved (shortened) real responses live in `catalog/tests/fixtures/`.
 - Keep [CHANGELOG.md](CHANGELOG.md) up to date (Keep a Changelog format).

@@ -44,6 +44,20 @@
   - Später (Backlog) zusätzlich pro Nutzer im Profil überschreibbar (z. B. 1/3/6/12 Monate, leer = Serverstandard), nach demselben Muster wie Sprache und Region.
   - Die Seite „Demnächst“ zeigt weiterhin alle bekannten Termine ohne Zeitlimit; das Dashboard ist nur eine Vorschau.
 
+- **2026-11-07 – Meilenstein 2 (TMDB-Anbindung):**
+  - **Neue App `catalog`** für alles rund um Filme und Serien (TMDB-Client, Suche, Poster, später Listen und Details).
+  - **HTTP-Bibliothek `httpx`:** moderner Client; Tests ersetzen das Netzwerk über einen „Mock-Transport“, ganz ohne Zusatzpaket.
+  - **Sprach-Fallback per Übersetzungsliste:** Die Detailabfrage holt mit `append_to_response=translations` alle Sprachen in einem Request. Fehlende Texte werden in dieser Reihenfolge aufgefüllt: exakte Sprache (`de-AT`) → Hauptland der Sprache (`de-DE`) → dieselbe Sprache, anderes Land → Englisch (`en-US`, dann andere) → Originaltitel bzw. leere Beschreibung. Hintergrund: Ein Live-Test zeigte, dass TMDB mit `de-AT` für viele Serien keine Beschreibung liefert, mit `de-DE` schon.
+  - **Poster gehören zur Übersetzung,** nicht zum sprachneutralen Titel: TMDB liefert je nach Sprache ein anderes (lokalisiertes) Poster.
+  - **Suchergebnisse werden nicht in der Datenbank gespeichert,** sondern 1 Stunde im Cache (pro Suchbegriff und Sprache). In die Datenbank kommen Titel erst, wenn sie gebraucht werden (Detailseite, Liste; ab Meilenstein 3). Die Suche zeigt Titel, Typ, Jahr, Poster und ggf. den Originaltitel, aber keine Beschreibung (die Suche liefert keinen Sprach-Fallback, und die Liste bleibt am Handy kompakt).
+  - **Sortierung der Suchergebnisse:** zuerst exakte Titeltreffer (übersetzter oder Originaltitel; Groß-/Kleinschreibung, Akzente und Leerzeichen egal), darunter nach Jahr absteigend (Titel ohne Jahr ans Ende dieser Gruppe), z. B. „Dune“ 2021 vor 1984. Danach alle übrigen Treffer in der Reihenfolge von TMDB. TMDB sortiert nach Relevanz, die stark von der Popularität abhängt; so landete „Dark“ bei der Suche nach „dark“ nur auf Platz 4. Durchgehend nach Jahr zu sortieren wurde verworfen: Unter den 20 Treffern stünden dann oft unbekannte neue Titel vor den bekannten. Ein Umschalter „Relevanz / Neueste zuerst“ ist eine Option für später.
+  - **Drosselung:** max. 20 TMDB-Anfragen pro Sekunde und Prozess; bei „429 Too Many Requests“ wartet der Client (höchstens 10 s) und versucht es bis zu zweimal erneut. Die Live-Suche wartet 300 ms nach dem letzten Tastendruck und ist auf 60 Suchen pro Minute und Nutzer begrenzt.
+  - **Ist TMDB nicht erreichbar,** werden veraltete Daten aus der Datenbank angezeigt statt eines Fehlers.
+  - **Poster-Proxy** unter `/posters/<größe>/<datei>`: nur Größen `w92`, `w185`, `w342`, `w500` und gültige TMDB-Dateinamen, nur für angemeldete Nutzer. Dateien liegen in `DATA_DIR/posters` und werden nie ungültig (neues Bild = neuer Dateiname); der Browser darf sie ein Jahr cachen. Aufräumen alter Poster: später (Backlog).
+  - **Ohne `TMDB_API_TOKEN`** zeigt die Suche einen Hinweis statt eines Fehlers.
+  - **Titel im Django-Admin** nur lesbar (Daten kommen von TMDB).
+  - **TMDB-Logo** für die Attribution liegt lokal in `catalog/static/catalog/` (offizielles Logo von themoviedb.org/about/logos-attribution).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -316,6 +330,7 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - Öffentliche JSON-API (z. B. django-ninja)
 - Zeitraum der Ankündigungen pro Nutzer im Profil einstellbar (1/3/6/12 Monate, leer = `ANNOUNCEMENT_MONTHS`)
 - Weitere UI-Sprachen
+- Poster-Cache aufräumen (Poster, die kein gespeicherter Titel mehr nutzt)
 
 ## Später zu entscheiden
 - Open-Source-Lizenz (z. B. MIT oder AGPL-3.0) → spätestens bei Meilenstein 7

@@ -1,0 +1,59 @@
+{
+ "id": 155,
+ "title": "The Dark Knight",
+ "original_title": "The Dark Knight",
+ "original_language": "en",
+ "release_date": "2008-07-16",
+ "overview": "Gemeinsam mit Bezirksstaatsanwalt Harvey Dent und Lieutenant James Gordon versucht der im Fledermauskostüm agierende Milliardär Bruce Wayne dem Verbrechen in Gotham City Einhalt zu gebieten. Wie aus dem Nichts taucht plötzlich ein psychotischer Superverbrecher auf - der Joker. In seiner wahnhaften Vision möchte er die Stadt in Chaos und Anarchie stürzen und Batman scheint der einzige, der ihn stoppen kann. Bis es zum endgültigen Show-Down kommt, wird aber viel Blut fließen und auch Menschen die Bruce Wayne nahe stehen, könnten Opfer werden.",
+ "poster_path": "/54WAzARB0rTp5L7gvCcfZ49AgkX.jpg",
+ "status": "Released",
+ "translations": {
+  "translations": [
+   {
+    "iso_3166_1": "US",
+    "iso_639_1": "en",
+    "name": "English",
+    "data": {
+     "overview": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
+     "title": ""
+    }
+   },
+   {
+    "iso_3166_1": "DE",
+    "iso_639_1": "de",
+    "name": "Deutsch",
+    "data": {
+     "overview": "Gemeinsam mit Bezirksstaatsanwalt Harvey Dent und Lieutenant James Gordon versucht der im Fledermauskostüm agierende Milliardär Bruce Wayne dem Verbrechen in Gotham City Einhalt zu gebieten. Wie aus dem Nichts taucht plötzlich ein psychotischer Superverbrecher auf - der Joker. In seiner wahnhaften Vision möchte er die Stadt in Chaos und Anarchie stürzen und Batman scheint der einzige, der ihn stoppen kann. Bis es zum endgültigen Show-Down kommt, wird aber viel Blut fließen und auch Menschen die Bruce Wayne nahe stehen, könnten Opfer werden.",
+     "title": ""
+    }
+   },
+   {
+    "iso_3166_1": "FR",
+    "iso_639_1": "fr",
+    "name": "Français",
+    "data": {
+     "overview": "Batman aborde une phase décisive de sa guerre contre le crime à Gotham City. Avec l'aide du lieutenant de police Jim Gordon et du nouveau procureur Harvey Dent, il entreprend de démanteler les dernières organisations criminelles qui infestent les rues de la ville. L'association s'avère efficace, mais le trio se heurte bientôt à un nouveau génie du crime qui répand la terreur et le chaos dans Gotham : le Joker. On ne sait pas d'où il vient ni qui il est. Ce criminel possède une intelligence redoutable doublé d'un humour sordide et n'hésite pas à s'attaquer à la pègre locale dans le seul but de semer le chaos.",
+     "title": "The Dark Knight : Le Chevalier noir"
+    }
+   },
+   {
+    "iso_3166_1": "CA",
+    "iso_639_1": "fr",
+    "name": "Français",
+    "data": {
+     "overview": "Batman se joint à James Gordon et au nouveau procureur de Gotham, Harvey Dent, afin de contrecarrer un voleur de banque aliéné connu sous le nom du Joker. Ce dernier déchaîne le chaos dans les rues et inscrit l'élimination de Batman à son ordre du jour personnel.",
+     "title": "Le Chevalier noir"
+    }
+   },
+   {
+    "iso_3166_1": "AT",
+    "iso_639_1": "de",
+    "name": "Deutsch",
+    "data": {
+     "overview": "Gemeinsam mit Bezirksstaatsanwalt Harvey Dent und Lieutenant James Gordon versucht der im Fledermauskostüm agierende Milliardär Bruce Wayne dem Verbrechen in Gotham City Einhalt zu gebieten. Wie aus dem Nichts taucht plötzlich ein psychotischer Superverbrecher auf - der Joker. In seiner wahnhaften Vision möchte er die Stadt in Chaos und Anarchie stürzen und Batman scheint der einzige, der ihn stoppen kann. Bis es zum endgültigen Show-Down kommt, wird aber viel Blut fließen und auch Menschen die Bruce Wayne nahe stehen, könnten Opfer werden.",
+     "title": "The Dark Knight"
+    }
+   }
+  ]
+ }
+}

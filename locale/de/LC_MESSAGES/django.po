@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: watchit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 15:21+0100\n"
+"POT-Creation-Date: 2026-11-07 15:48+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -28,7 +28,7 @@ msgstr "Link zum Zurücksetzen des Passworts erzeugen"
 msgid "Password reset link for %(user)s"
 msgstr "Link zum Zurücksetzen des Passworts für %(user)s"
 
-#: accounts/admin.py:38 accounts/admin.py:64
+#: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:25
 msgid "status"
 msgstr "Status"
 
@@ -213,7 +213,8 @@ msgid ""
 msgstr ""
 "Hallo,\n"
 "\n"
-"%(name)s hat dich zu watchit eingeladen, einer Watchlist für Filme und Serien.\n"
+"%(name)s hat dich zu watchit eingeladen, einer Watchlist für Filme und "
+"Serien.\n"
 "Lege dein Konto über diesen Link an:"
 
 #: accounts/templates/accounts/email/invitation_body.txt:8
@@ -230,11 +231,13 @@ msgstr "Deine Einladung zu watchit"
 msgid ""
 "Hello %(name)s,\n"
 "\n"
-"someone (hopefully you) asked to reset your watchit password. Set a new password with this link:"
+"someone (hopefully you) asked to reset your watchit password. Set a new "
+"password with this link:"
 msgstr ""
 "Hallo %(name)s,\n"
 "\n"
-"jemand (hoffentlich du) möchte dein watchit-Passwort zurücksetzen. Über diesen Link legst du ein neues Passwort fest:"
+"jemand (hoffentlich du) möchte dein watchit-Passwort zurücksetzen. Über "
+"diesen Link legst du ein neues Passwort fest:"
 
 #: accounts/templates/accounts/email/password_reset_body.txt:7
 msgid "If you did not request this, you can ignore this e-mail."
@@ -349,11 +352,11 @@ msgstr "Schau in dein E-Mail-Postfach"
 
 #: accounts/templates/accounts/password_reset_done.html:9
 msgid ""
-"If an account with this e-mail address exists, we have sent you a link to set"
-" a new password. Please also check your spam folder."
+"If an account with this e-mail address exists, we have sent you a link to "
+"set a new password. Please also check your spam folder."
 msgstr ""
-"Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen Link"
-" zum Festlegen eines neuen Passworts geschickt. Schau bitte auch im Spam-"
+"Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir einen "
+"Link zum Festlegen eines neuen Passworts geschickt. Schau bitte auch im Spam-"
 "Ordner nach."
 
 #: accounts/templates/accounts/password_reset_form.html:8
@@ -427,6 +430,112 @@ msgstr "Dein Profil wurde gespeichert."
 msgid "Your password has been changed."
 msgstr "Dein Passwort wurde geändert."
 
+#: catalog/apps.py:9
+msgid "Movies and shows"
+msgstr "Filme und Serien"
+
+#: catalog/models.py:7
+msgid "Movie"
+msgstr "Film"
+
+#: catalog/models.py:8
+msgid "TV show"
+msgstr "Serie"
+
+#: catalog/models.py:18
+msgid "type"
+msgstr "Typ"
+
+#: catalog/models.py:19
+msgid "TMDB ID"
+msgstr "TMDB-ID"
+
+#: catalog/models.py:20
+msgid "original title"
+msgstr "Originaltitel"
+
+#: catalog/models.py:21
+msgid "original language"
+msgstr "Originalsprache"
+
+#: catalog/models.py:23
+msgid "release date"
+msgstr "Erscheinungsdatum"
+
+#: catalog/models.py:26
+msgid "updated at"
+msgstr "aktualisiert am"
+
+#: catalog/models.py:29 catalog/models.py:51
+msgid "title"
+msgstr "Titel"
+
+#: catalog/models.py:30
+msgid "titles"
+msgstr "Titel"
+
+#: catalog/models.py:54
+msgid "language"
+msgstr "Sprache"
+
+#: catalog/models.py:55
+msgid "name"
+msgstr "Name"
+
+#: catalog/models.py:56
+msgid "description"
+msgstr "Beschreibung"
+
+#: catalog/models.py:58
+msgid "poster"
+msgstr "Poster"
+
+#: catalog/models.py:59
+msgid "loaded from TMDB at"
+msgstr "von TMDB geladen am"
+
+#: catalog/models.py:62
+msgid "translation"
+msgstr "Übersetzung"
+
+#: catalog/models.py:63
+msgid "translations"
+msgstr "Übersetzungen"
+
+#: catalog/templates/catalog/search.html:4
+#: catalog/templates/catalog/search.html:7 core/templates/core/_nav.html:31
+msgid "Search"
+msgstr "Suche"
+
+#: catalog/templates/catalog/search.html:14
+msgid "Movie or TV show"
+msgstr "Film oder Serie"
+
+#: catalog/templates/catalog/search.html:15
+msgid "Search for movies and TV shows"
+msgstr "Filme und Serien suchen"
+
+#: catalog/templates/catalog/search.html:49
+#, python-format
+msgid "Nothing found for “%(query)s”."
+msgstr "Nichts gefunden für „%(query)s“."
+
+#: catalog/templates/catalog/search.html:51
+msgid "Type a title to search movies and TV shows."
+msgstr "Gib einen Titel ein, um Filme und Serien zu suchen."
+
+#: catalog/views.py:35
+msgid "Too many searches in a short time. Please wait a moment."
+msgstr "Zu viele Suchanfragen in kurzer Zeit. Bitte warte einen Moment."
+
+#: catalog/views.py:40
+msgid "Search is not available: the administrator has not set up TMDB yet."
+msgstr "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht eingerichtet."
+
+#: catalog/views.py:43
+msgid "TMDB can't be reached right now. Please try again later."
+msgstr "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
+
 #: core/templates/core/_nav.html:3
 msgid "Main navigation"
 msgstr "Hauptnavigation"
@@ -443,10 +552,6 @@ msgstr "Listen"
 #: core/templates/core/_nav.html:25 core/urls.py:12
 msgid "Upcoming"
 msgstr "Demnächst"
-
-#: core/templates/core/_nav.html:31 core/urls.py:13
-msgid "Search"
-msgstr "Suche"
 
 #: core/templates/core/dashboard.html:8
 msgid ""
@@ -473,3 +578,8 @@ msgid ""
 msgstr ""
 "Schick diesen Link an die Person, die du einladen möchtest. Er kann nur "
 "einmal benutzt werden."
+
+#: templates/base.html:44
+msgid ""
+"This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Dieses Produkt nutzt die TMDB-API, wird aber nicht von TMDB unterstützt oder zertifiziert."

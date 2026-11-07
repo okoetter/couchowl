@@ -26,7 +26,7 @@
       </a>
     </li>
     <li>
-      <a href="{% url 'core:search' %}" {% if current == "search" %}aria-current="page"{% endif %}>
+      <a href="{% url 'catalog:search' %}" {% if current == "search" %}aria-current="page"{% endif %}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <span>{% translate "Search" %}</span>
       </a>

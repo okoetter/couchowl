@@ -1,0 +1,74 @@
+{
+ "page": 1,
+ "results": [
+  {
+   "id": 155,
+   "media_type": "movie",
+   "title": "The Dark Knight",
+   "original_title": "The Dark Knight",
+   "original_language": "en",
+   "release_date": "2008-07-16",
+   "poster_path": "/z1DfRQf2CgnROyhVZ6ch8FbWt71.jpg",
+   "overview": "Gemeinsam mit Bezirksstaatsanwalt Harvey Dent und Lieutenant James Gordon versucht der im Fledermauskostüm agierende Milliardär Bruce Wayne dem Verbrechen in Gotham City Einhalt zu gebieten. Wie aus dem Nichts taucht plötzlich ein psychotischer Superverbrecher auf - der Joker. In seiner wahnhaften Vision möchte er die Stadt in Chaos und Anarchie stürzen und Batman scheint der einzige, der ihn stoppen kann. Bis es zum endgültigen Show-Down kommt, wird aber viel Blut fließen und auch Menschen die Bruce Wayne nahe stehen, könnten Opfer werden."
+  },
+  {
+   "id": 196322,
+   "media_type": "tv",
+   "name": "Dark Matter – Der Zeitenläufer",
+   "original_name": "Dark Matter",
+   "original_language": "en",
+   "first_air_date": "2024-05-07",
+   "poster_path": "/jVZk29tNsqMf0BDABNPMWu6InPt.jpg",
+   "overview": "Jason Dessen wird in eine alternative Version seines Lebens entführt. Um zu seiner echten Familie zurückzukehren, begibt er sich auf eine beklemmende Reise, um sie vor dem furchterregendsten Feind überhaupt zu retten: Sich selbst."
+  },
+  {
+   "id": 1234,
+   "media_type": "person",
+   "name": "Dark Person",
+   "known_for_department": "Acting",
+   "profile_path": null
+  },
+  {
+   "id": 2883,
+   "media_type": "tv",
+   "name": "Dark Shadows",
+   "original_name": "Dark Shadows",
+   "original_language": "en",
+   "first_air_date": "1966-06-27",
+   "poster_path": "/eRtnI7qTJIiPUmlY3J8TTM3jlT7.jpg",
+   "overview": ""
+  },
+  {
+   "id": 70523,
+   "media_type": "tv",
+   "name": "Dark",
+   "original_name": "Dark",
+   "original_language": "de",
+   "first_air_date": "2017-12-01",
+   "poster_path": "/gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg",
+   "overview": "Nach dem Verschwinden eines Kindes begeben sich vier Familien auf die verzweifelte Suche nach Antworten und der Lösung eines Rätsels, das drei Generationen umspannt."
+  },
+  {
+   "id": 128904,
+   "media_type": "tv",
+   "name": "Dark Winds - Der Wind des Bösen",
+   "original_name": "Dark Winds",
+   "original_language": "en",
+   "first_air_date": "2022-06-12",
+   "poster_path": "/kDlrMN0P9ByrEH2GoRbBFeZHbcf.jpg",
+   "overview": "Dark Winds führt Dich in die Weiten der Navajo-Nation. Die Serie verbindet klassisches Western-Flair mit einem tiefen Einblick in die indigene Kultur und greift immer wieder gesellschaftliche Konflikte auf. Die weiten Landschaften und die spirituellen Elemente des Navajo-Volkes verstärken die Atmosphäre und machen Dark Winds zu einem fesselnden Mix aus Krimi und Western."
+  },
+  {
+   "id": 108847,
+   "media_type": "tv",
+   "name": "AEW Dark",
+   "original_name": "AEW Dark",
+   "original_language": "en",
+   "first_air_date": "2019-10-08",
+   "poster_path": "/ir0wYEhfGkpjHtrZ1ULUc1gx7AI.jpg",
+   "overview": ""
+  }
+ ],
+ "total_pages": 1,
+ "total_results": 7
+}

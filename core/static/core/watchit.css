@@ -213,3 +213,65 @@ textarea + .errorlist {
   align-items: center;
   justify-content: center;
 }
+
+/* ---- Footer: TMDB attribution ------------------------------------------------ */
+
+.tmdb-attribution {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.8em;
+}
+
+.tmdb-attribution img {
+  display: block;
+  height: 0.7rem;
+  width: auto;
+}
+
+.muted {
+  color: var(--pico-muted-color);
+}
+
+/* ---- Search ------------------------------------------------------------------- */
+
+/* While htmx loads new results, the old ones fade a little */
+#search-results.htmx-request {
+  opacity: 0.6;
+  transition: opacity 0.2s 0.2s;
+}
+
+.search-results {
+  padding: 0;
+}
+
+.search-results li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.search-results small {
+  display: block;
+  color: var(--pico-muted-color);
+}
+
+/* Poster thumbnails have TMDB's 2:3 aspect ratio */
+.poster {
+  flex: none;
+  width: 46px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: calc(var(--pico-border-radius) / 2);
+  background: var(--pico-muted-border-color);
+}
+
+.poster-missing {
+  display: block;
+}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n catalog %}
+
+{% block title %}{% translate "Search" %}{% endblock %}
+
+{% block content %}
+  <h1>{% translate "Search" %}</h1>
+
+  {# Without JavaScript the form reloads the page; with htmx only the results are replaced #}
+  <form role="search" action="{% url 'catalog:search' %}" method="get"
+        hx-get="{% url 'catalog:search' %}" hx-target="#search-results"
+        hx-replace-url="true" hx-sync="this:replace">
+    <input type="search" name="q" value="{{ query }}" id="search-q"
+           placeholder="{% translate 'Movie or TV show' %}"
+           aria-label="{% translate 'Search for movies and TV shows' %}"
+           autocomplete="off" autofocus
+           hx-get="{% url 'catalog:search' %}" hx-target="#search-results"
+           hx-trigger="input changed delay:300ms, search" hx-replace-url="true"
+           hx-sync="closest form:replace" hx-indicator="#search-results">
+  </form>
+
+  <div id="search-results" aria-live="polite">
+    {% partialdef results inline %}
+      {% if error %}
+        <article class="message message-error" role="alert">{{ error }}</article>
+      {% elif results %}
+        <ul class="search-results">
+          {% for result in results %}
+            <li>
+              {% poster result.poster_path "w92" as thumb %}
+              {% if thumb %}
+                {% poster result.poster_path "w185" as thumb_2x %}
+                <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                     alt="" width="46" height="69" loading="lazy" class="poster">
+              {% else %}
+                <span class="poster poster-missing" aria-hidden="true"></span>
+              {% endif %}
+              <div>
+                <strong>{{ result.title }}</strong>
+                <small>
+                  {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}
+                  {% if result.original_title != result.title %}<br>{{ result.original_title }}{% endif %}
+                </small>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% elif query|length >= min_query_length %}
+        <p>{% blocktranslate %}Nothing found for “{{ query }}”.{% endblocktranslate %}</p>
+      {% else %}
+        <p class="muted">{% translate "Type a title to search movies and TV shows." %}</p>
+      {% endif %}
+    {% endpartialdef %}
+  </div>
+{% endblock %}

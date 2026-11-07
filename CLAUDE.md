@@ -27,8 +27,12 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - No external resources at runtime (no CDN): vendored libs in `core/static/vendor/`.
   The browser must never talk to TMDB directly (texts cached in DB, posters via proxy).
 - Custom user model `accounts.User` (`ui_language`, `tmdb_language`, `region`, `theme`).
-- Tests: pytest-django, settings `config/settings_test.py`. TMDB is always mocked
+- Tests: pytest-django, settings `config/settings_test.py`. TMDB is always mocked via the autouse
+  fixture `fake_tmdb` (`conftest.py`, saved responses in `catalog/tests/fixtures/`)
   (marker `live` for real API checks, `e2e` for Playwright; both skipped by default).
+- TMDB code lives in the `catalog` app: `tmdb.py` (HTTP client), `services.py` (search, DB cache,
+  language fallback), `posters.py` (poster proxy). Views/templates use `{% load catalog %}`
+  and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.
 - UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at
   the images in `screenshots/` (light/dark, desktop/phone) before asking Oliver to test.
 - Form fields render via `core/templates/forms/field.html` (label, input, errors, help text).

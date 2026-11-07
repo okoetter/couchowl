@@ -36,6 +36,13 @@
 
   <footer class="container site-footer">
     <small>watchit {{ WATCHIT_VERSION }}</small>
+    {# Required by the TMDB terms of use. The logo is served locally like everything else. #}
+    <p class="tmdb-attribution">
+      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
+        <img src="{% static 'catalog/tmdb-logo.svg' %}" alt="TMDB" width="80" height="10">
+      </a>
+      <small>{% translate "This product uses the TMDB API but is not endorsed or certified by TMDB." %}</small>
+    </p>
   </footer>
 </body>
 </html>

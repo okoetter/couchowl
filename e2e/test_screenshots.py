@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from conftest import load_tmdb_fixture, tiny_png
 from e2e.conftest import LOCALE, login
 
 pytestmark = pytest.mark.e2e
@@ -48,18 +49,51 @@ def show_password_change(page, url):
     page.wait_for_load_state()
 
 
+def show_search(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/search/")
+    page.get_by_placeholder("Film oder Serie").press_sequentially("dark")
+    page.locator(".search-results img").first.wait_for()
+    page.wait_for_load_state("networkidle")  # all poster thumbnails loaded
+
+
+def show_search_error(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/search/?q=fail")
+
+
 PAGES = {
     "login-error": show_login_error,
     "register-error": show_register,
     "profile": show_profile,
     "password-change-error": show_password_change,
+    "search": show_search,
+    "search-error": show_search_error,
 }
+
+
+def fake_search(fake_tmdb):
+    """Search results for "dark" with colored placeholder posters."""
+    data = load_tmdb_fixture("search_multi")
+    fake_tmdb.add("/3/search/multi", json=data)
+    colors = [(26, 43, 74), (120, 40, 40), (40, 100, 60), (90, 70, 20), (60, 60, 60), (30, 90, 110)]
+    for item, color in zip(data["results"], colors * 2, strict=False):
+        if item.get("poster_path"):
+            for size in ("w92", "w185"):
+                fake_tmdb.add(
+                    f"/t/p/{size}{item['poster_path']}",
+                    content=tiny_png(color),
+                    headers={"Content-Type": "image/png"},
+                )
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 @pytest.mark.parametrize("device", VIEWPORTS)
 @pytest.mark.parametrize("name", PAGES)
-def test_screenshot(live_server, member, browser, name, device, scheme):
+def test_screenshot(live_server, member, browser, fake_tmdb, name, device, scheme):
+    fake_search(fake_tmdb)
+    if name == "search-error":
+        fake_tmdb.add("/3/search/multi", json={}, status=503)
     context = browser.new_context(locale=LOCALE, viewport=VIEWPORTS[device], color_scheme=scheme)
     page = context.new_page()
 

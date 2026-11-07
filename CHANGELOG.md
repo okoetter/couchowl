@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin action to create password reset links (works without e-mail)
 - Brute-force protection with django-axes
 - `docs/administration.md`
+- Live search for movies and TV shows (TMDB), with results in the user's language;
+  exact title matches come first (newest first)
+- TMDB client with caching in the database, language fallback (e.g. de-AT → de-DE →
+  English) and rate limiting
+- Poster proxy: posters are downloaded once and served by watchit, so browsers never
+  contact TMDB
+- TMDB attribution in the footer
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)
