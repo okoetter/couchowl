@@ -23,6 +23,18 @@
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
 - [ ] Ratings
+- [ ] **Movie announcements on the dashboard:** unwatched movies on any of my lists whose
+  release falls within the announcement window (no separate "Follow" for movies: being on
+  a list already means "I want to see this")
+  - release dates per region from TMDB `release_dates` (user's `region`), stored in the DB;
+    the dashboard still never asks TMDB
+  - show the theatrical and, if known, the digital release ("Cinema 12 Feb · digital 28 Mar");
+    fall back to the theatrical date (TMDB often adds digital dates late or never)
+  - a movie already in cinemas stays announced until its digital release has passed
+  - background sync keeps release dates of unreleased movies on lists up to date (dates
+    shift often)
+  - section subtitle covers both, e.g. "New seasons and movie releases in the next 3 months";
+    show release dates on the movie detail page too
 - [ ] Notifications (e-mail/push) for new seasons
 - [ ] Per-user announcement window in the profile (1/3/6/12 months; empty = `ANNOUNCEMENT_MONTHS`)
 - [ ] Public JSON API (e.g. django-ninja)
