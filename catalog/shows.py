@@ -111,6 +111,27 @@ def mark_episode(user, episode: Episode, watched_at=None, *, unknown_date=False)
     return bool(mark_episodes(user, [episode], watched_at, unknown_date=unknown_date))
 
 
+def unwatched_before(user, season: Season, episode: Episode | None = None) -> list[Episode]:
+    """Aired, unwatched episodes (without specials) before `episode`, or before `season`
+    when no episode is given; in season/episode order.
+
+    After marking an episode or season, the detail page offers to mark these too.
+    """
+    if season.is_specials:
+        return []
+    before = Q(season__number__lt=season.number)
+    if episode is not None:
+        before |= Q(season__number=season.number, number__lt=episode.number)
+    return list(
+        Episode.objects.filter(
+            before, _regular_aired(timezone.localdate()), season__show_id=season.show_id
+        )
+        .exclude(watched_by__user=user)
+        .select_related("season")
+        .order_by("season__number", "number")
+    )
+
+
 def unmark_episodes(user, episodes) -> None:
     WatchedEpisode.objects.filter(user=user, episode__in=episodes).delete()
 

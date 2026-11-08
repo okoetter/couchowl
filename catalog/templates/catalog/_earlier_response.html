@@ -1,0 +1,12 @@
+{% comment %}
+  Answer to "Mark earlier episodes too?" (and its "Undo"): everything by id ("out of
+  band"), since several seasons can change: their buttons, infos and episodes, the
+  progress line, and the message.
+{% endcomment %}
+{% for season in seasons %}
+  {% include "catalog/_seasons.html#season-toggle" with oob=True %}
+  {% include "catalog/_seasons.html#season-info" with oob=True %}
+  {% include "catalog/_seasons.html#season-episodes" with oob=True %}
+{% endfor %}
+{% include "catalog/title_detail.html#show-progress" with oob=True %}
+<div id="toast" hx-swap-oob="innerHTML">{% if toast %}{% include "catalog/_earlier.html#done" %}{% endif %}</div>

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: watchit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 17:48+0100\n"
+"POT-Creation-Date: 2026-11-08 18:50+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -470,7 +470,7 @@ msgstr "Gesehen am"
 
 #: catalog/forms.py:43 catalog/templates/catalog/_seasons.html:79
 #: catalog/templates/catalog/_seasons.html:159
-#: catalog/templates/catalog/title_detail.html:85
+#: catalog/templates/catalog/title_detail.html:90
 msgid "Date unknown"
 msgstr "Datum unbekannt"
 
@@ -741,16 +741,16 @@ msgstr "Leihen"
 msgid "Buy"
 msgstr "Kaufen"
 
-#: catalog/shows.py:236
+#: catalog/shows.py:257
 msgid "Specials"
 msgstr "Specials"
 
-#: catalog/shows.py:237
+#: catalog/shows.py:258
 #, python-format
 msgid "Season %(number)s"
 msgstr "Staffel %(number)s"
 
-#: catalog/shows.py:253
+#: catalog/shows.py:274
 #, python-format
 msgid "Episode %(number)s"
 msgstr "Folge %(number)s"
@@ -769,6 +769,37 @@ msgid "in %(days)s day"
 msgid_plural "in %(days)s days"
 msgstr[0] "in %(days)s Tag"
 msgstr[1] "in %(days)s Tagen"
+
+#: catalog/templates/catalog/_earlier.html:16
+#, python-format
+msgid "%(marked)s watched. %(counter)s earlier episode is not watched yet."
+msgid_plural ""
+"%(marked)s watched. %(counter)s earlier episodes are not watched yet."
+msgstr[0] "%(marked)s gesehen. Davor ist noch %(counter)s Folge offen."
+msgstr[1] "%(marked)s gesehen. Davor sind noch %(counter)s Folgen offen."
+
+#: catalog/templates/catalog/_earlier.html:24
+#, python-format
+msgid "Only season %(season)s (%(count)s)"
+msgstr "Nur Staffel %(season)s (%(count)s)"
+
+#: catalog/templates/catalog/_earlier.html:32
+#, python-format
+msgid "All (%(count)s)"
+msgstr "Alle (%(count)s)"
+
+#: catalog/templates/catalog/_earlier.html:32
+msgid "Yes, mark them"
+msgstr "Ja, abhaken"
+
+#: catalog/templates/catalog/_earlier.html:36
+msgid "No"
+msgstr "Nein"
+
+#: catalog/templates/catalog/_earlier.html:48
+#: catalog/templates/catalog/_toast.html:16
+msgid "Undo"
+msgstr "Rückgängig"
 
 #: catalog/templates/catalog/_list_dropdown.html:14
 #, python-format
@@ -848,7 +879,7 @@ msgstr[1] "%(counter)s Folgen"
 #: catalog/templates/catalog/_seasons.html:50
 #: catalog/templates/catalog/_watched_badge.html:2
 #: catalog/templates/catalog/search.html:45
-#: catalog/templates/catalog/title_detail.html:77 catalog/views.py:207
+#: catalog/templates/catalog/title_detail.html:82 catalog/views.py:207
 msgid "Watched"
 msgstr "Gesehen"
 
@@ -871,14 +902,14 @@ msgid "Season watched"
 msgstr "Staffel gesehen"
 
 #: catalog/templates/catalog/_seasons.html:77
-#: catalog/templates/catalog/title_detail.html:83
+#: catalog/templates/catalog/title_detail.html:88
 #, python-format
 msgid "on %(date)s"
 msgstr "am %(date)s"
 
 #: catalog/templates/catalog/_seasons.html:81
 #: catalog/templates/catalog/_seasons.html:161
-#: catalog/templates/catalog/title_detail.html:87
+#: catalog/templates/catalog/title_detail.html:92
 msgid "change"
 msgstr "ändern"
 
@@ -888,7 +919,7 @@ msgstr "Gilt für alle Folgen dieser Staffel."
 
 #: catalog/templates/catalog/_seasons.html:91
 #: catalog/templates/catalog/_seasons.html:171
-#: catalog/templates/catalog/title_detail.html:98
+#: catalog/templates/catalog/title_detail.html:103
 msgid "Save date"
 msgstr "Datum speichern"
 
@@ -906,7 +937,7 @@ msgstr "%(code)s als gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:117
 #: catalog/templates/catalog/_watched_button.html:52
-#: catalog/templates/catalog/title_detail.html:114
+#: catalog/templates/catalog/title_detail.html:119
 msgid "Mark as watched"
 msgstr "Als gesehen markieren"
 
@@ -933,17 +964,13 @@ msgstr "Datum ändern"
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
 
-#: catalog/templates/catalog/_toast.html:16
-msgid "Undo"
-msgstr "Rückgängig"
-
 #: catalog/templates/catalog/_watched_badge.html:2
-#: catalog/templates/catalog/title_detail.html:60
+#: catalog/templates/catalog/title_detail.html:65
 msgid "Next:"
 msgstr "Als Nächstes:"
 
 #: catalog/templates/catalog/_watched_button.html:19
-#: catalog/templates/catalog/title_detail.html:56
+#: catalog/templates/catalog/title_detail.html:61
 #: core/templates/core/dashboard.html:38
 #, python-format
 msgid "%(watched)s of %(aired)s episodes watched"
@@ -1087,58 +1114,58 @@ msgstr "Nichts gefunden für „%(query)s“."
 msgid "Type a title to search movies and TV shows."
 msgstr "Gib einen Titel ein, um Filme und Serien zu suchen."
 
-#: catalog/templates/catalog/title_detail.html:38
+#: catalog/templates/catalog/title_detail.html:43
 msgid "Click to unfollow"
 msgstr "Klicken, um nicht mehr zu folgen"
 
-#: catalog/templates/catalog/title_detail.html:38
+#: catalog/templates/catalog/title_detail.html:43
 msgid "Following"
 msgstr "Gefolgt"
 
-#: catalog/templates/catalog/title_detail.html:41
+#: catalog/templates/catalog/title_detail.html:46
 msgid "Follow"
 msgstr "Folgen"
 
-#: catalog/templates/catalog/title_detail.html:54
+#: catalog/templates/catalog/title_detail.html:59
 msgid "All episodes watched"
 msgstr "Alle Folgen gesehen"
 
-#: catalog/templates/catalog/title_detail.html:66
+#: catalog/templates/catalog/title_detail.html:71
 msgid "No episodes have aired yet."
 msgstr "Noch keine Folge ausgestrahlt."
 
-#: catalog/templates/catalog/title_detail.html:106
+#: catalog/templates/catalog/title_detail.html:111
 msgid "Mark as not watched"
 msgstr "Als nicht gesehen markieren"
 
-#: catalog/templates/catalog/title_detail.html:124
+#: catalog/templates/catalog/title_detail.html:129
 msgid "No description available."
 msgstr "Keine Beschreibung vorhanden."
 
-#: catalog/templates/catalog/title_detail.html:129
+#: catalog/templates/catalog/title_detail.html:134
 #, python-format
 msgid "Available in %(region_name)s"
 msgstr "Verfügbar in %(region_name)s"
 
-#: catalog/templates/catalog/title_detail.html:153
+#: catalog/templates/catalog/title_detail.html:158
 msgid "Source: JustWatch"
 msgstr "Quelle: JustWatch"
 
-#: catalog/templates/catalog/title_detail.html:153
+#: catalog/templates/catalog/title_detail.html:158
 msgid "All offers on TMDB"
 msgstr "Alle Angebote bei TMDB"
 
-#: catalog/templates/catalog/title_detail.html:157
+#: catalog/templates/catalog/title_detail.html:162
 #, python-format
 msgid "No streaming offers known in %(region_name)s."
 msgstr "Keine Streaming-Angebote in %(region_name)s bekannt."
 
-#: catalog/templates/catalog/title_detail.html:165
+#: catalog/templates/catalog/title_detail.html:170
 #, python-format
 msgid "Data from TMDB as of %(date)s"
 msgstr "Daten von TMDB, Stand %(date)s"
 
-#: catalog/templates/catalog/title_detail.html:167
+#: catalog/templates/catalog/title_detail.html:172
 msgid "Refresh now"
 msgstr "Jetzt aktualisieren"
 
@@ -1161,7 +1188,7 @@ msgstr ""
 "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
 "eingerichtet."
 
-#: catalog/views.py:55 catalog/views.py:380 catalog/views.py:426
+#: catalog/views.py:55 catalog/views.py:380 catalog/views.py:427
 #: core/views.py:128
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
@@ -1202,22 +1229,29 @@ msgstr "Liste umbenannt."
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:377 catalog/views.py:423 core/views.py:125
+#: catalog/views.py:377 catalog/views.py:424 core/views.py:125
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
-#: catalog/views.py:416
+#: catalog/views.py:417
 msgid "Too many refreshes in a short time. Please wait a moment."
 msgstr "Zu viele Aktualisierungen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:428
+#: catalog/views.py:429
 msgid "Refreshed from TMDB."
 msgstr "Von TMDB aktualisiert."
 
-#: catalog/views.py:481
+#: catalog/views.py:482
 #, python-format
 msgid "Please enter a name (at most %(max)s characters)."
 msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."
+
+#: catalog/views.py:807
+#, python-format
+msgid "%(count)s episode marked as watched."
+msgid_plural "%(count)s episodes marked as watched."
+msgstr[0] "%(count)s Folge gesehen."
+msgstr[1] "%(count)s Folgen gesehen."
 
 #: core/templates/core/_nav.html:3
 msgid "Main navigation"

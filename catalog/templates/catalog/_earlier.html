@@ -1,0 +1,51 @@
+{% load i18n %}
+{% comment %}
+  "Mark earlier episodes too?" after marking an episode or season on the detail page (see
+  catalog.views.watched_earlier). The question has no timeout: it stays until answered or
+  replaced by the next action. The answer's "Undo" message disappears like other toasts.
+{% endcomment %}
+
+{# The #toast region (base.html), replaced "out of band"; empty without a question #}
+{% partialdef region %}
+  <div id="toast" hx-swap-oob="innerHTML">{% if earlier %}{% partial prompt %}{% endif %}</div>
+{% endpartialdef %}
+
+{% partialdef prompt %}
+  {% url 'catalog:watched_earlier' earlier.show.tmdb_id as action_url %}
+  <div class="toast toast-prompt" x-data>
+    <span>{% blocktranslate with marked=earlier.marked count counter=earlier.count %}{{ marked }} watched. {{ counter }} earlier episode is not watched yet.{% plural %}{{ marked }} watched. {{ counter }} earlier episodes are not watched yet.{% endblocktranslate %}</span>
+    <div class="toast-actions">
+      {% if earlier.in_season %}
+        <form method="post" action="{{ action_url }}" hx-post="{{ action_url }}" hx-swap="none">
+          {% csrf_token %}
+          <input type="hidden" name="season" value="{{ earlier.season }}">
+          <input type="hidden" name="episode" value="{{ earlier.episode }}">
+          <input type="hidden" name="scope" value="season">
+          <button type="submit" class="secondary outline">{% blocktranslate with season=earlier.season count=earlier.in_season %}Only season {{ season }} ({{ count }}){% endblocktranslate %}</button>
+        </form>
+      {% endif %}
+      <form method="post" action="{{ action_url }}" hx-post="{{ action_url }}" hx-swap="none">
+        {% csrf_token %}
+        <input type="hidden" name="season" value="{{ earlier.season }}">
+        <input type="hidden" name="episode" value="{{ earlier.episode }}">
+        <input type="hidden" name="scope" value="all">
+        <button type="submit" class="secondary outline">{% if earlier.in_season %}{% blocktranslate with count=earlier.count %}All ({{ count }}){% endblocktranslate %}{% else %}{% translate "Yes, mark them" %}{% endif %}</button>
+      </form>
+      {# Without JavaScript "No" reloads the page (the question is gone then) #}
+      <a href="{{ earlier.show.get_absolute_url }}?season={{ earlier.season }}" role="button"
+         class="secondary outline" @click.prevent="$el.closest('.toast').remove()">{% translate "No" %}</a>
+    </div>
+  </div>
+{% endpartialdef %}
+
+{% partialdef done %}
+  {% url 'catalog:watched_earlier' title.tmdb_id as action_url %}
+  <div class="toast" x-data x-init="setTimeout(() => $el.remove(), 6000)">
+    <span>{{ toast.message }}</span>
+    <form method="post" action="{{ action_url }}" hx-post="{{ action_url }}" hx-swap="none">
+      {% csrf_token %}
+      <input type="hidden" name="undo" value="{{ toast.undo }}">
+      <button type="submit" class="secondary outline">{% translate "Undo" %}</button>
+    </form>
+  </div>
+{% endpartialdef %}

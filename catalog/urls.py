@@ -79,4 +79,5 @@ urlpatterns = [
         views.episode_watched,
         name="episode_watched",
     ),
+    path("tv/<int:tmdb_id>/watched/earlier/", views.watched_earlier, name="watched_earlier"),
 ]

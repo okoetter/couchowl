@@ -144,6 +144,14 @@ def show_show_jump(page, url):
     page.wait_for_timeout(300)
 
 
+def show_show_earlier(page, url):
+    """ "Mark earlier episodes too?" after marking S3 E2 (gaps in seasons 2 and 3)."""
+    login(page, url, "anna")
+    page.goto(f"{url}/tv/70523/?season=3")
+    page.get_by_role("button", name="S3 E2 als gesehen markieren").click()
+    page.locator(".toast-prompt").wait_for()
+
+
 def show_list_toast(page, url):
     show_list_grid(page, url)
     page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").click()
@@ -212,6 +220,7 @@ PAGES = {
     "show": show_show,
     "show-details": show_show_details,
     "show-jump": show_show_jump,
+    "show-earlier": show_show_earlier,
     "list-toast": show_list_toast,
     "followed": show_followed,
     "dashboard": show_dashboard,

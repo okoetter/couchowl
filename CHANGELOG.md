@@ -62,6 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Refresh now" button on detail pages
 - Dashboard: caught-up shows stay in "Continue watching" while their season is running,
   showing when the next episode airs ("in 3 days") instead of the check button
+- Show page: marking an episode or season with unwatched episodes before it asks whether
+  to mark those too (only the same season, or all), with the date "unknown" and "Undo"
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

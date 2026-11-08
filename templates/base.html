@@ -38,7 +38,7 @@
   </main>
 
   {# Short messages after htmx actions, e.g. "S2 E5 watched · Undo" (see catalog/_toast.html) #}
-  <div id="toast" class="toast-region" aria-live="polite"></div>
+  <div id="toast" class="toast-region" aria-live="polite">{% block toast %}{% endblock %}</div>
 
   <footer class="container site-footer">
     <small>watchit {{ WATCHIT_VERSION }}</small>

@@ -1073,12 +1073,25 @@ button.progress-button:focus-visible .progress-next {
   margin: 0;
 }
 
-.toast button {
+.toast button,
+.toast [role="button"] {
   margin: 0;
   padding: 0.3rem 0.75rem;
   color: var(--pico-contrast-inverse);
   border-color: currentColor;
   font-weight: 600;
+}
+
+/* "Mark earlier episodes too?": the buttons wrap below the text on narrow screens */
+.toast-prompt {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+.toast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 /* ---- Dashboard -------------------------------------------------------------------- */

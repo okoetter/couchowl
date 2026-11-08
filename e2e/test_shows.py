@@ -112,3 +112,49 @@ def test_jumped_to_episode_lights_up_on_every_click(live_server, member, page, f
     page.mouse.wheel(0, -2000)
     page.get_by_role("link", name="S1 E1").click()
     assert episode.evaluate(running) == 1
+
+
+def test_mark_earlier_episodes_too(live_server, member, page, fake_tmdb):
+    """Marking S2 E3 asks about the 12 episodes before it; "All" marks them, "Undo" takes
+    them back, S2 E3 stays."""
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    url = live_server.url
+    login(page, url, "anna")
+    page.goto(f"{url}/tv/70523/?season=2")
+
+    page.get_by_role("button", name="S2 E3 als gesehen markieren").click()
+    toast = page.locator(".toast")
+    expect(toast).to_contain_text("S2 E3 gesehen. Davor sind noch 12 Folgen offen.")
+    # No timeout: still there after the undo messages would have gone
+    page.wait_for_timeout(6500)
+    expect(toast).to_be_visible()
+
+    toast.get_by_role("button", name="Alle (12)").click()
+    expect(page.get_by_text("12 Folgen gesehen.")).to_be_visible()
+    expect(page.get_by_text("13 von 26 Folgen gesehen")).to_be_visible()
+    expect(page.get_by_role("button", name="S2 E1 als nicht gesehen markieren")).to_be_visible()
+    expect(page.locator("#season-1-info")).to_contain_text("Gesehen")
+    # Season 1 was closed: its episodes are there when opened, with "date unknown"
+    page.get_by_text("Staffel 1", exact=True).click()
+    expect(page.locator("#episode-1-10")).to_contain_text("Datum unbekannt")
+
+    page.get_by_role("button", name="Rückgängig").click()
+    expect(page.get_by_text("1 von 26 Folgen gesehen")).to_be_visible()
+    expect(page.get_by_role("button", name="S2 E1 als gesehen markieren")).to_be_visible()
+    assert WatchedEpisode.objects.count() == 1
+
+
+def test_no_closes_the_question(live_server, member, page, fake_tmdb):
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/tv/70523/")
+
+    page.get_by_role("button", name="S1 E3 als gesehen markieren").click()
+    page.get_by_role("button", name="Nein").click()
+
+    expect(page.locator(".toast")).to_have_count(0)
+    assert WatchedEpisode.objects.count() == 1

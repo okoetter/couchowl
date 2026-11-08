@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.cache import patch_cache_control, patch_vary_headers
-from django.utils.translation import get_language
+from django.utils.translation import get_language, ngettext
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
@@ -401,6 +401,7 @@ def title_detail(request, media_type, tmdb_id):
         context.update(_watched_context(request, title))
     else:
         context.update(_show_context(request, title))
+        context["earlier"] = _pop_earlier_prompt(request, title)
     return render(request, "catalog/title_detail.html", context)
 
 
@@ -663,8 +664,11 @@ def episode_watched(request, tmdb_id, season, episode):
     action = request.POST.get("action")
     prefix = f"e{season}-{episode}"
     form = None
+    earlier = None
     if action == "mark":
-        shows.mark_episode(request.user, found)  # not aired yet: nothing happens
+        # Not aired yet: nothing happens
+        if shows.mark_episode(request.user, found):
+            earlier = _earlier_prompt(request, show, found.season, found)
     elif action == "unmark":
         shows.unmark_episodes(request.user, [found])
     elif action == "date":
@@ -677,9 +681,11 @@ def episode_watched(request, tmdb_id, season, episode):
     if _is_htmx_fragment_request(request):
         context = _season_context(request, show, season, {prefix: form} if form else None)
         context["episode"] = next(e for e in context["season"].episode_rows if e.pk == found.pk)
+        context["earlier"] = earlier
         return render(request, "catalog/_episode_response.html", context)
     if form is not None:
         messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
+    _remember_earlier_prompt(request, earlier)
     return redirect(_season_anchor_url(show, season, f"episode-{season}-{episode}"))
 
 
@@ -692,8 +698,10 @@ def season_watched(request, tmdb_id, season):
     action = request.POST.get("action")
     prefix = f"s{season}"
     form = None
+    earlier = None
     if action == "mark":
-        shows.mark_season(request.user, found)
+        if shows.mark_season(request.user, found):
+            earlier = _earlier_prompt(request, show, found)
     elif action == "unmark":
         shows.unmark_season(request.user, found)
     elif action == "date":
@@ -707,7 +715,117 @@ def season_watched(request, tmdb_id, season):
 
     if _is_htmx_fragment_request(request):
         context = _season_context(request, show, season, {prefix: form} if form else None)
+        context["earlier"] = earlier
         return render(request, "catalog/_season_response.html", context)
     if form is not None:
         messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
+    _remember_earlier_prompt(request, earlier)
     return redirect(_season_anchor_url(show, season))
+
+
+# --- "Mark earlier episodes too?" ------------------------------------------------------------
+#
+# After marking an episode (or season) on the detail page, a message asks whether the
+# earlier unwatched episodes should be marked as well, with the date "unknown": you didn't
+# watch them today. It stays until answered or replaced by the next action (no timeout).
+
+
+def _earlier_prompt(request, show: Title, season: Season, episode: Episode | None = None):
+    """Context for the question, or None if nothing earlier is unwatched."""
+    earlier = shows.unwatched_before(request.user, season, episode)
+    if not earlier:
+        return None
+    in_season = sum(1 for e in earlier if e.season_id == season.pk)
+    return {
+        "show": show,
+        "marked": episode.code if episode else shows.default_season_name(season),
+        "season": season.number,
+        "episode": episode.number if episode else "",
+        "count": len(earlier),
+        # "Only season 3" only makes sense if older seasons have gaps too
+        "in_season": in_season if 0 < in_season < len(earlier) else 0,
+    }
+
+
+def _remember_earlier_prompt(request, earlier) -> None:
+    """Without JavaScript the question appears on the detail page after the redirect."""
+    if earlier is not None:
+        request.session["earlier_prompt"] = {
+            "show": earlier["show"].pk,
+            "season": earlier["season"],
+            "episode": earlier["episode"],
+        }
+
+
+def _pop_earlier_prompt(request, show: Title):
+    stored = request.session.pop("earlier_prompt", None)
+    if not stored or stored.get("show") != show.pk:
+        return None
+    season = Season.objects.filter(show=show, number=stored["season"]).first()
+    if season is None:
+        return None
+    episode = None
+    if stored["episode"] != "":
+        episode = season.episodes.select_related("season").filter(number=stored["episode"]).first()
+        if episode is None:
+            return None
+    return _earlier_prompt(request, show, season, episode)
+
+
+@require_POST
+def watched_earlier(request, tmdb_id):
+    """Answer to the question: mark the earlier unwatched episodes (date unknown), either
+    of the whole show (`scope=all`) or only of the same season; or `undo=<ids>`.
+
+    htmx gets the changed seasons and the progress line by their ids, plus a message.
+    """
+    show = _show(tmdb_id)
+    if undo := request.POST.get("undo"):
+        ids = [int(pk) for pk in undo.split(",") if pk.isdigit()]
+        episodes = list(
+            Episode.objects.filter(pk__in=ids, season__show=show).select_related("season")
+        )
+        shows.unmark_episodes(request.user, episodes)
+        if not _is_htmx_fragment_request(request):
+            return redirect(show)
+        return _earlier_response(request, show, episodes, toast=None)
+
+    season_number, episode_number = request.POST.get("season", ""), request.POST.get("episode", "")
+    if not season_number.isdigit() or not (episode_number.isdigit() or episode_number == ""):
+        return HttpResponse(status=400)
+    season = get_object_or_404(Season, show=show, number=season_number)
+    episode = None
+    if episode_number:
+        episode = get_object_or_404(
+            Episode.objects.select_related("season"), season=season, number=episode_number
+        )
+    episodes = shows.unwatched_before(request.user, season, episode)
+    if request.POST.get("scope") != "all":
+        episodes = [e for e in episodes if e.season_id == season.pk]
+    marked = shows.mark_episodes(request.user, episodes, unknown_date=True, keep_existing=True)
+    message = ngettext(
+        "%(count)s episode marked as watched.", "%(count)s episodes marked as watched.", len(marked)
+    ) % {"count": len(marked)}
+    if not _is_htmx_fragment_request(request):
+        messages.success(request, message)
+        return redirect(_season_anchor_url(show, season.number))
+    toast = {"message": message, "undo": ",".join(str(e.pk) for e in marked)} if marked else None
+    return _earlier_response(request, show, marked, toast=toast)
+
+
+def _earlier_response(request, show: Title, episodes, toast):
+    """The seasons of `episodes` (button, info, episodes) and the progress line, by id."""
+    numbers = {episode.season.number for episode in episodes}
+    seasons = [
+        season
+        for season in shows.seasons_overview(
+            request.user, show, request.user.effective_tmdb_language
+        )
+        if season.number in numbers
+    ]
+    for season in seasons:
+        _add_episode_rows(request, show, season)
+    context = {**_progress_context(request, show), "seasons": seasons, "toast": toast}
+    response = render(request, "catalog/_earlier_response.html", context)
+    patch_vary_headers(response, ["HX-Request"])
+    return response

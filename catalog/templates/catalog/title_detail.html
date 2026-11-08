@@ -3,6 +3,11 @@
 
 {% block title %}{{ translation.name }}{% endblock %}
 
+{% block toast %}
+  {# Without JavaScript: "Mark earlier episodes too?" after the redirect #}
+  {% if earlier %}{% include "catalog/_earlier.html#prompt" %}{% endif %}
+{% endblock %}
+
 {% block content %}
   <div class="title-detail">
     <div class="title-detail-poster">
