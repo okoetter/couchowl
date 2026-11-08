@@ -190,7 +190,7 @@ def dark(fake_tmdb):
 
 def details_requests(fake):
     """Requests for the details of a title (shows also send requests for their seasons)."""
-    return [r for r in fake.requests if r.url.params["append_to_response"] == "translations"]
+    return [r for r in fake.requests if r.url.params["append_to_response"] == tmdb.DETAILS_APPENDED]
 
 
 @pytest.mark.django_db

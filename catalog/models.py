@@ -30,6 +30,11 @@ class Title(models.Model):
     status = models.CharField(_("status"), max_length=50, blank=True)
     # Shows: names of the networks/platforms that air it, e.g. ["Netflix"] (from TMDB)
     networks = models.JSONField(_("networks"), default=list, blank=True)
+    # Streaming providers per region (data from JustWatch via TMDB), only for the regions
+    # of our users: {"DE": {"link": "…", "flatrate": [{"id": 8, "name": "Netflix",
+    # "logo": "/….png"}], "rent": […], …}}. {} for a region = no offers there.
+    # See catalog.providers.
+    watch_providers = models.JSONField(_("streaming providers"), default=dict, blank=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     class Meta:

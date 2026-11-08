@@ -156,7 +156,7 @@ def test_a_second_language_adds_texts_but_no_episodes(show):
 
 def failing_season_requests(request):
     """Details work, season requests fail."""
-    if request.url.params["append_to_response"] == "translations":
+    if request.url.params["append_to_response"] == tmdb.DETAILS_APPENDED:
         return load_tmdb_fixture("tv_70523")
     return httpx.Response(503)
 

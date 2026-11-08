@@ -77,14 +77,22 @@ def language_with_region(language: str, region: str) -> str:
 
 def country_choices(language: str) -> list[tuple[str, str]]:
     """All countries as (code, name) with names in the given language, sorted by name."""
-    # Only the language: Babel doesn't know every combination (e.g. "de-us")
-    language = language.split("-")[0]
-    try:
-        names = Locale.parse(language).territories
-    except UnknownLocaleError, ValueError:
-        names = Locale("en").territories
+    names = _country_names(language)
     choices = [(code, names.get(code, code)) for code in COUNTRY_CODES]
     return sorted(choices, key=lambda choice: _sort_key(choice[1]))
+
+
+def country_name(code: str, language: str) -> str:
+    """Name of a country in the given language, e.g. ("AT", "de") -> "Österreich"."""
+    return _country_names(language).get(code, code)
+
+
+def _country_names(language: str) -> dict[str, str]:
+    # Only the language: Babel doesn't know every combination (e.g. "de-us")
+    try:
+        return Locale.parse(language.split("-")[0]).territories
+    except UnknownLocaleError, ValueError:
+        return Locale("en").territories
 
 
 def _sort_key(name: str) -> str:

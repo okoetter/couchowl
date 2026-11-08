@@ -84,6 +84,75 @@ def test_caught_up_show_is_not_shown(user, show):
     assert UserSeries.objects.get(user=user, title=show).status == UserSeries.Status.WATCHING
 
 
+def running_season(show, number=3, aired=4):
+    """Season `number` is running: `aired` episodes are out, then one more per week."""
+    today = timezone.localdate()
+    for ep in Episode.objects.filter(season__show=show, season__number=number):
+        ep.air_date = today + timedelta(days=7 * (ep.number - aired) - 3)
+        ep.save()
+
+
+def watch_aired(user, show):
+    shows.mark_episodes(
+        user,
+        list(
+            Episode.objects.filter(
+                season__show=show, season__number__gt=0, air_date__lte=timezone.localdate()
+            )
+        ),
+    )
+
+
+def test_caught_up_show_waits_for_the_next_episode_of_a_running_season(user, show):
+    running_season(show)  # S3 E5 airs in 4 days
+    watch_aired(user, show)
+
+    [entry] = dashboard.continue_watching(user, "de-DE")
+
+    assert entry.waiting_for == episode(show, 3, 5)
+    assert entry.next_episode == episode(show, 3, 5)
+    assert entry.next_name == "Leben und Tod"
+    assert entry.days_until == 4
+    assert entry.progress.complete
+
+
+def test_show_waiting_for_a_new_season_is_not_shown(user, show):
+    """A season that hasn't started is an announcement, not "continue watching"."""
+    for number in (1, 2):
+        shows.mark_season(user, show.seasons.get(number=number))
+    starts_in(show, 3, 5)
+
+    assert dashboard.continue_watching(user, "de-DE") == []
+
+
+def test_running_season_without_next_date_is_not_shown(user, show):
+    running_season(show)
+    Episode.objects.filter(season__show=show, season__number=3, number__gt=4).update(air_date=None)
+    watch_aired(user, show)
+
+    assert dashboard.continue_watching(user, "de-DE") == []
+
+
+def test_waiting_shows_come_after_the_others_soonest_first(user, show):
+    later = another_show(1, "Later")
+    soon = another_show(2, "Soon")
+    ready = another_show(3, "Ready")
+    running_season(show, aired=4)  # S3 E5 in 4 days
+    running_season(later, aired=3)  # S3 E4 in 4 days, but "Later" sorts after "Dark"
+    running_season(soon, aired=5)  # S3 E6 in 4 days as well …
+    Episode.objects.filter(season__show=soon, season__number=3, number=6).update(
+        air_date=timezone.localdate() + timedelta(days=1)
+    )
+    for waiting in (show, later, soon):
+        watch_aired(user, waiting)
+    shows.mark_episode(user, episode(ready, 1, 1), date(2020, 1, 1))  # watched long ago
+
+    entries = dashboard.continue_watching(user, "de-DE")
+
+    assert [e.show.original_title for e in entries] == ["Ready", "Soon", "Dark", "Later"]
+    assert [e.waiting_for is None for e in entries] == [True, False, False, False]
+
+
 def test_show_without_watched_episodes_is_not_shown(user, show):
     first = episode(show, 1, 1)
     shows.mark_episode(user, first)

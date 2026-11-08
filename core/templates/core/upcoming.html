@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Upcoming" %}{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <hgroup>
+      <h1>{% translate "Upcoming" %}</h1>
+      <p>{% translate "New seasons and the next episodes of followed shows" %}</p>
+    </hgroup>
+    {% if follows_shows %}
+      {# Takes a few seconds (TMDB is asked for every followed show) #}
+      <form method="post" action="{% url 'core:upcoming_refresh' %}" data-busy>
+        {% csrf_token %}
+        <button type="submit" class="secondary outline">{% translate "Refresh all" %}</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if entries %}
+    {% regroup entries by month as months %}
+    {% for group in months %}
+      <section class="dashboard-section" aria-labelledby="month-{{ forloop.counter }}">
+        <h2 id="month-{{ forloop.counter }}">{{ group.grouper|date:"F Y" }}</h2>
+        <ul class="compact-list announcements">
+          {% for announcement in group.list %}
+            {% include "catalog/_announcement.html" %}
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  {% elif follows_shows %}
+    <p class="muted">{% translate "No dates known yet. New seasons and episodes appear here as soon as TMDB has a date for them." %}</p>
+  {% else %}
+    <p class="muted">{% translate "Follow shows to see their new seasons here. Use the “Follow” button on a show's page." %}</p>
+  {% endif %}
+{% endblock %}

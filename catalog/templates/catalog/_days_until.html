@@ -1,0 +1,1 @@
+{% load i18n %}{# "today", "tomorrow" or "in 3 days"; expects `days` #}{% if days == 0 %}{% translate "today" %}{% elif days == 1 %}{% translate "tomorrow" %}{% else %}{% blocktranslate count days=days %}in {{ days }} day{% plural %}in {{ days }} days{% endblocktranslate %}{% endif %}

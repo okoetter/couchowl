@@ -33,7 +33,7 @@ def test_details_include_all_translations(fake_tmdb):
     data = tmdb.get_client().details("tv", 70523, "de-AT")
 
     assert data["original_name"] == "Dark"
-    assert fake_tmdb.requests[0].url.params["append_to_response"] == "translations"
+    assert fake_tmdb.requests[0].url.params["append_to_response"] == tmdb.DETAILS_APPENDED
 
 
 def test_missing_token_raises_not_configured(settings):

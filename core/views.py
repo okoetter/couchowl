@@ -9,11 +9,13 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.cache import patch_vary_headers
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST
 
+from accounts.throttle import hit
 from catalog import dashboard as dashboard_rules
-from catalog import shows
+from catalog import shows, sync, tmdb
 from catalog.models import Episode, MediaType, Title
 
 
@@ -46,8 +48,9 @@ def watch_next(request, tmdb_id):
     """Check button on the dashboard: mark the show's next episode as watched (today).
 
     `undo=<episode id>` takes it back. htmx gets as little as possible (posters must not
-    flicker): only the entry's text and button, or the entry disappears when the show is
-    caught up; plus the message "S2 E5 watched · Undo".
+    flicker): only the entry's text and button (or the date of the next episode when the
+    show is caught up but its season is still running), or the entry disappears when the
+    show is caught up; plus the message "S2 E5 watched · Undo".
     """
     show = get_object_or_404(Title, media_type=MediaType.TV, tmdb_id=tmdb_id)
     if undo := request.POST.get("undo"):
@@ -94,9 +97,53 @@ def _toast(request, show: Title, episode: Episode | None) -> str:
     return render_to_string("catalog/_toast.html", context, request=request)
 
 
-def placeholder(request, title):
-    """Temporary page for navigation targets that are built in later milestones."""
-    return render(request, "core/placeholder.html", {"page_title": title})
+@require_GET
+def upcoming(request):
+    """Page "Upcoming": all known dates of followed shows, grouped by month (database only)."""
+    language = request.user.effective_tmdb_language
+    context = {
+        "entries": dashboard_rules.upcoming(request.user, language),
+        "follows_shows": shows.followed_shows(request.user).exists(),
+    }
+    return render(request, "core/upcoming.html", context)
+
+
+# "Refresh all" may take a while (one TMDB request per show and language); once per window
+REFRESH_ALL_LIMIT = 1
+REFRESH_ALL_WINDOW_SECONDS = 300
+
+
+@require_POST
+def upcoming_refresh(request):
+    """Button "Refresh all": reload the followed shows from TMDB (see catalog.sync)."""
+    if not hit(f"refresh-all:{request.user.pk}", REFRESH_ALL_LIMIT, REFRESH_ALL_WINDOW_SECONDS):
+        messages.warning(request, _("Everything was just refreshed. Please wait a few minutes."))
+        return redirect("core:upcoming")
+    try:
+        result = sync.refresh_followed(request.user)
+    except tmdb.TMDBNotConfigured:
+        messages.error(request, _("The administrator has not set up TMDB yet."))
+        return redirect("core:upcoming")
+    if result.failed and not result.updated:
+        messages.error(request, _("TMDB can't be reached right now. Please try again later."))
+    elif result.failed:
+        total = len(result.updated) + len(result.failed)
+        messages.warning(
+            request,
+            ngettext(
+                "%(updated)s of %(total)s show refreshed. The others could not be loaded.",
+                "%(updated)s of %(total)s shows refreshed. The others could not be loaded.",
+                total,
+            )
+            % {"updated": len(result.updated), "total": total},
+        )
+    else:
+        messages.success(
+            request,
+            ngettext("%(count)s show refreshed.", "%(count)s shows refreshed.", len(result.updated))
+            % {"count": len(result.updated)},
+        )
+    return redirect("core:upcoming")
 
 
 @login_not_required

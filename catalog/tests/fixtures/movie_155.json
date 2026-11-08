@@ -55,5 +55,73 @@
     }
    }
   ]
+ },
+ "watch/providers": {
+  "results": {
+   "DE": {
+    "link": "https://www.themoviedb.org/movie/155-the-dark-knight/watch?locale=DE",
+    "rent": [
+     {
+      "logo_path": "/qdEGArH3lKfFnAtYXMkSYk5wxuG.png",
+      "provider_id": 2,
+      "provider_name": "Apple TV Store",
+      "display_priority": 6
+     },
+     {
+      "logo_path": "/jn6TLbtaTZntTRX9UYucHJvpQx1.png",
+      "provider_id": 10,
+      "provider_name": "Amazon Video",
+      "display_priority": 8
+     }
+    ],
+    "flatrate": [
+     {
+      "logo_path": "/gMZdpavHmxFNnLpMHwVxfqeux2g.png",
+      "provider_id": 9,
+      "provider_name": "Amazon Prime Video",
+      "display_priority": 2
+     },
+     {
+      "logo_path": "/tpwTT1FpWqLLhxUfAuDavIXDDfI.png",
+      "provider_id": 2100,
+      "provider_name": "Amazon Prime Video with Ads",
+      "display_priority": 19
+     }
+    ],
+    "buy": [
+     {
+      "logo_path": "/qdEGArH3lKfFnAtYXMkSYk5wxuG.png",
+      "provider_id": 2,
+      "provider_name": "Apple TV Store",
+      "display_priority": 6
+     },
+     {
+      "logo_path": "/jn6TLbtaTZntTRX9UYucHJvpQx1.png",
+      "provider_id": 10,
+      "provider_name": "Amazon Video",
+      "display_priority": 8
+     }
+    ],
+    "ads": [
+     {
+      "logo_path": "/dB8G41Q6tSL5NBisrIeqByfepBc.png",
+      "provider_id": 300,
+      "provider_name": "Pluto TV",
+      "display_priority": 50
+     }
+    ]
+   },
+   "US": {
+    "link": "https://www.themoviedb.org/movie/155-the-dark-knight/watch?locale=US",
+    "flatrate": [
+     {
+      "logo_path": "/skypuy7SXuugIQeYg0IglmzoKaS.png",
+      "provider_id": 1899,
+      "provider_name": "HBO Max",
+      "display_priority": 3
+     }
+    ]
+   }
+  }
  }
 }

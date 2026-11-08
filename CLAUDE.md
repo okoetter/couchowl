@@ -37,7 +37,9 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - TMDB code lives in the `catalog` app: `tmdb.py` (HTTP client), `services.py` (search, DB cache,
   language fallback, seasons/episodes), `posters.py` (poster proxy), `lists.py` (lists, watched
   movies, system list "Followed shows"), `shows.py` (follow, watched episodes, progress, next episode),
-  `dashboard.py` (continue watching, announcements; database only, never asks TMDB).
+  `dashboard.py` (continue watching, announcements, upcoming; database only, never asks TMDB),
+  `providers.py` (streaming providers per region for display, stored in `Title.watch_providers`),
+  `sync.py` (bulk reload: `manage.py sync_tmdb`, "Refresh all").
   Fake shows in tests: `fake_tmdb.add_show()` (details and season requests share a path).
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.

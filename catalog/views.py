@@ -10,14 +10,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.cache import patch_cache_control, patch_vary_headers
+from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from accounts.models import User
+from accounts.regions import country_name
 from accounts.throttle import hit
 
 from . import lists as list_rules
-from . import posters, services, shows, tmdb
+from . import posters, providers, services, shows, tmdb
 from .forms import ListForm, WatchedDateForm
 from .models import Episode, MediaType, Season, Title, TitleTranslation, UserList, WatchedMovie
 
@@ -363,7 +365,12 @@ def _show_item_watched(request, user_list, item):
 def _load_title(request, media_type, tmdb_id) -> tuple[TitleTranslation | None, str]:
     """(translation, "") or (None, error message). Unknown titles raise Http404."""
     try:
-        translation = services.get_title(media_type, tmdb_id, request.user.effective_tmdb_language)
+        translation = services.get_title(
+            media_type,
+            tmdb_id,
+            request.user.effective_tmdb_language,
+            region=request.user.effective_region,
+        )
     except tmdb.TMDBNotFound:
         raise Http404 from None
     except tmdb.TMDBNotConfigured:
@@ -381,9 +388,13 @@ def title_detail(request, media_type, tmdb_id):
     if translation is None:
         return render(request, "catalog/title_error.html", {"error": error}, status=503)
     title = translation.title
+    region = request.user.effective_region
     context = {
         "title": title,
         "translation": translation,
+        "offers": providers.offers(title, region),
+        "offers_link": providers.link(title, region),
+        "region_name": country_name(region, get_language()),
         **_menu_context(request, media_type, tmdb_id, title),
     }
     if title.is_movie:
@@ -391,6 +402,31 @@ def title_detail(request, media_type, tmdb_id):
     else:
         context.update(_show_context(request, title))
     return render(request, "catalog/title_detail.html", context)
+
+
+# "Refresh now" on detail pages: requests per user and minute (protects the TMDB quota)
+REFRESH_LIMIT = 10
+
+
+@require_POST
+def title_refresh(request, media_type, tmdb_id):
+    """Button "Refresh now": reload the title from TMDB (texts, poster, seasons, providers)."""
+    url = reverse("catalog:title_detail", args=[media_type, tmdb_id])
+    if not hit(f"refresh:{request.user.pk}", REFRESH_LIMIT, 60):
+        messages.warning(request, _("Too many refreshes in a short time. Please wait a moment."))
+        return redirect(url)
+    try:
+        services.fetch_title(media_type, tmdb_id, request.user.effective_tmdb_language)
+    except tmdb.TMDBNotFound:
+        raise Http404 from None
+    except tmdb.TMDBNotConfigured:
+        messages.error(request, _("The administrator has not set up TMDB yet."))
+    except tmdb.TMDBError:
+        logger.exception("Could not refresh %s %s from TMDB", media_type, tmdb_id)
+        messages.error(request, _("TMDB can't be reached right now. Please try again later."))
+    else:
+        messages.success(request, _("Refreshed from TMDB."))
+    return redirect(url)
 
 
 def _menu_context(request, media_type, tmdb_id, title, error="") -> dict:

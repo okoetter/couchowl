@@ -55,6 +55,21 @@ is locked for `AXES_COOLOFF_MINUTES` (default 60). Other users are not affected.
 - Unlock everyone: `docker compose exec watchit python manage.py axes_reset`
 - Unlock one user: `docker compose exec watchit python manage.py axes_reset_username <username>`
 
+## TMDB sync
+
+Once a day (03:30 UTC) the container runs `manage.py sync_tmdb`. It reloads every show that
+someone follows or is watching: new seasons and episodes, air dates and streaming providers.
+Shows loaded within the last 6 hours are skipped. The result appears in `docker logs`
+(lines starting with `cron |`). Run it by hand:
+
+```sh
+docker compose exec watchit python manage.py sync_tmdb             # summary only
+docker compose exec watchit python manage.py sync_tmdb --force -v 2 # all shows, one line each
+```
+
+Users can also reload a single title ("Refresh now" on its page) or all shows they follow
+("Refresh all" on the page "Upcoming").
+
 ## Set up e-mail
 
 E-mail is optional. Configure it in `.env` (not in the admin) and restart the container:

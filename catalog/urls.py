@@ -53,6 +53,7 @@ urlpatterns = [
     ),
     # Movies and shows
     path("<media:media_type>/<int:tmdb_id>/", views.title_detail, name="title_detail"),
+    path("<media:media_type>/<int:tmdb_id>/refresh/", views.title_refresh, name="title_refresh"),
     path("<media:media_type>/<int:tmdb_id>/lists/", views.title_lists, name="title_lists"),
     path(
         "<media:media_type>/<int:tmdb_id>/lists/new/",

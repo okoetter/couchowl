@@ -123,6 +123,49 @@
       {% else %}
         <p class="muted">{% translate "No description available." %}</p>
       {% endif %}
+
+      {# Streaming providers in the user's region (JustWatch data via TMDB, see catalog.providers) #}
+      <section class="offers" aria-labelledby="offers-heading">
+        <h2 id="offers-heading">{% blocktranslate %}Available in {{ region_name }}{% endblocktranslate %}</h2>
+        {% if offers %}
+          <dl>
+            {% for group in offers %}
+              <dt>{{ group.label }}</dt>
+              <dd>
+                <ul class="offer-logos">
+                  {% for provider in group.providers %}
+                    <li>
+                      {% poster provider.logo "w92" as logo %}
+                      {% if logo %}
+                        <img src="{{ logo }}" alt="{{ provider.name }}" title="{{ provider.name }}"
+                             width="40" height="40" loading="lazy">
+                      {% else %}
+                        <span class="offer-name">{{ provider.name }}</span>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </dd>
+            {% endfor %}
+          </dl>
+          <p class="offers-source">
+            <small class="muted">
+              {% translate "Source: JustWatch" %}{% if offers_link %} · <a href="{{ offers_link }}" target="_blank" rel="noopener noreferrer">{% translate "All offers on TMDB" %}</a>{% endif %}
+            </small>
+          </p>
+        {% else %}
+          <p class="muted">{% blocktranslate %}No streaming offers known in {{ region_name }}.{% endblocktranslate %}</p>
+        {% endif %}
+      </section>
+
+      {# Reloads texts, poster, seasons and providers ("Refresh now", see catalog.views.title_refresh) #}
+      <form method="post" action="{% url 'catalog:title_refresh' title.media_type title.tmdb_id %}" class="title-refresh" data-busy>
+        {% csrf_token %}
+        <small class="muted">
+          {% blocktranslate with date=translation.fetched_at|date:"SHORT_DATETIME_FORMAT" %}Data from TMDB as of {{ date }}{% endblocktranslate %}
+        </small>
+        <button type="submit" class="secondary outline">{% translate "Refresh now" %}</button>
+      </form>
     </div>
   </div>
 

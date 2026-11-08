@@ -40,16 +40,23 @@
                           <small aria-hidden="true">{{ entry.progress.watched }}/{{ entry.progress.aired }}</small>
                         </span>
                       </div>
-                      <form method="post" action="{% url 'core:watch_next' entry.show.tmdb_id %}"
-                            hx-post="{% url 'core:watch_next' entry.show.tmdb_id %}"
-                            hx-target="#watching-body-{{ entry.show.pk }}" hx-swap="outerHTML">
-                        {% csrf_token %}
-                        <button type="submit" class="check-button"
-                                aria-label="{% blocktranslate %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %}"
-                                title="{% blocktranslate %}Mark {{ code }} as watched{% endblocktranslate %}">
-                          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-                        </button>
-                      </form>
+                      {% if entry.waiting_for %}
+                        <div class="announcement-date">
+                          <time datetime="{{ entry.waiting_for.air_date|date:'Y-m-d' }}">{{ entry.waiting_for.air_date|date:"SHORT_DATE_FORMAT" }}</time>
+                          <small>{% include "catalog/_days_until.html" with days=entry.days_until %}</small>
+                        </div>
+                      {% else %}
+                        <form method="post" action="{% url 'core:watch_next' entry.show.tmdb_id %}"
+                              hx-post="{% url 'core:watch_next' entry.show.tmdb_id %}"
+                              hx-target="#watching-body-{{ entry.show.pk }}" hx-swap="outerHTML">
+                          {% csrf_token %}
+                          <button type="submit" class="check-button"
+                                  aria-label="{% blocktranslate %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %}"
+                                  title="{% blocktranslate %}Mark {{ code }} as watched{% endblocktranslate %}">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                          </button>
+                        </form>
+                      {% endif %}
                     </div>
                   {% endwith %}
                 {% endpartialdef %}
@@ -74,30 +81,10 @@
     {% if announcements %}
       <ul class="compact-list announcements">
         {% for announcement in announcements %}
-          <li>
-            <a class="result-link" href="{{ announcement.show.get_absolute_url }}">
-              {% poster announcement.translation.poster_path "w92" as thumb %}
-              {% if thumb %}
-                {% poster announcement.translation.poster_path "w185" as thumb_2x %}
-                <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
-                     alt="" width="46" height="69" loading="lazy" class="poster">
-              {% else %}
-                <span class="poster poster-missing" aria-hidden="true"></span>
-              {% endif %}
-              <div>
-                <strong>{{ announcement.name }}</strong>
-                <small>{{ announcement.season_name }}{% for network in announcement.show.networks %}{% if forloop.first %} · {% else %}, {% endif %}{{ network }}{% endfor %}</small>
-              </div>
-            </a>
-            <div class="announcement-date">
-              <time datetime="{{ announcement.starts|date:'Y-m-d' }}">{{ announcement.starts|date:"SHORT_DATE_FORMAT" }}</time>
-              <small>
-                {% if announcement.days_until == 0 %}{% translate "today" %}{% elif announcement.days_until == 1 %}{% translate "tomorrow" %}{% else %}{% blocktranslate count days=announcement.days_until %}in {{ days }} day{% plural %}in {{ days }} days{% endblocktranslate %}{% endif %}
-              </small>
-            </div>
-          </li>
+          {% include "catalog/_announcement.html" %}
         {% endfor %}
       </ul>
+      <p><a href="{% url 'core:upcoming' %}">{% translate "All upcoming dates" %}</a></p>
     {% elif follows_shows %}
       <p class="muted">{% blocktranslate count months=announcement_months %}No new seasons announced for the next month.{% plural %}No new seasons announced for the next {{ months }} months.{% endblocktranslate %}</p>
     {% else %}

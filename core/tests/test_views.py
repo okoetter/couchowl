@@ -24,14 +24,6 @@ def test_assets_are_served_locally_without_cdn(auth_client):
         assert cdn not in content
 
 
-@pytest.mark.parametrize("name", ["upcoming"])
-def test_placeholder_pages_exist(auth_client, name):
-    response = auth_client.get(reverse(f"core:{name}"))
-
-    assert response.status_code == 200
-    assert "Diese Seite kommt bald." in response.content.decode()
-
-
 @pytest.mark.django_db
 def test_health_reports_ok_and_version(client):
     response = client.get(reverse("core:health"))

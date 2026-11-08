@@ -52,6 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `ANNOUNCEMENT_MONTHS` months (default 3), with date and network (e.g. Netflix)
 - Show page: the "Next" link scrolls to the episode below the sticky navigation and
   briefly highlights it
+- Daily TMDB sync (`manage.py sync_tmdb`, run by the container's cron at 03:30 UTC) for all
+  shows someone follows or watches: new seasons and episodes, air dates, streaming providers
+- Streaming providers ("Available in Germany": subscription, free, rent, buy) on movie and
+  show pages, for the user's region (data from JustWatch via TMDB); announcements also name
+  the streaming services
+- "Upcoming" page: all known season starts of followed shows plus the next episode of
+  running seasons, grouped by month; "Refresh all" reloads the followed shows
+- "Refresh now" button on detail pages
+- Dashboard: caught-up shows stay in "Continue watching" while their season is running,
+  showing when the next episode airs ("in 3 days") instead of the check button
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

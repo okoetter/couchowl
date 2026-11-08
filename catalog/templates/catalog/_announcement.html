@@ -1,0 +1,24 @@
+{% load i18n catalog %}
+{# One row: a season start or (page "Upcoming") the next episode of a running season #}
+<li>
+  <a class="result-link" href="{{ announcement.show.get_absolute_url }}">
+    {% poster announcement.translation.poster_path "w92" as thumb %}
+    {% if thumb %}
+      {% poster announcement.translation.poster_path "w185" as thumb_2x %}
+      <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+           alt="" width="46" height="69" loading="lazy" class="poster">
+    {% else %}
+      <span class="poster poster-missing" aria-hidden="true"></span>
+    {% endif %}
+    <div>
+      <strong>{{ announcement.name }}</strong>
+      <small>
+        {% if announcement.episode %}<span class="nowrap">{{ announcement.episode.code }}</span>{% if announcement.episode_name %} · {{ announcement.episode_name }}{% endif %}{% else %}{{ announcement.season_name }}{% endif %}{% for source in announcement.sources %}{% if forloop.first %} · {% else %}, {% endif %}{{ source }}{% endfor %}
+      </small>
+    </div>
+  </a>
+  <div class="announcement-date">
+    <time datetime="{{ announcement.starts|date:'Y-m-d' }}">{{ announcement.starts|date:"SHORT_DATE_FORMAT" }}</time>
+    <small>{% include "catalog/_days_until.html" with days=announcement.days_until %}</small>
+  </div>
+</li>

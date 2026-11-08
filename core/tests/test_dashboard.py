@@ -137,6 +137,45 @@ def test_last_entry_shows_the_empty_section(auth_client, user, show):
     assert "S3 E8 gesehen" in content
 
 
+def running_season(show):
+    """S3 E1-E4 are out, E5 airs in 4 days, then one per week."""
+    today = timezone.localdate()
+    for ep in Episode.objects.filter(season__show=show, season__number=3):
+        ep.air_date = today + timedelta(days=7 * (ep.number - 4) - 3)
+        ep.save()
+
+
+def test_waiting_entry_shows_the_date_instead_of_the_button(auth_client, user, show):
+    running_season(show)
+    for number in (1, 2):
+        shows.mark_season(user, show.seasons.get(number=number))
+    shows.mark_episodes(user, list(Episode.objects.filter(season__show=show, season__number=3))[:4])
+
+    content = auth_client.get(reverse("core:dashboard")).content.decode()
+
+    assert f'id="watching-{show.pk}"' in content
+    assert "S3 E5</span> · Leben und Tod" in content
+    assert "in 4 Tagen" in content
+    assert "als gesehen markieren" not in content
+    assert reverse("core:watch_next", args=[70523]) not in content
+
+
+def test_last_aired_episode_turns_the_entry_into_waiting(auth_client, user, show):
+    running_season(show)
+    for number in (1, 2):
+        shows.mark_season(user, show.seasons.get(number=number))
+    shows.mark_episodes(user, list(Episode.objects.filter(season__show=show, season__number=3))[:3])
+
+    response = auth_client.post(reverse("core:watch_next", args=[70523]), headers=HTMX)
+
+    content = response.content.decode()
+    assert "HX-Retarget" not in response  # the entry stays, only its text part changes
+    assert content.lstrip().startswith(f'<div class="watching-body" id="watching-body-{show.pk}">')
+    assert "S3 E5</span>" in content
+    assert "in 4 Tagen" in content
+    assert "S3 E4 gesehen" in content
+
+
 def test_undo_takes_the_episode_back_and_reloads_the_section(auth_client, user, show):
     shows.mark_episode(user, episode(show, 1, 1))
     second = episode(show, 1, 2)

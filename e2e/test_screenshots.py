@@ -168,6 +168,22 @@ def show_dashboard_toast(page, url):
     page.locator(".toast").wait_for()
 
 
+def show_upcoming(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/upcoming/")
+    page.wait_for_load_state("networkidle")
+
+
+def show_upcoming_busy(page, url):
+    """ "Refresh all" shows a spinner while TMDB is asked."""
+    show_upcoming(page, url)
+    # Keep the page: cancel the form submission after watchit.js has handled it
+    # (window listeners run after the document listener)
+    page.evaluate("window.addEventListener('submit', (event) => event.preventDefault())")
+    page.get_by_role("button", name="Alle aktualisieren").click()
+    page.wait_for_selector("button[aria-busy='true']")
+
+
 def show_dashboard_empty(page, url):
     from accounts.models import User
     from e2e.conftest import PASSWORD
@@ -201,6 +217,8 @@ PAGES = {
     "dashboard": show_dashboard,
     "dashboard-toast": show_dashboard_toast,
     "dashboard-empty": show_dashboard_empty,
+    "upcoming": show_upcoming,
+    "upcoming-busy": show_upcoming_busy,
 }
 
 
@@ -266,7 +284,8 @@ def sample_lists(fake_tmdb, user):
 
 
 def sample_dashboard(fake_tmdb, user):
-    """More shows for the dashboard: one being watched, two with announced seasons."""
+    """More shows for the dashboard: one being watched, one waiting for its next episode,
+    two with announced seasons."""
     from datetime import timedelta
 
     from django.utils import timezone
@@ -301,6 +320,19 @@ def sample_dashboard(fake_tmdb, user):
     starts_in(later, 2, 40)
     for show in (soon, later):
         shows.set_following(user, show, True)
+    # Caught up, season 3 is running: waits for E5 in 4 days (date instead of the button)
+    waiting = save_show(1004, "Läuft gerade", ["Netflix"], "show2")
+    for episode in Episode.objects.filter(season__show=waiting, season__number=3):
+        episode.air_date = timezone.localdate() + timedelta(days=7 * (episode.number - 4) - 3)
+        episode.save()
+    shows.mark_episodes(
+        user,
+        list(
+            Episode.objects.filter(
+                season__show=waiting, season__number__gt=0, air_date__lte=timezone.localdate()
+            )
+        ),
+    )
     colors = [(120, 40, 40), (40, 100, 60), (90, 70, 20)]
     for index, color in enumerate(colors, start=1):
         for size in ("w92", "w185"):
@@ -311,14 +343,32 @@ def sample_dashboard(fake_tmdb, user):
             )
 
 
+def provider_logos(fake_tmdb):
+    """Colored placeholders for the streaming provider logos in the fixtures."""
+    colors = [(200, 30, 40), (20, 120, 200), (30, 30, 30), (240, 180, 0), (90, 40, 140)]
+    logos = set()
+    for name in ("movie_155", "tv_70523"):
+        for offers in load_tmdb_fixture(name)["watch/providers"]["results"].values():
+            for kind, providers in offers.items():
+                if kind != "link":
+                    logos.update(p["logo_path"] for p in providers)
+    for index, logo in enumerate(sorted(logos)):
+        fake_tmdb.add(
+            f"/t/p/w92{logo}",
+            content=tiny_png(colors[index % len(colors)]),
+            headers={"Content-Type": "image/png"},
+        )
+
+
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 @pytest.mark.parametrize("device", VIEWPORTS)
 @pytest.mark.parametrize("name", PAGES)
 def test_screenshot(live_server, member, browser, fake_tmdb, name, device, scheme):
     fake_search(fake_tmdb)
     sample_lists(fake_tmdb, member)
-    if name.startswith("dashboard"):
+    if name.startswith(("dashboard", "upcoming")):
         sample_dashboard(fake_tmdb, member)
+    provider_logos(fake_tmdb)
     if name == "search-error":
         fake_tmdb.add("/3/search/multi", json={}, status=503)
     # Phones are touch devices: no hover, so hover-only elements must stay visible there

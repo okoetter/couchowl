@@ -88,5 +88,48 @@
    "air_date": "2020-06-27",
    "poster_path": "/mPxicgb5mozW8pfGQIadTA9ENCw.jpg"
   }
- ]
+ ],
+ "watch/providers": {
+  "results": {
+   "DE": {
+    "link": "https://www.themoviedb.org/tv/70523-dark/watch?locale=DE",
+    "flatrate": [
+     {
+      "logo_path": "/eGUwOOIxcazwEBxqJpSN5sWEu6V.png",
+      "provider_id": 1796,
+      "provider_name": "Netflix Standard with Ads",
+      "display_priority": 85
+     },
+     {
+      "logo_path": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
+      "provider_id": 8,
+      "provider_name": "Netflix",
+      "display_priority": 1
+     }
+    ]
+   },
+   "AT": {
+    "link": "https://www.themoviedb.org/tv/70523-dark/watch?locale=AT",
+    "flatrate": [
+     {
+      "logo_path": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
+      "provider_id": 8,
+      "provider_name": "Netflix",
+      "display_priority": 0
+     }
+    ]
+   },
+   "US": {
+    "link": "https://www.themoviedb.org/tv/70523-dark/watch?locale=US",
+    "flatrate": [
+     {
+      "logo_path": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
+      "provider_id": 8,
+      "provider_name": "Netflix",
+      "display_priority": 0
+     }
+    ]
+   }
+  }
+ }
 }

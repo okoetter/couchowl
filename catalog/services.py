@@ -12,6 +12,9 @@ from django.core.cache import cache
 from django.db import transaction
 from django.utils import timezone
 
+from accounts.models import User
+from accounts.regions import default_region
+
 from . import tmdb
 from .models import (
     Episode,
@@ -128,12 +131,19 @@ def _comparable(text: str) -> str:
 
 
 def get_title(
-    media_type: str, tmdb_id: int, language: str, *, force: bool = False
+    media_type: str,
+    tmdb_id: int,
+    language: str,
+    *,
+    region: str | None = None,
+    force: bool = False,
 ) -> TitleTranslation:
     """A movie or show in `language`, loaded from TMDB if missing or outdated.
 
     Data older than TMDB_MAX_AGE is refreshed; `force=True` always refreshes
-    ("refresh now" button). If TMDB is unreachable, outdated data is better than none.
+    ("refresh now" button). Also refreshed if the providers of `region` are missing
+    (e.g. after the user changed the region). If TMDB is unreachable, outdated data is
+    better than none.
     Raises tmdb.TMDBNotFound if the title does not exist, tmdb.TMDBError if it can't be loaded.
     """
     translation = (
@@ -141,15 +151,16 @@ def get_title(
         .filter(title__media_type=media_type, title__tmdb_id=tmdb_id, language=language)
         .first()
     )
-    if translation and not force and not is_outdated(translation):
+    if (
+        translation
+        and not force
+        and not is_outdated(translation)
+        and (region is None or region in translation.title.watch_providers)
+    ):
         return translation
 
     try:
-        data = tmdb.get_client().details(media_type, tmdb_id, language)
-        seasons = None
-        if media_type == MediaType.TV:
-            numbers = [s["season_number"] for s in data.get("seasons") or []]
-            seasons = load_seasons(tmdb_id, numbers, language)
+        return fetch_title(media_type, tmdb_id, language)
     except tmdb.TMDBNotFound:
         raise
     except tmdb.TMDBError:
@@ -158,6 +169,17 @@ def get_title(
         logger.warning("Showing outdated data for %s %s: TMDB unavailable", media_type, tmdb_id)
         return translation
 
+
+def fetch_title(media_type: str, tmdb_id: int, language: str) -> TitleTranslation:
+    """Load a movie or show from TMDB and store it (shows with seasons and episodes).
+
+    Raises tmdb.TMDBNotFound / tmdb.TMDBError; nothing is changed then.
+    """
+    data = tmdb.get_client().details(media_type, tmdb_id, language)
+    seasons = None
+    if media_type == MediaType.TV:
+        numbers = [s["season_number"] for s in data.get("seasons") or []]
+        seasons = load_seasons(tmdb_id, numbers, language)
     return save_title(media_type, data, language, seasons=seasons)
 
 
@@ -213,6 +235,7 @@ def save_title(
             "release_date": _parse_date(data.get("release_date" if is_movie else "first_air_date")),
             "status": data.get("status") or "",
             "networks": [n["name"] for n in data.get("networks") or [] if n.get("name")],
+            "watch_providers": watch_providers(data, provider_regions()),
         },
     )
     name, overview = localize(data, language, name_field="title" if is_movie else "name")
@@ -229,6 +252,51 @@ def save_title(
     if seasons is not None:
         save_seasons(title, seasons, language)
     return translation
+
+
+# --- Streaming providers ---------------------------------------------------------------------
+
+# TMDB's kinds of offers (JustWatch data)
+PROVIDER_KINDS = ("flatrate", "free", "ads", "rent", "buy")
+
+
+def provider_regions() -> set[str]:
+    """Regions whose streaming providers are stored: those of all users, plus the default.
+
+    TMDB sends all ~130 regions at once; storing only these keeps the database small.
+    """
+    regions = User.objects.exclude(region="").values_list("region", flat=True).distinct()
+    return {region.upper() for region in regions} | {default_region()}
+
+
+def watch_providers(data: dict, regions) -> dict[str, dict]:
+    """The providers from a TMDB details response (`watch/providers`) for `regions`.
+
+    Every wanted region gets an entry, {} if there are no offers there; so a missing
+    region means "not loaded yet" (see get_title). Providers are sorted like on JustWatch.
+    """
+    results = (data.get("watch/providers") or {}).get("results") or {}
+    stored = {}
+    for region in sorted(regions):
+        offers = results.get(region) or {}
+        entry = {}
+        for kind in PROVIDER_KINDS:
+            ranked = sorted(offers.get(kind) or [], key=lambda p: p.get("display_priority", 0))
+            providers = [
+                {
+                    "id": p["provider_id"],
+                    "name": p["provider_name"],
+                    "logo": p.get("logo_path") or "",
+                }
+                for p in ranked
+                if p.get("provider_id") and p.get("provider_name")
+            ]
+            if providers:
+                entry[kind] = providers
+        if entry and offers.get("link"):
+            entry["link"] = offers["link"]
+        stored[region] = entry
+    return stored
 
 
 # --- Seasons and episodes ------------------------------------------------------------------

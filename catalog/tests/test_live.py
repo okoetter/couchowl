@@ -57,3 +57,15 @@ def test_episodes_with_language_fallback():
     assert first.name == "Geheimnisse"
     assert first.overview
     assert show.seasons.filter(number__gt=0).count() == 3
+
+
+@pytest.mark.django_db
+def test_details_include_streaming_providers(settings):
+    settings.DEFAULT_REGION = "DE"
+
+    title = services.get_title("tv", 70523, "de-DE").title
+
+    # "Dark" is a Netflix original; TMDB sends the providers with the details
+    offers = title.watch_providers["DE"]
+    assert any(p["name"] == "Netflix" for p in offers.get("flatrate", []))
+    assert offers["link"].startswith("https://www.themoviedb.org/tv/70523")
