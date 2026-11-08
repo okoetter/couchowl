@@ -57,6 +57,24 @@ def test_get_title_stores_seasons_and_episodes(fake_tmdb):
 
 
 @pytest.mark.django_db
+def test_english_season_placeholder_shows_the_translated_default_name(fake_tmdb, user):
+    # Without a German name TMDB sends "Season 3" (in English) for de-DE
+    def seasons(language):
+        data = dark_seasons(language)
+        data[3]["name"] = "Season 3"
+        data[2]["name"] = "Season 2: Die Reise"  # a real name that starts like one
+        return data
+
+    fake_tmdb.add_show(seasons=seasons)
+    show = services.get_title("tv", 70523, "de-DE").title
+
+    assert show.seasons.get(number=3).translations.get().name == ""
+    names = {s.number: s.name for s in shows.seasons_overview(user, show, "de-DE")}
+    assert names[3] == "Staffel 3"
+    assert names[2] == "Season 2: Die Reise"
+
+
+@pytest.mark.django_db
 def test_missing_episode_texts_come_from_the_next_language(fake_tmdb):
     # Like the real TMDB: "de-AT" only has placeholders ("Episode 1", no description)
     fake_tmdb.add_show()
@@ -244,6 +262,33 @@ def test_first_watched_episode_starts_watching(user, show):
     shows.mark_episode(user, episode(show, 1, 1))
 
     assert UserSeries.objects.get(user=user, title=show).status == "watching"
+
+
+def test_first_watched_episode_follows_the_show(user, show):
+    shows.mark_season(user, show.seasons.get(number=1))
+
+    series = UserSeries.objects.get(user=user, title=show)
+    assert series.following
+    assert series.followed_at is not None
+
+
+def test_first_watched_episode_keeps_an_earlier_follow_date(user, show):
+    shows.set_following(user, show, True)
+    followed_at = UserSeries.objects.get(user=user, title=show).followed_at
+
+    shows.mark_episode(user, episode(show, 1, 1))
+
+    assert UserSeries.objects.get(user=user, title=show).followed_at == followed_at
+
+
+def test_watching_more_episodes_respects_an_unfollow(user, show):
+    shows.mark_episode(user, episode(show, 1, 1))
+    shows.set_following(user, show, False)
+
+    shows.mark_episode(user, episode(show, 1, 2))
+    shows.watch_next(user, show)
+
+    assert not shows.is_following(user, show)
 
 
 def test_marking_a_season_keeps_existing_dates(user, show):

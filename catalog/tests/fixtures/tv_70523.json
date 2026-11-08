@@ -7,6 +7,14 @@
  "overview": "",
  "poster_path": "/gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg",
  "status": "Ended",
+ "networks": [
+  {
+   "id": 213,
+   "logo_path": "/wwemzKWzjKYJFfCeiB57q3r4Bcm.png",
+   "name": "Netflix",
+   "origin_country": ""
+  }
+ ],
  "translations": {
   "translations": [
    {

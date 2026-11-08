@@ -45,6 +45,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   completely watched shows count as watched in filters and search
 - Dates are formatted for the user's region (e.g. 01/12/2017 in the UK, 12/01/2017 in
   the US)
+- Dashboard: "Continue watching" lists the followed shows you are watching with their
+  next episode and progress; a check button marks that episode as watched (with "Undo").
+  Marking the first episode of a show follows it; unfollow to remove it from the dashboard
+- Dashboard: announcements of new seasons of followed shows within the next
+  `ANNOUNCEMENT_MONTHS` months (default 3), with date and network (e.g. Netflix)
+- Show page: the "Next" link scrolls to the episode below the sticky navigation and
+  briefly highlights it
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

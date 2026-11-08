@@ -9,7 +9,7 @@ def test_dashboard_renders_in_german_by_default(auth_client):
     assert response.status_code == 200
     content = response.content.decode()
     assert '<html lang="de-de"' in content
-    assert "Willkommen bei watchit" in content
+    assert "Weiterschauen" in content
     # Navigation is translated and marks the current page
     assert "Demnächst" in content
     assert 'aria-current="page"' in content

@@ -2,6 +2,15 @@
 
 :root {
   --watchit-nav-height: 4rem;
+  /* Jumps to an anchor (e.g. "#episode-1-3") leave room for the sticky top bar,
+     otherwise it covers the target. Phones have the bar at the bottom (see below). */
+  scroll-padding-top: calc(var(--watchit-nav-height) + 1rem);
+}
+
+@media (max-width: 767px) {
+  :root {
+    scroll-padding-top: 1rem;
+  }
 }
 
 /* ---- Navigation: top bar on desktop ------------------------------------- */
@@ -816,6 +825,27 @@ button.check-button {
   padding: 0.4rem 0;
 }
 
+/* The episode a link jumped to ("Next: S1 E3" → #episode-1-3) lights up briefly, so it is
+   easy to find even when the page can't scroll it to the top (end of the page).
+   Negative margin + padding: the highlight reaches a bit beyond the text, without moving it. */
+.episodes li:target {
+  margin-inline: -0.5rem;
+  padding-inline: 0.5rem;
+  border-radius: var(--pico-border-radius);
+  animation: watchit-target 2.5s ease-out;
+}
+
+@keyframes watchit-target {
+  0%,
+  40% {
+    background-color: var(--pico-primary-focus);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
 .episodes li + li {
   border-top: 1px solid var(--pico-muted-border-color);
 }
@@ -1049,4 +1079,140 @@ button.progress-button:focus-visible .progress-next {
   color: var(--pico-contrast-inverse);
   border-color: currentColor;
   font-weight: 600;
+}
+
+/* ---- Dashboard -------------------------------------------------------------------- */
+
+.dashboard-section {
+  margin-bottom: calc(var(--pico-spacing) * 2.5);
+}
+
+.dashboard-section h2 {
+  margin-bottom: var(--pico-spacing);
+  font-size: 1.35rem;
+}
+
+.dashboard-section hgroup {
+  margin-bottom: var(--pico-spacing);
+}
+
+.dashboard-section hgroup h2 {
+  margin-bottom: 0.25rem;
+}
+
+/* "Continue watching": cards with poster, next episode, progress and a check button */
+.watching-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: var(--pico-spacing);
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .watching-list {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.watching-list li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0.6rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-card-background-color);
+  box-shadow: var(--pico-card-box-shadow);
+}
+
+.watching-poster {
+  flex: none;
+  line-height: 0;
+}
+
+.watching-poster .poster {
+  width: 64px;
+  height: 96px;
+}
+
+.watching-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.watching-body form {
+  margin: 0;
+}
+
+.watching-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.watching-text a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.watching-text a:hover strong {
+  text-decoration: underline;
+}
+
+/* Long names wrap to two lines at most, the episode line stays on one line */
+.watching-text > a {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.watching-next {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.watching-next {
+  font-size: 0.9rem;
+}
+
+.watching-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.watching-progress progress {
+  flex: 1;
+  height: 0.35rem;
+  margin: 0;
+}
+
+.watching-progress small {
+  color: var(--pico-muted-color);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Announcements": like the compact list, with the date on the right */
+.announcement-date {
+  flex: none;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.announcement-date small {
+  display: block;
+  color: var(--pico-muted-color);
 }

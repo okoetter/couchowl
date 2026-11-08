@@ -136,6 +136,14 @@ def show_show_details(page, url):
     page.wait_for_timeout(300)
 
 
+def show_show_jump(page, url):
+    """ "Next: S2 E3" jumps to the episode, which lights up briefly."""
+    show_show(page, url)
+    page.get_by_role("link", name="S2 E3").click()
+    page.wait_for_url("**#episode-2-3")
+    page.wait_for_timeout(300)
+
+
 def show_list_toast(page, url):
     show_list_grid(page, url)
     page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").click()
@@ -146,6 +154,27 @@ def show_followed(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/lists/followed/")
     page.wait_for_load_state("networkidle")
+
+
+def show_dashboard(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/")
+    page.wait_for_load_state("networkidle")
+
+
+def show_dashboard_toast(page, url):
+    show_dashboard(page, url)
+    page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").click()
+    page.locator(".toast").wait_for()
+
+
+def show_dashboard_empty(page, url):
+    from accounts.models import User
+    from e2e.conftest import PASSWORD
+
+    User.objects.create_user(username="ben", password=PASSWORD)
+    login(page, url, "ben")
+    page.goto(f"{url}/")
 
 
 PAGES = {
@@ -166,8 +195,12 @@ PAGES = {
     "movie": show_movie,
     "show": show_show,
     "show-details": show_show_details,
+    "show-jump": show_show_jump,
     "list-toast": show_list_toast,
     "followed": show_followed,
+    "dashboard": show_dashboard,
+    "dashboard-toast": show_dashboard_toast,
+    "dashboard-empty": show_dashboard_empty,
 }
 
 
@@ -232,12 +265,60 @@ def sample_lists(fake_tmdb, user):
             )
 
 
+def sample_dashboard(fake_tmdb, user):
+    """More shows for the dashboard: one being watched, two with announced seasons."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from catalog import services, shows
+    from catalog.models import Episode, Season
+
+    def save_show(tmdb_id, name, networks, poster):
+        data = load_tmdb_fixture("tv_70523")
+        data.update(
+            id=tmdb_id,
+            original_name=name,
+            poster_path=f"/{poster}.jpg",
+            networks=[{"id": i, "name": n} for i, n in enumerate(networks)],
+        )
+        for translation in data["translations"]["translations"]:
+            translation["data"]["name"] = ""  # use the original name
+        return services.save_title("tv", data, "de-DE", seasons=dark_seasons("de-DE")).title
+
+    def starts_in(show, number, days):
+        start = timezone.localdate() + timedelta(days=days)
+        Season.objects.filter(show=show, number=number).update(air_date=start)
+        Episode.objects.filter(season__show=show, season__number=number).update(air_date=start)
+
+    long_title = "Ein sehr langer Serientitel, der kaum in eine Zeile passt"
+    long_name = save_show(1001, long_title, [], "show1")
+    for number in (1, 2, 3):
+        shows.mark_episode(user, long_name.seasons.get(number=1).episodes.get(number=number))
+    soon = save_show(1002, "Kommt bald", ["ZDF"], "show2")
+    starts_in(soon, 3, 1)
+    later = save_show(1003, "Später", ["Netflix", "ZDFneo"], "show3")
+    starts_in(later, 2, 40)
+    for show in (soon, later):
+        shows.set_following(user, show, True)
+    colors = [(120, 40, 40), (40, 100, 60), (90, 70, 20)]
+    for index, color in enumerate(colors, start=1):
+        for size in ("w92", "w185"):
+            fake_tmdb.add(
+                f"/t/p/{size}/show{index}.jpg",
+                content=tiny_png(color),
+                headers={"Content-Type": "image/png"},
+            )
+
+
 @pytest.mark.parametrize("scheme", ["light", "dark"])
 @pytest.mark.parametrize("device", VIEWPORTS)
 @pytest.mark.parametrize("name", PAGES)
 def test_screenshot(live_server, member, browser, fake_tmdb, name, device, scheme):
     fake_search(fake_tmdb)
     sample_lists(fake_tmdb, member)
+    if name.startswith("dashboard"):
+        sample_dashboard(fake_tmdb, member)
     if name == "search-error":
         fake_tmdb.add("/3/search/multi", json={}, status=503)
     # Phones are touch devices: no hover, so hover-only elements must stay visible there

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: watchit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-07 22:55+0100\n"
+"POT-Creation-Date: 2026-11-08 12:28+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -29,7 +29,7 @@ msgid "Password reset link for %(user)s"
 msgstr "Link zum Zurücksetzen des Passworts für %(user)s"
 
 #: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:30
-#: catalog/models.py:326
+#: catalog/models.py:328
 msgid "status"
 msgstr "Status"
 
@@ -195,7 +195,7 @@ msgstr "Nur für Admins sichtbar."
 msgid "created by"
 msgstr "erstellt von"
 
-#: accounts/models.py:117 catalog/models.py:120
+#: accounts/models.py:117 catalog/models.py:122
 msgid "created at"
 msgstr "erstellt am"
 
@@ -490,7 +490,7 @@ msgstr "Gefolgte Serien"
 msgid "Movie"
 msgstr "Film"
 
-#: catalog/models.py:13 catalog/models.py:197 catalog/models.py:318
+#: catalog/models.py:13 catalog/models.py:199 catalog/models.py:320
 msgid "TV show"
 msgstr "Serie"
 
@@ -498,7 +498,7 @@ msgstr "Serie"
 msgid "type"
 msgstr "Typ"
 
-#: catalog/models.py:24 catalog/models.py:248
+#: catalog/models.py:24 catalog/models.py:250
 msgid "TMDB ID"
 msgstr "TMDB-ID"
 
@@ -514,206 +514,210 @@ msgstr "Originalsprache"
 msgid "release date"
 msgstr "Erscheinungsdatum"
 
-#: catalog/models.py:31
+#: catalog/models.py:32
+msgid "networks"
+msgstr "Sender"
+
+#: catalog/models.py:33
 msgid "updated at"
 msgstr "aktualisiert am"
 
-#: catalog/models.py:34 catalog/models.py:67 catalog/models.py:143
+#: catalog/models.py:36 catalog/models.py:69 catalog/models.py:145
 msgid "title"
 msgstr "Titel"
 
-#: catalog/models.py:35
+#: catalog/models.py:37
 msgid "titles"
 msgstr "Titel"
 
-#: catalog/models.py:70 catalog/models.py:227 catalog/models.py:280
+#: catalog/models.py:72 catalog/models.py:229 catalog/models.py:282
 msgid "language"
 msgstr "Sprache"
 
-#: catalog/models.py:71 catalog/models.py:119 catalog/models.py:228
-#: catalog/models.py:281
+#: catalog/models.py:73 catalog/models.py:121 catalog/models.py:230
+#: catalog/models.py:283
 msgid "name"
 msgstr "Name"
 
-#: catalog/models.py:72 catalog/models.py:229 catalog/models.py:282
+#: catalog/models.py:74 catalog/models.py:231 catalog/models.py:284
 msgid "description"
 msgstr "Beschreibung"
 
-#: catalog/models.py:74
+#: catalog/models.py:76
 msgid "poster"
 msgstr "Poster"
 
-#: catalog/models.py:75
+#: catalog/models.py:77
 msgid "loaded from TMDB at"
 msgstr "von TMDB geladen am"
 
-#: catalog/models.py:78
+#: catalog/models.py:80
 msgid "translation"
 msgstr "Übersetzung"
 
-#: catalog/models.py:79
+#: catalog/models.py:81
 msgid "translations"
 msgstr "Übersetzungen"
 
-#: catalog/models.py:90
+#: catalog/models.py:92
 msgid "Released"
 msgstr "Veröffentlicht"
 
-#: catalog/models.py:91
+#: catalog/models.py:93
 msgid "Rumored"
 msgstr "Gerücht"
 
-#: catalog/models.py:92
+#: catalog/models.py:94
 msgid "Planned"
 msgstr "Geplant"
 
-#: catalog/models.py:93
+#: catalog/models.py:95
 msgid "In production"
 msgstr "In Produktion"
 
-#: catalog/models.py:94
+#: catalog/models.py:96
 msgid "Post-production"
 msgstr "Postproduktion"
 
-#: catalog/models.py:95
+#: catalog/models.py:97
 msgid "Canceled"
 msgstr "Abgesetzt"
 
-#: catalog/models.py:96
+#: catalog/models.py:98
 msgid "Returning series"
 msgstr "Wird fortgesetzt"
 
-#: catalog/models.py:97
+#: catalog/models.py:99
 msgid "Ended"
 msgstr "Beendet"
 
-#: catalog/models.py:98
+#: catalog/models.py:100
 msgid "Pilot"
 msgstr "Pilotfolge"
 
-#: catalog/models.py:115 catalog/models.py:164 catalog/models.py:311
-#: catalog/models.py:342
+#: catalog/models.py:117 catalog/models.py:166 catalog/models.py:313
+#: catalog/models.py:344
 msgid "user"
 msgstr "Benutzer"
 
-#: catalog/models.py:123 catalog/models.py:140
+#: catalog/models.py:125 catalog/models.py:142
 msgid "list"
 msgstr "Liste"
 
-#: catalog/models.py:124
+#: catalog/models.py:126
 msgid "lists"
 msgstr "Listen"
 
-#: catalog/models.py:145
+#: catalog/models.py:147
 msgid "added at"
 msgstr "hinzugefügt am"
 
-#: catalog/models.py:148
+#: catalog/models.py:150
 msgid "list entry"
 msgstr "Listeneintrag"
 
-#: catalog/models.py:149
+#: catalog/models.py:151
 msgid "list entries"
 msgstr "Listeneinträge"
 
-#: catalog/models.py:170
+#: catalog/models.py:172
 msgid "movie"
 msgstr "Film"
 
-#: catalog/models.py:176 catalog/models.py:350
+#: catalog/models.py:178 catalog/models.py:352
 msgid "watched on"
 msgstr "gesehen am"
 
-#: catalog/models.py:179
+#: catalog/models.py:181
 msgid "watched movie"
 msgstr "gesehener Film"
 
-#: catalog/models.py:180
+#: catalog/models.py:182
 msgid "watched movies"
 msgstr "gesehene Filme"
 
-#: catalog/models.py:202 catalog/models.py:246
+#: catalog/models.py:204 catalog/models.py:248
 msgid "number"
 msgstr "Nummer"
 
-#: catalog/models.py:203 catalog/models.py:250
+#: catalog/models.py:205 catalog/models.py:252
 msgid "air date"
 msgstr "Ausstrahlung"
 
-#: catalog/models.py:206 catalog/models.py:225 catalog/models.py:244
+#: catalog/models.py:208 catalog/models.py:227 catalog/models.py:246
 msgid "season"
 msgstr "Staffel"
 
-#: catalog/models.py:207
+#: catalog/models.py:209
 msgid "seasons"
 msgstr "Staffeln"
 
-#: catalog/models.py:232
+#: catalog/models.py:234
 msgid "season translation"
 msgstr "Staffel-Übersetzung"
 
-#: catalog/models.py:233
+#: catalog/models.py:235
 msgid "season translations"
 msgstr "Staffel-Übersetzungen"
 
-#: catalog/models.py:251
+#: catalog/models.py:253
 msgid "runtime (minutes)"
 msgstr "Laufzeit (Minuten)"
 
-#: catalog/models.py:254 catalog/models.py:278 catalog/models.py:347
+#: catalog/models.py:256 catalog/models.py:280 catalog/models.py:349
 msgid "episode"
 msgstr "Folge"
 
-#: catalog/models.py:255
+#: catalog/models.py:257
 msgid "episodes"
 msgstr "Folgen"
 
-#: catalog/models.py:267
+#: catalog/models.py:269
 #, python-format
 msgid "S%(season)s E%(episode)s"
 msgstr "S%(season)s E%(episode)s"
 
-#: catalog/models.py:285
+#: catalog/models.py:287
 msgid "episode translation"
 msgstr "Folgen-Übersetzung"
 
-#: catalog/models.py:286
+#: catalog/models.py:288
 msgid "episode translations"
 msgstr "Folgen-Übersetzungen"
 
-#: catalog/models.py:305
+#: catalog/models.py:307
 msgid "Watching"
 msgstr "Schaue gerade"
 
-#: catalog/models.py:306
+#: catalog/models.py:308
 msgid "Paused"
 msgstr "Pausiert"
 
-#: catalog/models.py:307
+#: catalog/models.py:309
 msgid "Finished"
 msgstr "Fertig"
 
-#: catalog/models.py:323
+#: catalog/models.py:325
 msgid "following"
 msgstr "gefolgt"
 
-#: catalog/models.py:324
+#: catalog/models.py:326
 msgid "followed since"
 msgstr "gefolgt seit"
 
-#: catalog/models.py:329
+#: catalog/models.py:331
 msgid "user show"
 msgstr "Serie eines Nutzers"
 
-#: catalog/models.py:330
+#: catalog/models.py:332
 msgid "user shows"
 msgstr "Serien der Nutzer"
 
-#: catalog/models.py:353
+#: catalog/models.py:355
 msgid "watched episode"
 msgstr "gesehene Folge"
 
-#: catalog/models.py:354
+#: catalog/models.py:356
 msgid "watched episodes"
 msgstr "gesehene Folgen"
 
@@ -773,19 +777,19 @@ msgid "Mark all episodes of “%(name)s” as not watched?"
 msgstr "Alle Folgen von „%(name)s“ als nicht gesehen markieren?"
 
 #: catalog/templates/catalog/_seasons.html:26
-#: catalog/templates/catalog/_watched_button.html:42
+#: catalog/templates/catalog/_watched_button.html:47
 #, python-format
 msgid "Mark “%(name)s” as not watched"
 msgstr "„%(name)s“ als nicht gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:27
 #: catalog/templates/catalog/_seasons.html:112
-#: catalog/templates/catalog/_watched_button.html:43
+#: catalog/templates/catalog/_watched_button.html:48
 msgid "Watched – click to undo"
 msgstr "Gesehen – zum Rückgängigmachen klicken"
 
 #: catalog/templates/catalog/_seasons.html:33
-#: catalog/templates/catalog/_watched_button.html:46
+#: catalog/templates/catalog/_watched_button.html:51
 #, python-format
 msgid "Mark “%(name)s” as watched"
 msgstr "„%(name)s“ als gesehen markieren"
@@ -859,13 +863,14 @@ msgid "Mark %(code)s as not watched"
 msgstr "%(code)s als nicht gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:116
-#: catalog/templates/catalog/_watched_button.html:27
+#: catalog/templates/catalog/_watched_button.html:29
+#: core/templates/core/dashboard.html:50
 #, python-format
 msgid "Mark %(code)s as watched"
 msgstr "%(code)s als gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:117
-#: catalog/templates/catalog/_watched_button.html:47
+#: catalog/templates/catalog/_watched_button.html:52
 #: catalog/templates/catalog/title_detail.html:114
 msgid "Mark as watched"
 msgstr "Als gesehen markieren"
@@ -888,22 +893,29 @@ msgstr "%(minutes)s Min."
 msgid "Change date"
 msgstr "Datum ändern"
 
-#: catalog/templates/catalog/_toast.html:10
+#: catalog/templates/catalog/_toast.html:11
 #, python-format
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
 
-#: catalog/templates/catalog/_toast.html:15
+#: catalog/templates/catalog/_toast.html:16
 msgid "Undo"
 msgstr "Rückgängig"
 
-#: catalog/templates/catalog/_watched_button.html:17
+#: catalog/templates/catalog/_watched_badge.html:2
+#: catalog/templates/catalog/title_detail.html:60
+msgid "Next:"
+msgstr "Als Nächstes:"
+
+#: catalog/templates/catalog/_watched_button.html:19
 #: catalog/templates/catalog/title_detail.html:56
+#: core/templates/core/dashboard.html:38
 #, python-format
 msgid "%(watched)s of %(aired)s episodes watched"
 msgstr "%(watched)s von %(aired)s Folgen gesehen"
 
-#: catalog/templates/catalog/_watched_button.html:26
+#: catalog/templates/catalog/_watched_button.html:28
+#: core/templates/core/dashboard.html:49
 #, python-format
 msgid "Mark %(code)s of “%(name)s” as watched"
 msgstr "%(code)s von „%(name)s“ als gesehen markieren"
@@ -1056,10 +1068,6 @@ msgstr "Folgen"
 msgid "All episodes watched"
 msgstr "Alle Folgen gesehen"
 
-#: catalog/templates/catalog/title_detail.html:60
-msgid "Next:"
-msgstr "Als Nächstes:"
-
 #: catalog/templates/catalog/title_detail.html:66
 msgid "No episodes have aired yet."
 msgstr "Noch keine Folge ausgestrahlt."
@@ -1117,7 +1125,7 @@ msgstr "Filme"
 msgid "TV shows"
 msgstr "Serien"
 
-#: catalog/views.py:243
+#: catalog/views.py:243 core/views.py:66
 #, python-format
 msgid "%(episode)s watched."
 msgstr "%(episode)s gesehen."
@@ -1149,22 +1157,71 @@ msgstr "Hauptnavigation"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: core/templates/core/_nav.html:25 core/urls.py:11
+#: core/templates/core/_nav.html:25 core/urls.py:12
 msgid "Upcoming"
 msgstr "Demnächst"
 
-#: core/templates/core/dashboard.html:8
+#: core/templates/core/dashboard.html:10
+msgid "Continue watching"
+msgstr "Weiterschauen"
+
+#: core/templates/core/dashboard.html:63
+#, python-format
 msgid ""
-"Welcome to watchit. Your shows and upcoming seasons will appear here soon."
+"Shows you are watching appear here with their next episode. Find a show in "
+"the <a href=\"%(search_url)s\">search</a> and mark the first episode as "
+"watched."
 msgstr ""
-"Willkommen bei watchit. Hier erscheinen bald deine Serien und kommenden "
-"Staffeln."
+"Serien, die du gerade schaust, erscheinen hier mit ihrer nächsten Folge. "
+"Such dir eine Serie über die <a href=\"%(search_url)s\">Suche</a> und hak "
+"die erste Folge ab."
+
+#: core/templates/core/dashboard.html:72
+msgid "Announcements"
+msgstr "Ankündigungen"
+
+#: core/templates/core/dashboard.html:73
+#, python-format
+msgid "New seasons of followed shows in the next month"
+msgid_plural "New seasons of followed shows in the next %(months)s months"
+msgstr[0] "Neue Staffeln gefolgter Serien im nächsten Monat"
+msgstr[1] "Neue Staffeln gefolgter Serien in den nächsten %(months)s Monaten"
+
+#: core/templates/core/dashboard.html:96
+msgid "today"
+msgstr "heute"
+
+#: core/templates/core/dashboard.html:96
+msgid "tomorrow"
+msgstr "morgen"
+
+#: core/templates/core/dashboard.html:96
+#, python-format
+msgid "in %(days)s day"
+msgid_plural "in %(days)s days"
+msgstr[0] "in %(days)s Tag"
+msgstr[1] "in %(days)s Tagen"
+
+#: core/templates/core/dashboard.html:103
+#, python-format
+msgid "No new seasons announced for the next month."
+msgid_plural "No new seasons announced for the next %(months)s months."
+msgstr[0] "Keine neuen Staffeln im nächsten Monat angekündigt."
+msgstr[1] "Keine neuen Staffeln in den nächsten %(months)s Monaten angekündigt."
+
+#: core/templates/core/dashboard.html:105
+msgid ""
+"Follow shows to see their new seasons here. Use the “Follow” button on a "
+"show's page."
+msgstr ""
+"Folge Serien, um ihre neuen Staffeln hier zu sehen. Auf der Seite einer "
+"Serie gibt es dafür den Button „Folgen“."
 
 #: core/templates/core/placeholder.html:8
 msgid "This page is coming soon."
 msgstr "Diese Seite kommt bald."
 
-#: core/views.py:46
+#: core/views.py:126
 msgid "Your watchlist for movies and TV shows"
 msgstr "Deine Watchlist für Filme und Serien"
 

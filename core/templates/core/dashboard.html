@@ -1,9 +1,107 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n catalog %}
 
 {% block title %}{% translate "Dashboard" %}{% endblock %}
 
 {% block content %}
-  <h1>{% translate "Dashboard" %}</h1>
-  <p>{% translate "Welcome to watchit. Your shows and upcoming seasons will appear here soon." %}</p>
+  <h1 class="visually-hidden">{% translate "Dashboard" %}</h1>
+
+  <section class="dashboard-section" aria-labelledby="watching-heading">
+    <h2 id="watching-heading">{% translate "Continue watching" %}</h2>
+    {% comment %}
+      Reloaded with "morph" after "Undo" (see core.views.watch_next): entries keep their
+      id, so their posters stay. The check button only replaces the entry's text part.
+    {% endcomment %}
+    <div id="watching">
+      {% partialdef watching inline %}
+        {% if watching %}
+          <ul class="watching-list">
+            {% for entry in watching %}
+              <li id="watching-{{ entry.show.pk }}">
+                <a href="{{ entry.show.get_absolute_url }}" class="watching-poster" tabindex="-1" aria-hidden="true">
+                  {% poster entry.translation.poster_path "w185" as thumb %}
+                  {% if thumb %}
+                    <img src="{{ thumb }}" alt="" width="64" height="96" loading="lazy" class="poster">
+                  {% else %}
+                    <span class="poster poster-missing"></span>
+                  {% endif %}
+                </a>
+                {% partialdef watching-entry inline %}
+                  {% with code=entry.next_episode.code name=entry.name %}
+                    <div class="watching-body" id="watching-body-{{ entry.show.pk }}">
+                      <div class="watching-text">
+                        <a href="{{ entry.show.get_absolute_url }}"><strong>{{ name }}</strong></a>
+                        <span class="watching-next">
+                          <span class="nowrap">{{ code }}</span>{% if entry.next_name %} · {{ entry.next_name }}{% endif %}
+                        </span>
+                        {% blocktranslate asvar progress_label with watched=entry.progress.watched aired=entry.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
+                        <span class="watching-progress" title="{{ progress_label }}">
+                          <progress value="{{ entry.progress.watched }}" max="{{ entry.progress.aired }}" aria-label="{{ progress_label }}"></progress>
+                          <small aria-hidden="true">{{ entry.progress.watched }}/{{ entry.progress.aired }}</small>
+                        </span>
+                      </div>
+                      <form method="post" action="{% url 'core:watch_next' entry.show.tmdb_id %}"
+                            hx-post="{% url 'core:watch_next' entry.show.tmdb_id %}"
+                            hx-target="#watching-body-{{ entry.show.pk }}" hx-swap="outerHTML">
+                        {% csrf_token %}
+                        <button type="submit" class="check-button"
+                                aria-label="{% blocktranslate %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %}"
+                                title="{% blocktranslate %}Mark {{ code }} as watched{% endblocktranslate %}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                        </button>
+                      </form>
+                    </div>
+                  {% endwith %}
+                {% endpartialdef %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">
+            {% url 'catalog:search' as search_url %}
+            {% blocktranslate %}Shows you are watching appear here with their next episode. Find a show in the <a href="{{ search_url }}">search</a> and mark the first episode as watched.{% endblocktranslate %}
+          </p>
+        {% endif %}
+      {% endpartialdef %}
+    </div>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="announcements-heading">
+    <hgroup>
+      <h2 id="announcements-heading">{% translate "Announcements" %}</h2>
+      <p>{% blocktranslate count months=announcement_months %}New seasons of followed shows in the next month{% plural %}New seasons of followed shows in the next {{ months }} months{% endblocktranslate %}</p>
+    </hgroup>
+    {% if announcements %}
+      <ul class="compact-list announcements">
+        {% for announcement in announcements %}
+          <li>
+            <a class="result-link" href="{{ announcement.show.get_absolute_url }}">
+              {% poster announcement.translation.poster_path "w92" as thumb %}
+              {% if thumb %}
+                {% poster announcement.translation.poster_path "w185" as thumb_2x %}
+                <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                     alt="" width="46" height="69" loading="lazy" class="poster">
+              {% else %}
+                <span class="poster poster-missing" aria-hidden="true"></span>
+              {% endif %}
+              <div>
+                <strong>{{ announcement.name }}</strong>
+                <small>{{ announcement.season_name }}{% for network in announcement.show.networks %}{% if forloop.first %} · {% else %}, {% endif %}{{ network }}{% endfor %}</small>
+              </div>
+            </a>
+            <div class="announcement-date">
+              <time datetime="{{ announcement.starts|date:'Y-m-d' }}">{{ announcement.starts|date:"SHORT_DATE_FORMAT" }}</time>
+              <small>
+                {% if announcement.days_until == 0 %}{% translate "today" %}{% elif announcement.days_until == 1 %}{% translate "tomorrow" %}{% else %}{% blocktranslate count days=announcement.days_until %}in {{ days }} day{% plural %}in {{ days }} days{% endblocktranslate %}{% endif %}
+              </small>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% elif follows_shows %}
+      <p class="muted">{% blocktranslate count months=announcement_months %}No new seasons announced for the next month.{% plural %}No new seasons announced for the next {{ months }} months.{% endblocktranslate %}</p>
+    {% else %}
+      <p class="muted">{% translate "Follow shows to see their new seasons here. Use the “Follow” button on a show's page." %}</p>
+    {% endif %}
+  </section>
 {% endblock %}

@@ -28,6 +28,8 @@ class Title(models.Model):
     release_date = models.DateField(_("release date"), null=True, blank=True)
     # TMDB status, e.g. "Released", "Returning Series", "Ended" (not translated by TMDB)
     status = models.CharField(_("status"), max_length=50, blank=True)
+    # Shows: names of the networks/platforms that air it, e.g. ["Netflix"] (from TMDB)
+    networks = models.JSONField(_("networks"), default=list, blank=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     class Meta:

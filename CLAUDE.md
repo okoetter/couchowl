@@ -28,6 +28,7 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
   use `hx-swap-oob` for extra spots, and `hx-swap="morph:innerHTML"` (Idiomorph) when a
   region is refreshed but most entries stay; morphed entries need a stable `id`.
 - No external resources at runtime (no CDN): vendored libs in `core/static/vendor/`.
+  Own JavaScript stays small and lives in `core/static/core/watchit.js`.
   The browser must never talk to TMDB directly (texts cached in DB, posters via proxy).
 - Custom user model `accounts.User` (`ui_language`, `tmdb_language`, `region`, `theme`).
 - Tests: pytest-django, settings `config/settings_test.py`. TMDB is always mocked via the autouse
@@ -35,7 +36,8 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
   (marker `live` for real API checks, `e2e` for Playwright; both skipped by default).
 - TMDB code lives in the `catalog` app: `tmdb.py` (HTTP client), `services.py` (search, DB cache,
   language fallback, seasons/episodes), `posters.py` (poster proxy), `lists.py` (lists, watched
-  movies, system list "Followed shows"), `shows.py` (follow, watched episodes, progress, next episode).
+  movies, system list "Followed shows"), `shows.py` (follow, watched episodes, progress, next episode),
+  `dashboard.py` (continue watching, announcements; database only, never asks TMDB).
   Fake shows in tests: `fake_tmdb.add_show()` (details and season requests share a path).
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.

@@ -48,8 +48,67 @@ def test_follow_mark_episodes_and_watch_next_from_the_list(live_server, member, 
     page.get_by_role("link", name="Gefolgte Serien").click()
     page.get_by_role("button", name="S1 E2 von „Dark“ als gesehen markieren").click()
     expect(page.get_by_text("S1 E2 gesehen")).to_be_visible()
+    # Away from the button: on hover it shows the next episode ("S1 E3") instead
+    page.mouse.move(0, 0)
     expect(page.get_by_text("2/26")).to_be_visible()
     page.get_by_role("button", name="Rückgängig").click()
     expect(page.get_by_text("1/26")).to_be_visible()
     expect(page.get_by_text("S1 E2 gesehen")).to_be_hidden()
     assert WatchedEpisode.objects.count() == 1
+
+
+@pytest.mark.parametrize(
+    "viewport", [{"width": 1280, "height": 800}, {"width": 390, "height": 844}]
+)
+def test_next_episode_link_scrolls_the_episode_into_view(
+    live_server, member, browser, fake_tmdb, viewport
+):
+    """The sticky top bar (desktop) must not cover the episode the link jumps to."""
+    from catalog import services, shows
+    from catalog.models import Episode
+    from e2e.conftest import LOCALE
+
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    show = services.get_title("tv", 70523, "de-DE").title
+    for number in (1, 2):
+        shows.mark_episode(
+            member, Episode.objects.get(season__show=show, season__number=1, number=number)
+        )
+    context = browser.new_context(locale=LOCALE, viewport=viewport)
+    page = context.new_page()
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/tv/70523/")
+
+    page.get_by_role("link", name="S1 E3").click()
+    page.wait_for_url("**#episode-1-3")
+    page.wait_for_load_state("networkidle")
+
+    episode = page.locator("#episode-1-3").bounding_box()
+    nav = page.locator(".app-nav").bounding_box()
+    nav_bottom = nav["y"] + nav["height"] if nav["y"] < 100 else 0  # phones: bar at the bottom
+    assert episode["y"] >= nav_bottom
+    assert episode["y"] + episode["height"] <= viewport["height"]
+    context.close()
+
+
+def test_jumped_to_episode_lights_up_on_every_click(live_server, member, page, fake_tmdb):
+    """A second click on the same link doesn't change the URL; the highlight must restart."""
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/tv/70523/")
+    episode = page.locator("#episode-1-1")
+    running = "el => el.getAnimations().length"
+
+    page.get_by_role("link", name="S1 E1").click()
+    page.wait_for_url("**#episode-1-1")
+    assert episode.evaluate(running) == 1
+    page.wait_for_timeout(2700)  # the highlight is over
+    assert episode.evaluate(running) == 0
+
+    page.mouse.wheel(0, -2000)
+    page.get_by_role("link", name="S1 E1").click()
+    assert episode.evaluate(running) == 1

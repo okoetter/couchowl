@@ -5,6 +5,7 @@ Rules (see docs/KONZEPT.md):
 - Progress and "next episode" ignore specials (season 0).
 - A show counts as watched when all aired episodes (without specials) are watched.
 - The next episode is the first unwatched aired episode, in season/episode order.
+- The first watched episode of a show also follows it (see _start_watching).
 """
 
 from dataclasses import dataclass
@@ -127,11 +128,18 @@ def unmark_season(user, season: Season) -> None:
 
 
 def _start_watching(user, show_id: int) -> None:
-    """The first watched episode makes a show "currently watching" (for the dashboard)."""
+    """The first watched episode makes a show "currently watching" and follows it.
+
+    Only the first time (status still empty): after an explicit "unfollow", watching more
+    episodes doesn't follow the show again. Following puts it on the dashboard.
+    """
     series, _created = UserSeries.objects.get_or_create(user=user, title_id=show_id)
     if not series.status:
         series.status = UserSeries.Status.WATCHING
-        series.save(update_fields=["status"])
+        if not series.following:
+            series.following = True
+            series.followed_at = timezone.now()
+        series.save(update_fields=["status", "following", "followed_at"])
 
 
 def watch_next(user, show: Title) -> Episode | None:

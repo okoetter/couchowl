@@ -167,6 +167,10 @@ SEARCH_RATE_LIMIT = 60
 # Downloaded posters (see catalog/posters.py)
 POSTER_CACHE_DIR = DATA_DIR / "posters"
 
+# --- Dashboard ------------------------------------------------------------------
+# New seasons of followed shows that start within this many months are announced
+ANNOUNCEMENT_MONTHS = env.int("ANNOUNCEMENT_MONTHS", default=3)
+
 # --- Cache ----------------------------------------------------------------------
 # File-based, so all gunicorn worker processes share it (rate limits, TMDB search results).
 

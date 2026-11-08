@@ -2,6 +2,7 @@
 
 import hashlib
 import logging
+import re
 import unicodedata
 from dataclasses import asdict, dataclass
 from datetime import date
@@ -211,6 +212,7 @@ def save_title(
             "original_language": data.get("original_language") or "",
             "release_date": _parse_date(data.get("release_date" if is_movie else "first_air_date")),
             "status": data.get("status") or "",
+            "networks": [n["name"] for n in data.get("networks") or [] if n.get("name")],
         },
     )
     name, overview = localize(data, language, name_field="title" if is_movie else "name")
@@ -291,6 +293,17 @@ def _fill_missing_texts(seasons: dict[int, dict], other: dict[int, dict]) -> Non
                 episode["overview"] = found["overview"]
 
 
+# TMDB's name for seasons without a name in the requested language, always in English
+SEASON_PLACEHOLDER = re.compile(r"Season \d+")
+
+
+def _season_name(season: dict) -> str:
+    """TMDB's season name; its English placeholder ("Season 3") is stored as empty, so
+    pages show our translated default name ("Staffel 3") instead."""
+    name = season.get("name") or ""
+    return "" if SEASON_PLACEHOLDER.fullmatch(name) else name
+
+
 def save_seasons(show: Title, seasons: dict[int, dict], language: str) -> None:
     """Replace the stored seasons and episodes of `show` with `seasons` (see load_seasons).
 
@@ -314,7 +327,7 @@ def save_seasons(show: Title, seasons: dict[int, dict], language: str) -> None:
             SeasonTranslation(
                 season_id=season_ids[number],
                 language=language,
-                name=data.get("name") or "",
+                name=_season_name(data),
                 overview=data.get("overview") or "",
             )
             for number, data in seasons.items()
