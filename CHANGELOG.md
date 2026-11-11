@@ -64,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   showing when the next episode airs ("in 3 days") instead of the check button
 - Show page: marking an episode or season with unwatched episodes before it asks whether
   to mark those too (only the same season, or all), with the date "unknown" and "Undo"
+- TMDB ratings ("★ 8.4") on detail pages (with the number of votes), in lists and in
+  search; overviews only show ratings with at least 10 votes
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

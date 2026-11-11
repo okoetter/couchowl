@@ -130,6 +130,8 @@
 
 - **2026-11-08 – Nachfrage „Frühere Folgen auch abhaken?“** (eigener Commit zwischen Meilenstein 6 und 7, kein eigener Meilenstein): Wird auf der Serienseite eine Folge abgehakt und sind davor ausgestrahlte Folgen (ohne Specials) noch ungesehen, fragt ein Hinweis unten: „S3 E5 gesehen. Davor sind noch 12 Folgen offen.“ mit [Nur Staffel 3 (4)] [Alle (12)] [Nein]; „Nur Staffel …“ nur, wenn auch ältere Staffeln Lücken haben, sonst ein Button „Ja, abhaken“. Beim Abhaken einer ganzen Staffel fragt er nach den älteren Staffeln. Erst abhaken, dann fragen (kein modaler Dialog vorher: wer bewusst Folgen überspringt, soll nicht jedes Mal angehalten werden). Die Frage hat **kein Timeout**, sie bleibt bis zur Antwort oder bis zur nächsten Aktion, die sie ersetzt; die Antwort zeigt „12 Folgen gesehen · Rückgängig“ mit dem üblichen Timeout. Die früheren Folgen bekommen **„Datum unbekannt“** (man hat sie ja nicht heute gesehen); schon gesehene behalten ihr Datum. Dashboard und Listen fragen nie: Sie haken immer die nächste Folge ab, dort gibt es keine Lücke. Ohne JavaScript erscheint die Frage nach dem Neuladen.
 
+- **2026-11-11 – TMDB-Bewertungen** (eigener Commit vor Meilenstein 7): `vote_average` und `vote_count` kommen ohnehin mit der Detail- und Suchanfrage; gespeichert als `Title.vote_average`/`vote_count`. Anzeige „★ 8,4“ in Suche und Listen (Raster und kompakt) neben dem Jahr, auf der Detailseite mit Stimmenzahl („★ 8,4 (32.000 Stimmen)“). In Suche und Listen erst ab 10 Stimmen (`MIN_VOTES`), weil „10,0 aus 2 Stimmen“ wenig sagt; auf der Detailseite ab 1 Stimme, dort steht die Anzahl dabei. Zahlen im Format der Region (8,4 / 8.4). Aktualisiert wird die Bewertung wie alle Titeldaten (24-h-Regel beim Öffnen, „Jetzt aktualisieren“, Sync für Serien); Filme auf Listen bleiben bis zum nächsten Öffnen auf altem Stand, das ist bei Bewertungen vertretbar. Die Migration markiert alle gespeicherten Titel als veraltet. Sortieren nach Bewertung kommt mit dem Listen-Sortieren aus dem Backlog. Eigene Bewertungen gestrichen (nicht gebraucht).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -394,13 +396,12 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
   - Vorher klären: wie Oliver seine Daten aus JustWatch bekommt. JustWatch hat keine offizielle Export-Funktion; möglich sind eine DSGVO-Datenauskunft (Art. 15/20), ein Export über Drittanbieter-Tools oder das eigene Profil. Format erst prüfen, wenn ein echter Export vorliegt.
 - Datenexport als JSON und Konto selbst löschen; später Import aus Trakt, TV Time oder Letterboxd (gemeinsame Import-Infrastruktur mit dem JustWatch-Import)
 - Listen-Komfort:
-  - Sortieren (Hinzufügedatum, Titel, Jahr); Filter nach gesehen/ungesehen und Film/Serie gibt es seit Meilenstein 3
+  - Sortieren (Hinzufügedatum, Titel, Jahr, TMDB-Bewertung); Filter nach gesehen/ungesehen und Film/Serie gibt es seit Meilenstein 3
   - Mehrfachauswahl mit Sammelaktionen: alle markieren/entmarkieren, auf einmal als gesehen markieren oder von der Liste entfernen
   - in der Suche „ist schon auf Liste X“ anzeigen
   - Listen per Ziehen sortieren (bis dahin alphabetisch)
   - Notiz pro Listeneintrag
 - Barrierefreiheit gezielt prüfen und verbessern (Labels, Tastatur, Kontrast, Screenreader bei HTMX-Updates)
-- Bewertungen
 - Benachrichtigungen per E-Mail oder Push bei neuen Staffeln
 - Öffentliche JSON-API (z. B. django-ninja)
 - Zeitraum der Ankündigungen pro Nutzer im Profil einstellbar (1/3/6/12 Monate, leer = `ANNOUNCEMENT_MONTHS`)

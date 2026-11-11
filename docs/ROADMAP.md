@@ -11,6 +11,7 @@
 - [x] **6 – Sync and "Upcoming":** daily/manual TMDB sync, streaming providers, upcoming page
 - [x] Show page: "Mark earlier episodes too?" after marking an episode or season with gaps
   before it
+- [x] TMDB ratings on detail pages, in lists and in search
 - [ ] **7 – Production and open source:** security behind proxy, backups, docs, license, CI, 1.0.0
   - "About watchit" page (version, license, TMDB logo and notice, JustWatch credit); the
     footer may then shrink to a link
@@ -22,11 +23,10 @@
   - match via IMDb ID (TMDB `/find`), else title + year; report unmatched entries
   - open question: how to obtain the export (no official export; GDPR data request?)
 - [ ] Data export (JSON) and self-service account deletion; later imports (Trakt, TV Time, Letterboxd)
-- [ ] Lists: sort (date added, title, year); "already on list X" in search; note per list entry
+- [ ] Lists: sort (date added, title, year, TMDB rating); "already on list X" in search; note per list entry
 - [ ] Lists: multi-select with bulk actions (select all/none, mark as watched, remove)
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
-- [ ] Ratings
 - [ ] **Movie announcements on the dashboard:** unwatched movies on any of my lists whose
   release falls within the announcement window (no separate "Follow" for movies: being on
   a list already means "I want to see this")

@@ -1321,3 +1321,8 @@ button.progress-button:focus-visible .progress-next {
   padding: 0.3rem 0.75rem;
   font-size: 0.875rem;
 }
+
+/* TMDB rating "★ 8.4" (template tag `rating`): never split across lines */
+.rating {
+  white-space: nowrap;
+}

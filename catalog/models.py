@@ -35,6 +35,9 @@ class Title(models.Model):
     # "logo": "/….png"}], "rent": […], …}}. {} for a region = no offers there.
     # See catalog.providers.
     watch_providers = models.JSONField(_("streaming providers"), default=dict, blank=True)
+    # TMDB user rating: average of 0-10 and number of votes (see catalog.templatetags)
+    vote_average = models.FloatField(_("TMDB rating"), null=True, blank=True)
+    vote_count = models.PositiveIntegerField(_("TMDB votes"), default=0)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     class Meta:

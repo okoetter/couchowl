@@ -40,7 +40,7 @@
                 <div>
                   <strong>{{ result.title }}</strong>
                   <small>
-                    {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}
+                    {{ result.media_type_label }}{% if result.year %} · {{ result.year }}{% endif %}{% rating result as stars %}{% if stars %} · {{ stars }}{% endif %}
                     {% if result.key in watched %}
                       · <span class="watched-badge">✓ {% translate "Watched" %}</span>
                     {% endif %}

@@ -79,7 +79,7 @@
                     <div>
                       <strong>{{ name }}</strong>
                       <small>
-                        {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}
+                        {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}{% rating item.title as stars %}{% if stars %} · {{ stars }}{% endif %}
                         {% include "catalog/_watched_badge.html" %}
                       </small>
                     </div>
@@ -116,7 +116,7 @@
                       <span class="poster-missing" aria-hidden="true"></span>
                     {% endif %}
                     <strong>{{ name }}</strong>
-                    <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}</small>
+                    <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}{% rating item.title as stars %}{% if stars %} · {{ stars }}{% endif %}</small>
                   </a>
                   {# Outside the link (a button inside a link is invalid), placed on the poster #}
                   {% include "catalog/_watched_button.html" with corner=True %}

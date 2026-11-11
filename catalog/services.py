@@ -43,6 +43,9 @@ class SearchResult:
     original_title: str
     year: int | None
     poster_path: str
+    # Defaults: cached results from before ratings existed still load
+    vote_average: float | None = None
+    vote_count: int = 0
 
     @property
     def key(self) -> str:
@@ -66,6 +69,8 @@ class SearchResult:
             original_title=original,
             year=released.year if released else None,
             poster_path=item.get("poster_path") or "",
+            vote_average=item.get("vote_average"),
+            vote_count=item.get("vote_count") or 0,
         )
 
 
@@ -236,6 +241,8 @@ def save_title(
             "status": data.get("status") or "",
             "networks": [n["name"] for n in data.get("networks") or [] if n.get("name")],
             "watch_providers": watch_providers(data, provider_regions()),
+            "vote_average": data.get("vote_average"),
+            "vote_count": data.get("vote_count") or 0,
         },
     )
     name, overview = localize(data, language, name_field="title" if is_movie else "name")
