@@ -1,4 +1,4 @@
-# watchit – Konzept und Beschlüsse
+# Couch Owl – Konzept und Beschlüsse
 
 > Interne Planungsgrundlage (Deutsch). Ändert sich ein Beschluss, wird er hier angepasst,
 > ein Eintrag kommt unter „Änderungsprotokoll“.
@@ -101,7 +101,7 @@
   - **Fortschritts-Button nennt beim Überfahren die nächste Folge:** Statt „2/26“ steht dann „S1 E3“, damit klar ist, was ein Klick tut (auch bei Tastaturfokus). Beide Texte liegen übereinander, die Pille ändert ihre Breite nicht. Format wie überall „S1 E3“, nicht „S01E03“. Handys haben kein Hover; dort zeigt die kompakte Ansicht unter dem Titel „Als Nächstes: S1 E3“ (im Raster nicht, damit es ruhig bleibt).
   - **Suche** zeigt „✓ Gesehen“ auch für komplett gesehene Serien.
   - **Datumsformat nach Region:** Die aktive Sprache enthält jetzt auch das Land (`en-gb`, `de-at`). Texte kommen weiter aus der Übersetzung der Sprache, Datumsformate aus Djangos Formaten für das Land (`en-gb`: 01/12/2017, `en-us`: 12/01/2017). Gibt es für die Kombination kein eigenes Format (z. B. Englisch + Deutschland), gilt das der Sprache. Im HTML steht entsprechend `lang="de-de"`.
-  - **Date-Picker bleibt der des Browsers** (`<input type="date">`): Anzeigeformat und Wochenanfang bestimmt das Gerät des Nutzers, nicht watchit. Ein eigener JavaScript-Kalender wurde verworfen (am Handy schlechter bedienbar, zusätzliche Bibliothek).
+  - **Date-Picker bleibt der des Browsers** (`<input type="date">`): Anzeigeformat und Wochenanfang bestimmt das Gerät des Nutzers, nicht Couch Owl. Ein eigener JavaScript-Kalender wurde verworfen (am Handy schlechter bedienbar, zusätzliche Bibliothek).
 
 - **2026-11-08 – Meilenstein 5 (Dashboard):**
   - **Das Dashboard fragt TMDB nie ab,** es zeigt nur, was in der Datenbank steht (wie die Listen). Neue Staffeln und Termine kommen beim nächsten Laden einer Serie (Detailseite, 24-h-Regel) und ab Meilenstein 6 über den täglichen Sync.
@@ -114,7 +114,7 @@
   - **Ankündigungen nur für gefolgte Serien,** nicht für Serien, die nur auf einer Liste stehen (wie im Konzept vorgesehen).
   - **Staffelnamen ohne Übersetzung:** Fehlt der Name in der gewünschten Sprache, schickt TMDB den englischen Platzhalter „Season 3“. Der wird als leer gespeichert, angezeigt wird dann der übersetzte Standardname („Staffel 3“). Bereits gespeicherte Platzhalter bereinigt eine Migration. Bei Folgen kommt das nicht vor (dort liefert TMDB „Folge 1“ in der angefragten Sprache).
   - **Leere Zustände** erklären, wie man den Bereich füllt (Folge abhaken bzw. Serien folgen). Die Überschrift „Dashboard“ ist nur für Screenreader da; sichtbar sind die Abschnittsüberschriften.
-  - **Sprung zur nächsten Folge** („Als Nächstes: S1 E3“ auf der Detailseite): Die feste Navigation am Desktop verdeckt die Folge nicht mehr (`scroll-padding-top`). Die angesprungene Folge leuchtet kurz auf, weil der Browser am Seitenende (vor allem am Handy) nicht weiter scrollen kann und die Folge sonst mitten auf dem Bildschirm steht. Damit das auch beim zweiten Klick auf denselben Link klappt, startet die erste eigene JavaScript-Datei `core/static/core/watchit.js` die Animation neu.
+  - **Sprung zur nächsten Folge** („Als Nächstes: S1 E3“ auf der Detailseite): Die feste Navigation am Desktop verdeckt die Folge nicht mehr (`scroll-padding-top`). Die angesprungene Folge leuchtet kurz auf, weil der Browser am Seitenende (vor allem am Handy) nicht weiter scrollen kann und die Folge sonst mitten auf dem Bildschirm steht. Damit das auch beim zweiten Klick auf denselben Link klappt, startet die erste eigene JavaScript-Datei `core/static/core/couchowl.js` die Animation neu.
 - **2026-11-08 – Idee für den Backlog: Ankündigungen für Filme.** Kein eigenes „Folgen“ für Filme: Ein noch ungesehener Film auf einer Liste heißt schon „will ich sehen“. Angekündigt werden Kino- und (falls bekannt) Digitalstart für die Region des Benutzers; ein Film im Kino bleibt angekündigt, bis der Digitalstart vorbei ist. Details in `docs/ROADMAP.md`.
 
 - **2026-11-08 – Meilenstein 6 (Sync und „Demnächst“):**
@@ -124,7 +124,7 @@
   - **Anbieter auf den Detailseiten von Filmen und Serien:** „Verfügbar in Deutschland“ mit Logos, gruppiert nach Abo, Kostenlos (inkl. „mit Werbung“), Leihen, Kaufen; darunter „Quelle: JustWatch“ und ein Link zu allen Angeboten bei TMDB. Logos laufen über den Poster-Proxy (`w92`). JustWatch steht zusätzlich im Footer, weil die TMDB-Nutzungsbedingungen die Nennung verlangen und Anbieter auch auf Dashboard und „Demnächst“ erscheinen.
   - **Quelle in Ankündigungen und auf „Demnächst“:** Sender (`networks`) plus Abo- und Gratis-Anbieter der Region, ohne Leihen/Kaufen. Varianten eines schon genannten Namens fallen weg („Netflix Standard with Ads“ nach „Netflix“), „ZDFneo“ nach „ZDF“ bleibt (nur ganze Wörter).
   - **Seite „Demnächst“:** alle bekannten Staffelstarts gefolgter Serien ohne Zeitlimit, plus pro laufender Staffel (Start vor heute, noch Folgen mit Datum ab heute) die nächste Folge („S3 E4 · Folgentitel“). Nach Monaten gruppiert, früheste zuerst. Wie das Dashboard nur aus der Datenbank. Staffeln, die heute oder später starten, erscheinen nur einmal (mit ihrem Start). Das Dashboard bleibt bei Staffelstarts und verlinkt auf „Alle Termine“.
-  - **„Alle aktualisieren“** auf „Demnächst“ lädt die gefolgten Serien des Nutzers in seiner Sprache neu, beendete und abgesetzte Serien ausgenommen (sie bekommen keine neuen Termine; der tägliche Sync lädt sie trotzdem, wegen der Anbieter). Läuft direkt im Request, höchstens einmal pro 5 Minuten und Nutzer. Der Button zeigt währenddessen einen Lade-Kreisel (`data-busy` in `watchit.js`).
+  - **„Alle aktualisieren“** auf „Demnächst“ lädt die gefolgten Serien des Nutzers in seiner Sprache neu, beendete und abgesetzte Serien ausgenommen (sie bekommen keine neuen Termine; der tägliche Sync lädt sie trotzdem, wegen der Anbieter). Läuft direkt im Request, höchstens einmal pro 5 Minuten und Nutzer. Der Button zeigt währenddessen einen Lade-Kreisel (`data-busy` in `couchowl.js`).
   - **„Jetzt aktualisieren“** auf jeder Detailseite (Film und Serie) mit „Daten von TMDB, Stand …“; höchstens 10-mal pro Minute und Nutzer.
   - **Aufgeholte Serien bleiben in „Weiterschauen“, solange ihre Staffel läuft** (ersetzt „Aufgeholte Serien verschwinden“ aus Meilenstein 5): Sind alle ausgestrahlten Folgen gesehen und hat die nächste Folge einer schon gestarteten Staffel ein Datum in der Zukunft, bleibt die Karte mit dieser Folge stehen. Statt des Hakens zeigt sie Datum und „in 3 Tagen“. Solche wartenden Karten stehen nach den Serien, die man gerade schauen kann, früheste Folge zuerst. Ohne bekanntes Datum oder wenn die nächste Staffel noch gar nicht begonnen hat, verschwindet die Karte wie bisher; ein Staffelstart bleibt eine Ankündigung. Nach dem Abhaken der letzten ausgestrahlten Folge wird die Karte direkt zur wartenden Karte.
 
@@ -136,22 +136,30 @@
   - **Aufgeteilt in 7a (Betrieb), Namenssuche, 7b (Open Source) und 7c (CI und Release).** Der Projektname „watchit“ ist nur ein Platzhalter. 7a hängt nicht am Namen; 7b und 7c schon (Repo, Image-Name, Über-Seite, README, Lizenz). Umbenennen ist jetzt billig (fast nur Texte, die Django-Apps heißen `core`, `accounts`, `catalog`), wird aber teuer nach öffentlichem Repo und Image und nach dem NAS-Deployment (Volume-Name, installierte PWA, Lesezeichen). Deshalb steht der Name vor 7b fest.
   - **Lizenz AGPL-3.0:** Copyleft auch für Webdienste (wer eine veränderte Version betreibt, muss den Code offenlegen), üblich bei Self-Hosted-Apps. Die Über-Seite verlinkt deshalb den Quellcode.
   - **Images auf GHCR** (GitHub Container Registry, Login über das automatische `GITHUB_TOKEN`).
-  - **Reverse Proxy generisch:** watchit funktioniert ohne, mit einem oder mit mehreren Proxys, mit IPv4 und IPv6; die Doku bleibt herstellerneutral. Oliver nutzt den Synology-Proxy, sein Zugang (neuer Anschluss, evtl. nur IPv6) ist noch offen.
+  - **Reverse Proxy generisch:** Couch Owl funktioniert ohne, mit einem oder mit mehreren Proxys, mit IPv4 und IPv6; die Doku bleibt herstellerneutral. Oliver nutzt den Synology-Proxy, sein Zugang (neuer Anschluss, evtl. nur IPv6) ist noch offen.
   - **Backup: Die App liefert nur eine stimmige Kopie,** das eigentliche Sichern (externe Platte, Cloud, Versionen) macht der Host, z. B. Hyper Backup. Grund: Eine laufende SQLite-Datei einfach zu kopieren kann eine kaputte Kopie ergeben; nur die App kann über die SQLite-Backup-API sicher kopieren. **Kein `restore`-Befehl:** Wiederherstellen heißt Container stoppen und die Datei zurückkopieren, das steht in der Doku. `BACKUP_KEEP` Standard 3 statt 7, die Versionen verwaltet der Host.
   - **Erst `1.0.0-rc.1`:** CI baut das Image, Oliver installiert es auf dem NAS; `1.0.0` folgt erst, wenn es dort läuft.
   - **Content Security Policy ins Backlog:** Die Standardversion von Alpine.js braucht `unsafe-eval`, eine strenge Policy erst mit der CSP-Version von Alpine.
 
 - **2026-11-13 – Meilenstein 7a (Betrieb):**
-  - **`SITE_URL` als eine Einstellung für die Adresse** (z. B. `https://watchit.example.com`, ohne Pfad): Daraus folgen erlaubter Host, vertrauenswürdige Origin für Formulare (CSRF), Secure-Cookies und HSTS bei https sowie die Links in Einladungs- und Reset-Mails. Grund: Getrennt gesetzte `ALLOWED_HOSTS` und `CSRF_TRUSTED_ORIGINS` sind eine typische Stolperfalle (vergisst man das zweite, scheitert hinter HTTPS jedes Formular); beide bleiben als optionale Extras. Links nutzen `SITE_URL`, weil nicht jeder Proxy den öffentlichen Hostnamen weitergibt. Ein `https`-`SITE_URL` ohne Proxy bricht den Start mit einer klaren Meldung ab (watchit selbst spricht nur http).
-  - **`TRUSTED_PROXY_COUNT`** (wie `trust proxy` in Express, Standard 0): Nur dann glaubt watchit `X-Forwarded-For` und `X-Forwarded-Proto`. Die Client-IP ist der Eintrag, den der äußerste vertrauenswürdige Proxy angehängt hat; weiter links stehende (fälschbare) Einträge werden ignoriert. Adressen werden normalisiert (IPv6, Port, IPv4-in-IPv6). django-axes und die Drossel bei „Passwort vergessen“ nutzen dieselbe Funktion. gunicorn vertraut den Headern nicht mehr selbst (vorher von jedem Absender).
-  - **HSTS** bei https standardmäßig 1 Jahr, ohne Subdomains und ohne Preload (andere Subdomains der Domain könnten andere Dienste sein; Preload ist kaum rückgängig zu machen); `HSTS_SECONDS=0` schaltet es ab. **Keine http→https-Umleitung** in watchit: das macht der Proxy, und der Healthcheck im Container nutzt http. Die zugehörigen Warnungen von `check --deploy` sind bewusst stummgeschaltet.
-  - **IPv6 ohne Proxy:** Docker reicht IPv6-Verbindungen oft über einen eigenen Hilfsprozess weiter, watchit sieht dann nur Dockers interne Adresse. Hinweis in `docs/deployment.md`, Empfehlung Reverse Proxy.
-  - **Backup:** `BACKUP_DIR` (Standard `/data/backups`) lässt sich auf einen Host-Ordner legen, den das eigene Backup ohnehin erfasst. Nur Dateien nach dem Muster `watchit-JJJJMMTT-HHMMSS.sqlite3` werden rotiert, eigene Kopien im Ordner bleiben. Wiederherstellen: Container stoppen, Kopie per `docker compose run --rm --entrypoint cp …` zurückkopieren, starten (`migrate` bringt ältere Sicherungen auf Stand).
+  - **`SITE_URL` als eine Einstellung für die Adresse** (z. B. `https://couchowl.example.com`, ohne Pfad): Daraus folgen erlaubter Host, vertrauenswürdige Origin für Formulare (CSRF), Secure-Cookies und HSTS bei https sowie die Links in Einladungs- und Reset-Mails. Grund: Getrennt gesetzte `ALLOWED_HOSTS` und `CSRF_TRUSTED_ORIGINS` sind eine typische Stolperfalle (vergisst man das zweite, scheitert hinter HTTPS jedes Formular); beide bleiben als optionale Extras. Links nutzen `SITE_URL`, weil nicht jeder Proxy den öffentlichen Hostnamen weitergibt. Ein `https`-`SITE_URL` ohne Proxy bricht den Start mit einer klaren Meldung ab (Couch Owl selbst spricht nur http).
+  - **`TRUSTED_PROXY_COUNT`** (wie `trust proxy` in Express, Standard 0): Nur dann glaubt Couch Owl `X-Forwarded-For` und `X-Forwarded-Proto`. Die Client-IP ist der Eintrag, den der äußerste vertrauenswürdige Proxy angehängt hat; weiter links stehende (fälschbare) Einträge werden ignoriert. Adressen werden normalisiert (IPv6, Port, IPv4-in-IPv6). django-axes und die Drossel bei „Passwort vergessen“ nutzen dieselbe Funktion. gunicorn vertraut den Headern nicht mehr selbst (vorher von jedem Absender).
+  - **HSTS** bei https standardmäßig 1 Jahr, ohne Subdomains und ohne Preload (andere Subdomains der Domain könnten andere Dienste sein; Preload ist kaum rückgängig zu machen); `HSTS_SECONDS=0` schaltet es ab. **Keine http→https-Umleitung** in Couch Owl: das macht der Proxy, und der Healthcheck im Container nutzt http. Die zugehörigen Warnungen von `check --deploy` sind bewusst stummgeschaltet.
+  - **IPv6 ohne Proxy:** Docker reicht IPv6-Verbindungen oft über einen eigenen Hilfsprozess weiter, Couch Owl sieht dann nur Dockers interne Adresse. Hinweis in `docs/deployment.md`, Empfehlung Reverse Proxy.
+  - **Backup:** `BACKUP_DIR` (Standard `/data/backups`) lässt sich auf einen Host-Ordner legen, den das eigene Backup ohnehin erfasst. Nur Dateien nach dem Muster `couchowl-JJJJMMTT-HHMMSS.sqlite3` werden rotiert, eigene Kopien im Ordner bleiben. Wiederherstellen: Container stoppen, Kopie per `docker compose run --rm --entrypoint cp …` zurückkopieren, starten (`migrate` bringt ältere Sicherungen auf Stand).
+
+- **2026-11-13 – Projektname „Couch Owl“** (ersetzt den Platzhalter „watchit“):
+  - **Kriterien:** Englisch reicht (funktioniert auch in Deutschland), der Name muss nicht sagen, dass es um Filme und Serien geht, eine freie Domain ist unnötig. Entscheidend ist nur, dass im selben Bereich (Watchlists, Tracker, Medienserver) niemand den Namen nutzt.
+  - **Prüfung:** GitHub (Repos, User/Organisation), Websuche, Apple App Store, Markenhinweise im Web: keine App, kein Projekt, keine Marke „Couch Owl“; „Couch…“-Marken gibt es nur für Möbel. Die offiziellen Register (DPMA, TMview) blocken automatische Abfragen, Oliver prüft sie bei Bedarf von Hand.
+  - **Verworfen**, weil im selben Bereich schon belegt oder zu nah dran: u. a. Couchplan (Android-Tracker für Paare), Sofa…-Namen (selbst gehosteter Tracker „Sofa“, App „Sofa Time“), Snug (selbst gehosteter Serien-Tracker), CouchSloth (Familien-Watchlist), Serialist, Laterna, Couchbuddy. Couchradar wegen der Nähe zu Radarr und CouchPotato (Download-Tools).
+  - **Schreibweise:** „Couch Owl“ in allen Texten (deutsch zusammengesetzt mit Bindestrichen: „Couch-Owl-Passwort“), `couchowl` für alles Technische (Repo, Image, Compose-Dienst, Volume `couchowl-data`, Linux-Nutzer im Container, `couchowl.css`/`couchowl.js`, Backup-Dateien `couchowl-JJJJMMTT-HHMMSS.sqlite3`).
+  - **Name nur an einer Stelle:** `APP_NAME` in `config/settings.py`, im Template als `{{ APP_NAME }}` (Titel, Navigation, Fußzeile, PWA-Manifest, Standard-Absender). Interne Namen sind neutral (Context Processor `core.context_processors.app`, `APP_VERSION`, CSS-Variablen `--app-…`), damit eine spätere Umbenennung nichts Technisches mehr anfasst. Übersetzte Sätze enthalten den Namen direkt, weil das Deutsche ihn in Zusammensetzungen braucht.
+  - **App-Icon mit Eule** folgt in 7b; bis dahin bleibt das Auge mit Play-Button.
 
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
-watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in Docker auf seiner Synology DS218+, ist aus dem Internet erreichbar und soll später als Open Source veröffentlicht werden.
+Couch Owl ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in Docker auf seiner Synology DS218+, ist aus dem Internet erreichbar und soll später als Open Source veröffentlicht werden.
 
 ## Beschlüsse
 
@@ -233,7 +241,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
      - Buttons pro Nutzer kurz gedrosselt, um das TMDB-Kontingent zu schonen
 - **Datenbank:** SQLite als Standard (schont die 2 GB RAM des NAS), PostgreSQL optional über `DATABASE_URL`
 - **Konfiguration:** ausschließlich über Umgebungsvariablen (`django-environ`); Secrets nie im Repository
-- **Betrieb: ein einziger Container** (Compose-Datei mit einem Dienst `watchit`)
+- **Betrieb: ein einziger Container** (Compose-Datei mit einem Dienst `couchowl`)
   - Prozessmanager **honcho** (`Procfile`) startet zwei Prozesse:
     - `web`: gunicorn mit whitenoise für statische Dateien
     - `cron`: supercronic, startet täglich `manage.py sync_tmdb` und `manage.py backup`
@@ -321,7 +329,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
     - SQLite in einem Docker-Volume
   - **Zwischenschritt:** vor einem Deployment `docker compose up --build` auch lokal ausführen, um produktionsnahe Unterschiede (statische Dateien, `DEBUG=False`, Security-Settings) vorab zu erkennen
 - **Dokumentation im Repo** (Englisch, außer `docs/KONZEPT.md`):
-  - `README.md`: für Nutzer und Self-Hoster (was ist watchit, Screenshots, Schnellstart mit Docker Compose, Konfiguration über Umgebungsvariablen)
+  - `README.md`: für Nutzer und Self-Hoster (was ist Couch Owl, Screenshots, Schnellstart mit Docker Compose, Konfiguration über Umgebungsvariablen)
   - `CONTRIBUTING.md`: Entwicklungsumgebung für **Linux, macOS und Windows**, Tests ausführen, Code-Stil, neue Übersetzung anlegen
   - `docs/deployment.md`: allgemeine Docker-Anleitung, unabhängig vom Host (Compose-Datei, Volumes und Backup, Updates, Betrieb hinter einem beliebigen Reverse Proxy mit HTTPS, nötige Proxy-Header); keine herstellerspezifischen Anleitungen
   - `docs/administration.md`: für Admins
@@ -398,8 +406,8 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
    - Seite „Demnächst“
 7. **Produktionsreife und Open Source** (aufgeteilt, siehe Änderungsprotokoll 2026-11-13)
    - **7a – Betrieb:** Security-Settings hinter dem Reverse Proxy (ohne, einer oder mehrere Proxys; IPv4 und IPv6), echte Client-IP für Brute-Force-Schutz und Drosselung, `backup`-Befehl mit Rotation, eingebunden über supercronic
-   - **Namenssuche** und Umbenennung vor 7b
-   - **7b – Open Source:** Über-Seite (Version, Lizenz, Link zum Quellcode, TMDB-Logo und -Hinweis, JustWatch), `IMPRINT_URL` und `PRIVACY_URL`, Lizenz AGPL-3.0, README und `docs/deployment.md` (allgemeines Docker-Deployment)
+   - **Namenssuche** und Umbenennung vor 7b → „Couch Owl“ (2026-11-13)
+   - **7b – Open Source:** Eulen-App-Icon, Über-Seite (Version, Lizenz, Link zum Quellcode, TMDB-Logo und -Hinweis, JustWatch), `IMPRINT_URL` und `PRIVACY_URL`, Lizenz AGPL-3.0, README und `docs/deployment.md` (allgemeines Docker-Deployment)
    - **7c – CI und Release:** GitHub Actions (Tests mit Matrix Ubuntu/macOS/Windows, E2E-Tests, Docker-Smoke-Test), Multi-Arch-Images auf GHCR mit Versions-Tags, `1.0.0-rc.1`; `1.0.0` nach erfolgreichem NAS-Deployment
 
 ## Backlog (ToDo, nach dem MVP)
@@ -426,8 +434,8 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 
 ## Später zu entscheiden
 - ~~Open-Source-Lizenz~~ → entschieden: AGPL-3.0 (2026-11-13)
-- Zugang aus dem Internet: watchit bleibt generisch (mit oder ohne Reverse Proxy); Olivers eigener Weg (Synology-Proxy, neuer Anschluss evtl. nur IPv6) ist noch offen
-- Endgültiger Projektname („watchit“ ist ein Platzhalter) → vor Meilenstein 7b
+- Zugang aus dem Internet: Couch Owl bleibt generisch (mit oder ohne Reverse Proxy); Olivers eigener Weg (Synology-Proxy, neuer Anschluss evtl. nur IPv6) ist noch offen
+- ~~Endgültiger Projektname~~ → entschieden: Couch Owl (2026-11-13)
 
 ## Verifikation
 - Pro Meilenstein:

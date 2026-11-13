@@ -1,4 +1,4 @@
-# watchit
+# Couch Owl
 
 A self-hosted watchlist for movies and TV shows.
 
@@ -25,10 +25,10 @@ docker compose up -d --build
 Create the first admin account, then open <http://localhost:8000>:
 
 ```sh
-docker compose exec watchit python manage.py createsuperuser
+docker compose exec couchowl python manage.py createsuperuser
 ```
 
-All settings are documented in [.env.example](.env.example). Running watchit behind a
+All settings are documented in [.env.example](.env.example). Running Couch Owl behind a
 reverse proxy with HTTPS is described in [docs/deployment.md](docs/deployment.md); inviting
 users, password resets, e-mail setup and backups in
 [docs/administration.md](docs/administration.md).

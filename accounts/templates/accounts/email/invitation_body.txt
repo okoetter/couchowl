@@ -1,6 +1,6 @@
 {% load i18n %}{% autoescape off %}{% blocktranslate with name=inviter.get_username %}Hello,
 
-{{ name }} has invited you to watchit, a watchlist for movies and TV shows.
+{{ name }} has invited you to Couch Owl, a watchlist for movies and TV shows.
 Create your account with this link:{% endblocktranslate %}
 
 {{ url }}

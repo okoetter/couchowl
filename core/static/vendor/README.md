@@ -1,6 +1,6 @@
 # Vendored frontend libraries
 
-Served by watchit itself (no CDN, so browsers never contact third parties).
+Served by Couch Owl itself (no CDN, so browsers never contact third parties).
 To update, download the new version from npm (e.g. via jsdelivr) and adjust this table.
 
 | File            | Library   | Version | License |

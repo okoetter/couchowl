@@ -15,8 +15,9 @@
 - [x] **7a – Operations:** security settings behind a reverse proxy (with, without or several
   proxies; IPv4 and IPv6), real client IP for brute-force protection and rate limits, nightly
   consistent database copy (`manage.py backup`, rotation) for the host's backup to pick up
-- [ ] **Name:** find the final project name ("watchit" is a placeholder) and rename before 7b
-- [ ] **7b – Open source:** "About" page (version, license, source code link, TMDB logo and
+- [x] **Name:** "watchit" was a placeholder; the project is now called **Couch Owl**
+  (technical name `couchowl`). The owl app icon follows in 7b
+- [ ] **7b – Open source:** owl app icon, "About" page (version, license, source code link, TMDB logo and
   notice, JustWatch credit; the footer shrinks to a link), `IMPRINT_URL`/`PRIVACY_URL`,
   AGPL-3.0 license, README, `docs/deployment.md`
 - [ ] **7c – CI and release:** GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke

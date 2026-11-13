@@ -63,6 +63,6 @@ def test_wrong_password_shows_form_error(client, user):
 
     content = response.content.decode()
     assert response.status_code == 200
-    # styled red via .errorlist.nonfield in watchit.css
+    # styled red via .errorlist.nonfield in couchowl.css
     assert '<ul class="errorlist nonfield">' in content
     assert "Benutzername oder Passwort ist falsch." in content

@@ -4,7 +4,7 @@ import os
 import tempfile
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
-os.environ.setdefault("DATA_DIR", tempfile.mkdtemp(prefix="watchit-test-"))
+os.environ.setdefault("DATA_DIR", tempfile.mkdtemp(prefix="couchowl-test-"))
 
 from config.settings import *  # noqa: E402, F403
 

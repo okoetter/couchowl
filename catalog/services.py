@@ -99,7 +99,7 @@ def search(query: str, language: str) -> list[SearchResult]:
         results = [
             SearchResult.from_tmdb(item)
             for item in data.get("results", [])
-            # /search/multi also finds people; watchit only lists movies and shows
+            # /search/multi also finds people; Couch Owl only lists movies and shows
             if item.get("media_type") in MediaType.values
         ]
         # Plain dicts in TMDB's order, so cached entries survive code changes here

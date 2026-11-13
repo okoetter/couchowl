@@ -11,7 +11,7 @@ from django.utils.http import urlsafe_base64_encode
 
 
 def base_url(request) -> str:
-    """Scheme and host for links in e-mails and the admin, e.g. "https://watchit.example.com".
+    """Scheme and host for links in e-mails and the admin, e.g. "https://couchowl.example.com".
 
     SITE_URL if configured: reverse proxies don't always pass on the public host name.
     """

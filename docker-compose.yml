@@ -1,13 +1,13 @@
-# watchit – Docker Compose
+# Couch Owl – Docker Compose
 # 1. Copy .env.example to .env and adjust it (at least SECRET_KEY and ALLOWED_HOSTS).
 # 2. docker compose up -d
 # 3. Open http://localhost:8000
 
 services:
-  watchit:
+  couchowl:
     build: .
-    image: watchit:local
-    container_name: watchit
+    image: couchowl:local
+    container_name: couchowl
     restart: unless-stopped
     env_file: .env
     environment:
@@ -16,23 +16,23 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - watchit-data:/data
+      - couchowl-data:/data
       # Optional: nightly database copies into a host folder your backup already covers
       # (then set BACKUP_DIR=/backups in .env; the folder must be writable by uid 1000)
-      # - /volume1/backup/watchit:/backups
+      # - /volume1/backup/couchowl:/backups
 
   # Optional: PostgreSQL instead of SQLite. Uncomment, then set in .env:
-  # DATABASE_URL=postgres://watchit:change-me@db:5432/watchit
+  # DATABASE_URL=postgres://couchowl:change-me@db:5432/couchowl
   # db:
   #   image: postgres:18
   #   restart: unless-stopped
   #   environment:
-  #     POSTGRES_DB: watchit
-  #     POSTGRES_USER: watchit
+  #     POSTGRES_DB: couchowl
+  #     POSTGRES_USER: couchowl
   #     POSTGRES_PASSWORD: change-me
   #   volumes:
-  #     - watchit-db:/var/lib/postgresql
+  #     - couchowl-db:/var/lib/postgresql
 
 volumes:
-  watchit-data:
-  # watchit-db:
+  couchowl-data:
+  # couchowl-db:

@@ -15,6 +15,15 @@ def test_dashboard_renders_in_german_by_default(auth_client):
     assert 'aria-current="page"' in content
 
 
+def test_app_name_appears_in_title_navigation_and_footer(auth_client):
+    content = auth_client.get(reverse("core:dashboard")).content.decode()
+
+    assert settings.APP_NAME == "Couch Owl"
+    assert "· Couch Owl</title>" in content
+    assert "<strong>Couch Owl</strong>" in content
+    assert f"<small>Couch Owl {settings.VERSION}</small>" in content
+
+
 def test_assets_are_served_locally_without_cdn(auth_client):
     content = auth_client.get(reverse("core:dashboard")).content.decode()
 
@@ -43,6 +52,7 @@ def test_manifest_is_valid_pwa_manifest(client):
     assert response.status_code == 200
     assert response["Content-Type"] == "application/manifest+json"
     data = response.json()
+    assert data["name"] == data["short_name"] == "Couch Owl"
     assert data["display"] == "standalone"
     assert data["start_url"] == "/"
     assert data["description"] == "Deine Watchlist für Filme und Serien"

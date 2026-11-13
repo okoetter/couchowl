@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# watchit production image: Debian slim, multi-stage, runs as non-root.
+# Couch Owl production image: Debian slim, multi-stage, runs as non-root.
 
 ARG PYTHON_VERSION=3.15
 
@@ -55,16 +55,16 @@ ENV PATH=/app/.venv/bin:$PATH \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends tini \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid 1000 watchit \
-    && useradd --system --uid 1000 --gid 1000 --home-dir /app --no-create-home watchit \
+    && groupadd --system --gid 1000 couchowl \
+    && useradd --system --uid 1000 --gid 1000 --home-dir /app --no-create-home couchowl \
     && mkdir -p /data \
-    && chown watchit:watchit /data
+    && chown couchowl:couchowl /data
 
 COPY --from=supercronic /supercronic /usr/local/bin/supercronic
 COPY --from=builder --chown=root:root /app /app
 
 WORKDIR /app
-USER watchit
+USER couchowl
 VOLUME /data
 EXPOSE 8000
 

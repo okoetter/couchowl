@@ -1,14 +1,14 @@
 # Administration
 
-This guide is for the person running a watchit instance. Commands are shown for Docker Compose;
-for local development, replace `docker compose exec watchit` with `uv run`.
+This guide is for the person running a Couch Owl instance. Commands are shown for Docker Compose;
+for local development, replace `docker compose exec couchowl` with `uv run`.
 
 ## Create the first admin
 
-watchit has no open registration. Create the first account on the command line:
+Couch Owl has no open registration. Create the first account on the command line:
 
 ```sh
-docker compose exec watchit python manage.py createsuperuser
+docker compose exec couchowl python manage.py createsuperuser
 ```
 
 Then log in at `https://your-host/admin/` (Django admin) or the normal login page.
@@ -52,8 +52,8 @@ After `AXES_FAILURE_LIMIT` failed logins (default 5), the combination of usernam
 is locked for `AXES_COOLOFF_MINUTES` (default 60). Other users are not affected.
 
 - See failed attempts and lockouts: **Admin → Axes → Access attempts**
-- Unlock everyone: `docker compose exec watchit python manage.py axes_reset`
-- Unlock one user: `docker compose exec watchit python manage.py axes_reset_username <username>`
+- Unlock everyone: `docker compose exec couchowl python manage.py axes_reset`
+- Unlock one user: `docker compose exec couchowl python manage.py axes_reset_username <username>`
 
 ## TMDB sync
 
@@ -63,8 +63,8 @@ Shows loaded within the last 6 hours are skipped. The result appears in `docker 
 (lines starting with `cron |`). Run it by hand:
 
 ```sh
-docker compose exec watchit python manage.py sync_tmdb             # summary only
-docker compose exec watchit python manage.py sync_tmdb --force -v 2 # all shows, one line each
+docker compose exec couchowl python manage.py sync_tmdb             # summary only
+docker compose exec couchowl python manage.py sync_tmdb --force -v 2 # all shows, one line each
 ```
 
 Users can also reload a single title ("Refresh now" on its page) or all shows they follow
@@ -72,16 +72,16 @@ Users can also reload a single title ("Refresh now" on its page) or all shows th
 
 ## Backups and restore
 
-watchit stores everything in one SQLite file (`/data/db.sqlite3`). Copying that file while
-watchit writes to it can give a broken copy. So every night (03:00 UTC) the container runs
+Couch Owl stores everything in one SQLite file (`/data/db.sqlite3`). Copying that file while
+Couch Owl writes to it can give a broken copy. So every night (03:00 UTC) the container runs
 `manage.py backup`, which writes a consistent copy to `BACKUP_DIR` (default `/data/backups`)
 and keeps the newest `BACKUP_KEEP` copies (default 3):
 
 ```
-/data/backups/watchit-20261113-030000.sqlite3
+/data/backups/couchowl-20261113-030000.sqlite3
 ```
 
-**watchit does not keep your backups safe – that is your host's job.** Include the backup
+**Couch Owl does not keep your backups safe – that is your host's job.** Include the backup
 folder in your regular backup (another disk, another machine, the cloud), with as many
 versions as you like. Back up the copies, not the live `db.sqlite3`. To make that easier,
 mount a host folder for the copies (see `docker-compose.yml`, then set `BACKUP_DIR`).
@@ -90,30 +90,30 @@ The poster cache needs no backup; posters are downloaded again when needed.
 Make a copy by hand, e.g. before an update:
 
 ```sh
-docker compose exec watchit python manage.py backup
+docker compose exec couchowl python manage.py backup
 ```
 
 ### Restore
 
-Stop watchit first, so nothing writes to the database while it is replaced. Then copy a
-backup over the database and start watchit again:
+Stop Couch Owl first, so nothing writes to the database while it is replaced. Then copy a
+backup over the database and start Couch Owl again:
 
 ```sh
 docker compose stop
-docker compose run --rm --entrypoint cp watchit /data/backups/watchit-20261113-030000.sqlite3 /data/db.sqlite3
+docker compose run --rm --entrypoint cp couchowl /data/backups/couchowl-20261113-030000.sqlite3 /data/db.sqlite3
 docker compose start
 ```
 
 Everything is back to the state of that backup (accounts, lists, watched episodes). On
-start, watchit updates an older backup to the current database schema automatically.
+start, Couch Owl updates an older backup to the current database schema automatically.
 List the available copies with
-`docker compose run --rm --entrypoint ls watchit -l /data/backups`.
+`docker compose run --rm --entrypoint ls couchowl -l /data/backups`.
 
 ### PostgreSQL
 
 With `DATABASE_URL` pointing to PostgreSQL, `manage.py backup` refuses to run. Use
 PostgreSQL's own tools instead, e.g.
-`docker compose exec db pg_dump -U watchit watchit > watchit.sql`.
+`docker compose exec db pg_dump -U couchowl couchowl > couchowl.sql`.
 
 ## Set up e-mail
 
@@ -121,12 +121,12 @@ E-mail is optional. Configure it in `.env` (not in the admin) and restart the co
 
 ```ini
 EMAIL_URL=smtp+tls://user:password@mail.example.com:587
-DEFAULT_FROM_EMAIL=watchit <watchit@example.com>
+DEFAULT_FROM_EMAIL=Couch Owl <couchowl@example.com>
 ```
 
 Use `smtp+ssl://…:465` for implicit TLS. Special characters in the user name or password must be
 URL-encoded (e.g. `@` → `%40`). Send a test mail:
 
 ```sh
-docker compose exec watchit python manage.py sendtestemail you@example.com
+docker compose exec couchowl python manage.py sendtestemail you@example.com
 ```

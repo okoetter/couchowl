@@ -1,7 +1,7 @@
 """Consistent copies of the SQLite database for the host's backup (`manage.py backup`).
 
-watchit only makes the copy; keeping backups safe (other disk, cloud, versions) is the
-job of the host, e.g. the NAS backup. Copying a SQLite file while watchit writes to it
+Couch Owl only makes the copy; keeping backups safe (other disk, cloud, versions) is the
+job of the host, e.g. the NAS backup. Copying a SQLite file while Couch Owl writes to it
 can give a broken copy; SQLite's backup API always gives a consistent one.
 """
 
@@ -12,8 +12,8 @@ from pathlib import Path
 
 from django.utils import timezone
 
-# watchit-20261113-030000.sqlite3; other files in the directory are never touched
-BACKUP_NAME = re.compile(r"^watchit-\d{8}-\d{6}\.sqlite3$")
+# couchowl-20261113-030000.sqlite3; other files in the directory are never touched
+BACKUP_NAME = re.compile(r"^couchowl-\d{8}-\d{6}\.sqlite3$")
 
 
 class BackupError(Exception):
@@ -25,7 +25,7 @@ def database_path(database: dict) -> Path:
     if not database["ENGINE"].endswith("sqlite3"):
         raise BackupError(
             "Backups are only built in for SQLite. For PostgreSQL use pg_dump, "
-            "e.g. docker compose exec db pg_dump -U watchit watchit > watchit.sql"
+            "e.g. docker compose exec db pg_dump -U couchowl couchowl > couchowl.sql"
         )
     path = Path(database["NAME"])
     if not path.is_file():
@@ -42,7 +42,7 @@ def create_backup(database: Path, backup_dir: Path, keep: int) -> tuple[Path, li
         raise BackupError("BACKUP_KEEP must be at least 1.")
     backup_dir.mkdir(parents=True, exist_ok=True)
     stamp = timezone.localtime().strftime("%Y%m%d-%H%M%S")
-    target = backup_dir / f"watchit-{stamp}.sqlite3"
+    target = backup_dir / f"couchowl-{stamp}.sqlite3"
     # Write to a hidden temporary file first: the rotation (and the host's backup)
     # never sees a half-written copy
     temp = backup_dir / f".{target.name}.tmp"

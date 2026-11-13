@@ -35,7 +35,7 @@ def test_backup_is_a_complete_copy(database, backup_dir, monkeypatch):
 
     backup, removed = backups.create_backup(database, backup_dir, keep=3)
 
-    assert backup == backup_dir / "watchit-20261113-030000.sqlite3"
+    assert backup == backup_dir / "couchowl-20261113-030000.sqlite3"
     assert removed == []
     with sqlite3.connect(backup) as connection:
         assert connection.execute("SELECT name FROM lists").fetchall() == [("Watchlist",)]
@@ -57,7 +57,7 @@ def test_only_the_newest_backups_are_kept(database, backup_dir, monkeypatch):
 
 def test_other_files_in_the_backup_dir_are_left_alone(database, backup_dir, monkeypatch):
     backup_dir.mkdir()
-    own_copy = backup_dir / "watchit-before-update.sqlite3"
+    own_copy = backup_dir / "couchowl-before-update.sqlite3"
     own_copy.write_bytes(b"mine")
     at(monkeypatch, 2026, 11, 13, 3, 0, 0)
 
@@ -83,7 +83,7 @@ def test_missing_database_is_not_created(tmp_path, backup_dir):
 
 def test_postgresql_points_to_pg_dump():
     with pytest.raises(backups.BackupError, match="pg_dump"):
-        backups.database_path({"ENGINE": "django.db.backends.postgresql", "NAME": "watchit"})
+        backups.database_path({"ENGINE": "django.db.backends.postgresql", "NAME": "couchowl"})
 
 
 def test_command(database, backup_dir, monkeypatch, settings, capsys):
@@ -93,7 +93,7 @@ def test_command(database, backup_dir, monkeypatch, settings, capsys):
 
     call_command("backup")
 
-    assert len(list(backup_dir.glob("watchit-*.sqlite3"))) == 1
+    assert len(list(backup_dir.glob("couchowl-*.sqlite3"))) == 1
     assert "Backup:" in capsys.readouterr().out
 
 

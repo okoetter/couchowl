@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- watchit app icon: an eye with a play button as pupil.
+  <!-- Couch Owl app icon: an eye with a play button as pupil.
        Source of truth: PNG icons are generated from this file (see CONTRIBUTING.md). -->
   <rect width="512" height="512" rx="112" fill="#1a2b4a"/>
   <path d="M64 256c48-84 116-128 192-128s144 44 192 128c-48 84-116 128-192 128S112 340 64 256z"

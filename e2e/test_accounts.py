@@ -28,7 +28,7 @@ def test_invitation_registration_and_login(live_server, admin, browser):
     page.locator("#id_password1").fill(PASSWORD)
     page.locator("#id_password2").fill(PASSWORD)
     page.get_by_role("button", name="Konto anlegen").click()
-    expect(page.get_by_text("Willkommen bei watchit, ben!")).to_be_visible()
+    expect(page.get_by_text("Willkommen bei Couch Owl, ben!")).to_be_visible()
     expect(page.get_by_role("heading", name="Dashboard")).to_be_visible()
 
     # Log out via the profile page, then log in again

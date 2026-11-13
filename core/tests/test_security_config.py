@@ -15,11 +15,11 @@ def test_nothing_configured():
 
 
 def test_https_behind_a_proxy():
-    security = security_settings("https://Watchit.Example.com/", 1)
+    security = security_settings("https://CouchOwl.Example.com/", 1)
 
-    assert security.site_url == "https://watchit.example.com"
-    assert security.allowed_hosts == ["watchit.example.com"]
-    assert security.csrf_trusted_origins == ["https://watchit.example.com"]
+    assert security.site_url == "https://couchowl.example.com"
+    assert security.allowed_hosts == ["couchowl.example.com"]
+    assert security.csrf_trusted_origins == ["https://couchowl.example.com"]
     assert security.https
     assert security.hsts_seconds == DEFAULT_HSTS_SECONDS
     assert security.proxy_ssl_header == ("HTTP_X_FORWARDED_PROTO", "https")
@@ -27,7 +27,7 @@ def test_https_behind_a_proxy():
 
 def test_hsts_can_be_turned_off():
     # e.g. because the reverse proxy already sends the header
-    assert security_settings("https://watchit.example.com", 1, hsts_seconds=0).hsts_seconds == 0
+    assert security_settings("https://couchowl.example.com", 1, hsts_seconds=0).hsts_seconds == 0
 
 
 def test_plain_http_in_the_home_network():
@@ -53,10 +53,10 @@ def test_proxy_without_site_url_still_trusts_the_proto_header():
 @pytest.mark.parametrize(
     ("site_url", "proxies", "message"),
     [
-        ("watchit.example.com", 1, "must look like"),
-        ("ftp://watchit.example.com", 1, "must look like"),
-        ("https://example.com/watchit", 1, "must not contain a path"),
-        ("https://watchit.example.com", 0, "TRUSTED_PROXY_COUNT"),
+        ("couchowl.example.com", 1, "must look like"),
+        ("ftp://couchowl.example.com", 1, "must look like"),
+        ("https://example.com/couchowl", 1, "must not contain a path"),
+        ("https://couchowl.example.com", 0, "TRUSTED_PROXY_COUNT"),
         ("", -1, "TRUSTED_PROXY_COUNT"),
     ],
 )

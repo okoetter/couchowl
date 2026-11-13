@@ -7,22 +7,22 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#1a2b4a">
   {# Every page sets its own title block #}
-  <title>{% block title %}{% endblock %} · watchit</title>
+  <title>{% block title %}{% endblock %} · {{ APP_NAME }}</title>
 
   {# PWA: manifest and icons #}
   <link rel="manifest" href="{% url 'core:manifest' %}">
   <link rel="icon" href="{% static 'core/icon.svg' %}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{% static 'core/apple-touch-icon.png' %}">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="watchit">
+  <meta name="apple-mobile-web-app-title" content="{{ APP_NAME }}">
 
   <link rel="stylesheet" href="{% static 'vendor/pico.min.css' %}">
-  <link rel="stylesheet" href="{% static 'core/watchit.css' %}">
+  <link rel="stylesheet" href="{% static 'core/couchowl.css' %}">
   <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
   {# "morph" swaps change only what differs, so unchanged posters don't flicker #}
   <script src="{% static 'vendor/idiomorph-ext.min.js' %}" defer></script>
   <script src="{% static 'vendor/alpine.min.js' %}" defer></script>
-  <script src="{% static 'core/watchit.js' %}" defer></script>
+  <script src="{% static 'core/couchowl.js' %}" defer></script>
 </head>
 {# Every htmx request sends the CSRF token automatically #}
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-ext="morph">
@@ -41,7 +41,7 @@
   <div id="toast" class="toast-region" aria-live="polite">{% block toast %}{% endblock %}</div>
 
   <footer class="container site-footer">
-    <small>watchit {{ WATCHIT_VERSION }}</small>
+    <small>{{ APP_NAME }} {{ APP_VERSION }}</small>
     {# Required by the TMDB terms of use. The logo is served locally like everything else. #}
     <p class="tmdb-attribution">
       <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">

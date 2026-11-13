@@ -27,7 +27,7 @@ class SecuritySettings:
 def security_settings(
     site_url: str, proxy_count: int, hsts_seconds: int | None = None
 ) -> SecuritySettings:
-    """Settings for watchit reachable at `site_url` behind `proxy_count` reverse proxies.
+    """Settings for Couch Owl reachable at `site_url` behind `proxy_count` reverse proxies.
 
     `hsts_seconds=None` means the default (one year, only with https).
     """
@@ -41,17 +41,17 @@ def security_settings(
     parts = urlsplit(site_url.strip())
     if parts.scheme not in ("http", "https") or not parts.hostname:
         raise ImproperlyConfigured(
-            f"SITE_URL must look like https://watchit.example.com, not {site_url!r}."
+            f"SITE_URL must look like https://couchowl.example.com, not {site_url!r}."
         )
     if parts.path not in ("", "/") or parts.query or parts.fragment:
         raise ImproperlyConfigured(
-            "SITE_URL must not contain a path: watchit needs its own (sub)domain."
+            "SITE_URL must not contain a path: Couch Owl needs its own (sub)domain."
         )
     https = parts.scheme == "https"
     if https and not proxy_count:
-        # watchit itself only speaks http; https always comes from a reverse proxy
+        # Couch Owl itself only speaks http; https always comes from a reverse proxy
         raise ImproperlyConfigured(
-            "SITE_URL uses https, so watchit runs behind a reverse proxy: "
+            "SITE_URL uses https, so Couch Owl runs behind a reverse proxy: "
             "set TRUSTED_PROXY_COUNT (usually 1)."
         )
 

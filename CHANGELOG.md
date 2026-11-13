@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exact title matches come first (newest first)
 - TMDB client with caching in the database, language fallback (e.g. de-AT → de-DE →
   English) and rate limiting
-- Poster proxy: posters are downloaded once and served by watchit, so browsers never
+- Poster proxy: posters are downloaded once and served by Couch Owl, so browsers never
   contact TMDB
 - TMDB attribution in the footer
 - Private lists: create, rename and delete as many as you like; each holds movies and

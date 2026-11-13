@@ -24,7 +24,7 @@ def primary_language(region: str) -> str | None:
 
 
 def ui_language_for_region(region: str) -> str:
-    """Interface language for a country, if watchit has a translation, else the default."""
+    """Interface language for a country, if Couch Owl has a translation, else the default."""
     language = primary_language(region)
     if language in dict(settings.LANGUAGES):
         return language

@@ -14,7 +14,7 @@ from django.urls import reverse
 
 from . import tmdb
 
-# Sizes offered by TMDB that watchit uses (width in pixels). Other sizes are refused,
+# Sizes offered by TMDB that Couch Owl uses (width in pixels). Other sizes are refused,
 # so the cache can't be filled with arbitrary variants.
 POSTER_SIZES = ("w92", "w185", "w342", "w500")
 # TMDB file names: letters, digits, and an image extension. Nothing else is accepted.

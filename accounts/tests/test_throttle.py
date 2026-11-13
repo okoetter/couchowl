@@ -38,7 +38,7 @@ def test_forged_entries_on_the_left_are_ignored(proxies):
 
 
 def test_two_proxies(proxies):
-    # client -> outer proxy (appends client) -> inner proxy (appends outer) -> watchit
+    # client -> outer proxy (appends client) -> inner proxy (appends outer) -> Couch Owl
     proxies(2)
 
     forwarded = "10.0.0.1, 203.0.113.5, 192.0.2.10"

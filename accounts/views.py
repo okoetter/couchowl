@@ -45,7 +45,7 @@ def register(request, token):
                 user = form.save()
                 Invitation.objects.filter(pk=invitation.pk).update(used_by=user)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            messages.success(request, _("Welcome to watchit, %(name)s!") % {"name": user})
+            messages.success(request, _("Welcome to Couch Owl, %(name)s!") % {"name": user})
             return redirect("core:dashboard")
     else:
         form = RegistrationForm(initial={"email": invitation.email})

@@ -71,7 +71,7 @@ def test_history_restore_gets_the_full_page(auth_client, search_response):
     assert "<html" in response.content.decode()
 
 
-def test_posters_are_served_by_watchit_never_by_tmdb(auth_client, search_response):
+def test_posters_are_served_locally_never_by_tmdb(auth_client, search_response):
     content = auth_client.get(SEARCH, {"q": "dark"}, headers=HTMX).content.decode()
 
     assert '/posters/w92/z1DfRQf2CgnROyhVZ6ch8FbWt71.jpg"' in content

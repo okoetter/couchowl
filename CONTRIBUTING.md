@@ -1,4 +1,4 @@
-# Contributing to watchit
+# Contributing to Couch Owl
 
 ## Development setup
 
@@ -15,7 +15,7 @@ You need **git** and **[uv](https://docs.astral.sh/uv/)**. uv installs the right
 Docker: Docker Engine on Linux, Docker Desktop on macOS/Windows.
 
 ```sh
-git clone <repository-url> watchit && cd watchit
+git clone <repository-url> couchowl && cd couchowl
 uv sync                              # creates .venv with all dependencies
 cp .env.example .env                 # Windows: copy .env.example .env
 ```

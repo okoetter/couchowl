@@ -1,11 +1,11 @@
-# German translation of watchit.
-# This file is distributed under the same license as the watchit package.
+# German translation of Couch Owl.
+# This file is distributed under the same license as the Couch Owl package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: watchit\n"
+"Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 17:05+0100\n"
+"POT-Creation-Date: 2026-11-13 21:54+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -229,12 +229,12 @@ msgstr "Einladung #%(id)s"
 msgid ""
 "Hello,\n"
 "\n"
-"%(name)s has invited you to watchit, a watchlist for movies and TV shows.\n"
+"%(name)s has invited you to Couch Owl, a watchlist for movies and TV shows.\n"
 "Create your account with this link:"
 msgstr ""
 "Hallo,\n"
 "\n"
-"%(name)s hat dich zu watchit eingeladen, einer Watchlist für Filme und "
+"%(name)s hat dich zu Couch Owl eingeladen, einer Watchlist für Filme und "
 "Serien.\n"
 "Lege dein Konto über diesen Link an:"
 
@@ -244,20 +244,20 @@ msgid "The link is valid until %(date)s and can only be used once."
 msgstr "Der Link ist bis %(date)s gültig und kann nur einmal benutzt werden."
 
 #: accounts/templates/accounts/email/invitation_subject.txt:1
-msgid "Your invitation to watchit"
-msgstr "Deine Einladung zu watchit"
+msgid "Your invitation to Couch Owl"
+msgstr "Deine Einladung zu Couch Owl"
 
 #: accounts/templates/accounts/email/password_reset_body.txt:1
 #, python-format
 msgid ""
 "Hello %(name)s,\n"
 "\n"
-"someone (hopefully you) asked to reset your watchit password. Set a new "
+"someone (hopefully you) asked to reset your Couch Owl password. Set a new "
 "password with this link:"
 msgstr ""
 "Hallo %(name)s,\n"
 "\n"
-"jemand (hoffentlich du) möchte dein watchit-Passwort zurücksetzen. Über "
+"jemand (hoffentlich du) möchte dein Couch-Owl-Passwort zurücksetzen. Über "
 "diesen Link legst du ein neues Passwort fest:"
 
 #: accounts/templates/accounts/email/password_reset_body.txt:7
@@ -266,8 +266,8 @@ msgstr ""
 "Falls du das nicht angefordert hast, kannst du diese E-Mail ignorieren."
 
 #: accounts/templates/accounts/email/password_reset_subject.txt:1
-msgid "Reset your watchit password"
-msgstr "Dein watchit-Passwort zurücksetzen"
+msgid "Reset your Couch Owl password"
+msgstr "Dein Couch-Owl-Passwort zurücksetzen"
 
 #: accounts/templates/accounts/invitation_invalid.html:4
 #: accounts/templates/accounts/invitation_invalid.html:7
@@ -327,10 +327,11 @@ msgid "Forgot your password? Please contact your administrator."
 msgstr "Passwort vergessen? Bitte wende dich an deinen Administrator."
 
 #: accounts/templates/accounts/login.html:20
-msgid "watchit is invite-only. Ask your administrator for an invitation link."
+msgid ""
+"Couch Owl is invite-only. Ask your administrator for an invitation link."
 msgstr ""
-"watchit funktioniert nur mit Einladung. Frag deinen Administrator nach einem "
-"Einladungslink."
+"Couch Owl funktioniert nur mit Einladung. Frag deinen Administrator nach "
+"einem Einladungslink."
 
 #: accounts/templates/accounts/password_change.html:4
 #: accounts/templates/accounts/password_change.html:7
@@ -431,9 +432,10 @@ msgid "Create account"
 msgstr "Konto anlegen"
 
 #: accounts/templates/accounts/register.html:8
-msgid "You have been invited to watchit. Choose a username and a password."
+msgid "You have been invited to Couch Owl. Choose a username and a password."
 msgstr ""
-"Du wurdest zu watchit eingeladen. Wähle einen Benutzernamen und ein Passwort."
+"Du wurdest zu Couch Owl eingeladen. Wähle einen Benutzernamen und ein "
+"Passwort."
 
 #: accounts/views.py:30
 msgid "You are already logged in."
@@ -441,8 +443,8 @@ msgstr "Du bist bereits angemeldet."
 
 #: accounts/views.py:48
 #, python-format
-msgid "Welcome to watchit, %(name)s!"
-msgstr "Willkommen bei watchit, %(name)s!"
+msgid "Welcome to Couch Owl, %(name)s!"
+msgstr "Willkommen bei Couch Owl, %(name)s!"
 
 #: accounts/views.py:63
 msgid "Your profile has been saved."
@@ -1193,7 +1195,7 @@ msgid_plural "TMDB rating: %(average)s of 10 (%(count)s votes)"
 msgstr[0] "TMDB-Bewertung: %(average)s von 10 (%(count)s Stimme)"
 msgstr[1] "TMDB-Bewertung: %(average)s von 10 (%(count)s Stimmen)"
 
-#: catalog/templatetags/catalog.py:42
+#: catalog/templatetags/catalog.py:41
 #, python-format
 msgid "%(average)s (%(count)s vote)"
 msgid_plural "%(average)s (%(count)s votes)"

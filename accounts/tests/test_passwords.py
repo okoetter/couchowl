@@ -66,7 +66,7 @@ def test_reset_email_contains_working_link(client, user):
     assert len(mail.outbox) == 1
     message = mail.outbox[0]
     assert message.to == ["oliver@example.com"]
-    assert "watchit" in message.subject
+    assert message.subject == "Dein Couch-Owl-Passwort zurücksetzen"
     path = re.search(r"https?://[^/]+(/\S+)", message.body).group(1)
 
     # Django redirects the token URL to a session-based URL before showing the form
@@ -204,8 +204,8 @@ def test_reset_rate_limit_is_per_client_behind_a_proxy(client, user, settings):
 
 
 def test_reset_email_link_uses_site_url(client, user, settings):
-    settings.SITE_URL = "https://watchit.example.com"
+    settings.SITE_URL = "https://couchowl.example.com"
 
     request_reset(client, "oliver@example.com")
 
-    assert "https://watchit.example.com/accounts/password/reset/" in mail.outbox[0].body
+    assert "https://couchowl.example.com/accounts/password/reset/" in mail.outbox[0].body

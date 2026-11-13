@@ -1,5 +1,5 @@
 """
-Django settings for watchit.
+Django settings for Couch Owl.
 
 All configuration comes from environment variables (see .env.example).
 Without a .env file, safe-ish development defaults are used.
@@ -20,6 +20,9 @@ env = environ.Env()
 # Read .env if present (local development). In Docker, variables come from compose.
 environ.Env.read_env(BASE_DIR / ".env")
 
+# The product name, shown in the page title, navigation, footer, PWA manifest and as the
+# default e-mail sender. Code and templates use APP_NAME instead of spelling it out.
+APP_NAME = "Couch Owl"
 VERSION = get_version()
 
 # --- Core ---------------------------------------------------------------------
@@ -28,9 +31,9 @@ DEBUG = env.bool("DEBUG", default=False)
 SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-only-change-me" if DEBUG else None)
 
 # --- Address, reverse proxy and HTTPS (rules: config/security.py) ------------------
-# SITE_URL: the public address, e.g. https://watchit.example.com. Determines the allowed
+# SITE_URL: the public address, e.g. https://couchowl.example.com. Determines the allowed
 # host, trusted origin for forms, secure cookies and HSTS, and the links in e-mails.
-# TRUSTED_PROXY_COUNT: number of reverse proxies in front of watchit (like Express's
+# TRUSTED_PROXY_COUNT: number of reverse proxies in front of Couch Owl (like Express's
 # "trust proxy"). Only then are X-Forwarded-For/-Proto believed.
 TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT", default=0)
 _security = security_settings(
@@ -117,7 +120,7 @@ TEMPLATES = [
                 "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "core.context_processors.watchit",
+                "core.context_processors.app",
             ],
         },
     },
@@ -127,7 +130,7 @@ TEMPLATES = [
 FORM_RENDERER = "core.forms.FormRenderer"
 
 # --- Database -----------------------------------------------------------------
-# SQLite by default; PostgreSQL via e.g. DATABASE_URL=postgres://user:pass@db:5432/watchit
+# SQLite by default; PostgreSQL via e.g. DATABASE_URL=postgres://user:pass@db:5432/couchowl
 
 DATABASES = {
     "default": env.db("DATABASE_URL", default=f"sqlite:///{DATA_DIR / 'db.sqlite3'}"),
@@ -163,7 +166,7 @@ AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 AXES_RESET_ON_SUCCESS = True
 AXES_LOCKOUT_TEMPLATE = "accounts/locked_out.html"
 # The real client address behind reverse proxies (TRUSTED_PROXY_COUNT), same as for
-# watchit's own rate limits
+# Couch Owl's own rate limits
 AXES_CLIENT_IP_CALLABLE = "accounts.throttle.client_ip"
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -243,7 +246,7 @@ STORAGES = {
 
 EMAIL_ENABLED = "EMAIL_URL" in env
 MAILERS = {"default": mailer_from_url(env("EMAIL_URL"))} if EMAIL_ENABLED else {}
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="watchit <watchit@localhost>")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=f"{APP_NAME} <couchowl@localhost>")
 
 # --- Logging ------------------------------------------------------------------
 

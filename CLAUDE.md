@@ -1,4 +1,4 @@
-# CLAUDE.md – watchit
+# CLAUDE.md – Couch Owl
 
 Self-hosted watchlist for movies and TV shows (TMDB). Django + HTMX, SQLite, one Docker container.
 Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `docs/ROADMAP.md`.
@@ -28,7 +28,7 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
   use `hx-swap-oob` for extra spots, and `hx-swap="morph:innerHTML"` (Idiomorph) when a
   region is refreshed but most entries stay; morphed entries need a stable `id`.
 - No external resources at runtime (no CDN): vendored libs in `core/static/vendor/`.
-  Own JavaScript stays small and lives in `core/static/core/watchit.js`.
+  Own JavaScript stays small and lives in `core/static/core/couchowl.js`.
   The browser must never talk to TMDB directly (texts cached in DB, posters via proxy).
 - Custom user model `accounts.User` (`ui_language`, `tmdb_language`, `region`, `theme`).
 - Tests: pytest-django, settings `config/settings_test.py`. TMDB is always mocked via the autouse

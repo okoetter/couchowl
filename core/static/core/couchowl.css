@@ -1,10 +1,10 @@
-/* watchit styles on top of Pico CSS. Keep this small. */
+/* Couch Owl styles on top of Pico CSS. Keep this small. */
 
 :root {
-  --watchit-nav-height: 4rem;
+  --app-nav-height: 4rem;
   /* Jumps to an anchor (e.g. "#episode-1-3") leave room for the sticky top bar,
      otherwise it covers the target. Phones have the bar at the bottom (see below). */
-  scroll-padding-top: calc(var(--watchit-nav-height) + 1rem);
+  scroll-padding-top: calc(var(--app-nav-height) + 1rem);
 }
 
 @media (max-width: 767px) {
@@ -16,7 +16,7 @@
 /* ---- Navigation: top bar on desktop ------------------------------------- */
 
 .app-nav {
-  min-height: var(--watchit-nav-height);
+  min-height: var(--app-nav-height);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -104,7 +104,7 @@
 
   /* Keep content clear of the fixed bottom bar */
   body {
-    padding-bottom: calc(var(--watchit-nav-height) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--app-nav-height) + env(safe-area-inset-bottom));
   }
 }
 
@@ -161,7 +161,7 @@ textarea + .errorlist {
 
   .app-nav:not(:has(ul)) .app-brand {
     display: flex;
-    min-height: var(--watchit-nav-height);
+    min-height: var(--app-nav-height);
   }
 }
 
@@ -170,17 +170,17 @@ textarea + .errorlist {
    and <ul class="errorlist nonfield"> (whole form, e.g. wrong login). Both look the same. */
 
 :root {
-  --watchit-error-color: var(--pico-del-color);
+  --app-error-color: var(--pico-del-color);
 }
 
 .errorlist {
   margin: 0 0 var(--pico-spacing);
   padding: calc(var(--pico-spacing) / 2) var(--pico-spacing);
   list-style: none;
-  color: var(--watchit-error-color);
-  border-left: 4px solid var(--watchit-error-color);
+  color: var(--app-error-color);
+  border-left: 4px solid var(--app-error-color);
   border-radius: var(--pico-border-radius);
-  background: color-mix(in srgb, var(--watchit-error-color) 10%, transparent);
+  background: color-mix(in srgb, var(--app-error-color) 10%, transparent);
 }
 
 .errorlist li {
@@ -189,8 +189,8 @@ textarea + .errorlist {
 
 /* Page messages (django.contrib.messages) with level "error" */
 .message-error {
-  color: var(--watchit-error-color);
-  border-left: 4px solid var(--watchit-error-color);
+  color: var(--app-error-color);
+  border-left: 4px solid var(--app-error-color);
 }
 
 /* ---- Button row (e.g. profile: link button + button in its own form) ------- */
@@ -308,8 +308,8 @@ svg.icon {
 
 /* Destructive action (Pico has no "danger" variant) */
 button.danger {
-  --pico-background-color: var(--watchit-error-color);
-  --pico-border-color: var(--watchit-error-color);
+  --pico-background-color: var(--app-error-color);
+  --pico-border-color: var(--app-error-color);
   --pico-color: #fff;
 }
 
@@ -409,7 +409,7 @@ details.dropdown.list-dropdown-compact > summary + ul {
 }
 
 .list-menu-error {
-  color: var(--watchit-error-color);
+  color: var(--app-error-color);
 }
 
 /* ---- Lists --------------------------------------------------------------------- */
@@ -832,10 +832,10 @@ button.check-button {
   margin-inline: -0.5rem;
   padding-inline: 0.5rem;
   border-radius: var(--pico-border-radius);
-  animation: watchit-target 2.5s ease-out;
+  animation: target-highlight 2.5s ease-out;
 }
 
-@keyframes watchit-target {
+@keyframes target-highlight {
   0%,
   40% {
     background-color: var(--pico-primary-focus);
@@ -1054,7 +1054,7 @@ button.progress-button:focus-visible .progress-next {
 
 @media (max-width: 767px) {
   .toast-region {
-    bottom: calc(var(--watchit-nav-height) + env(safe-area-inset-bottom) + 0.75rem);
+    bottom: calc(var(--app-nav-height) + env(safe-area-inset-bottom) + 0.75rem);
   }
 }
 

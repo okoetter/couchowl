@@ -1,6 +1,6 @@
 # Deployment
 
-watchit runs as a single Docker container. It speaks plain http on port 8000 and keeps all
+Couch Owl runs as a single Docker container. It speaks plain http on port 8000 and keeps all
 data in the volume `/data` (database, poster cache, backups). HTTPS comes from a reverse
 proxy in front of it. This guide is independent of the host; any machine with Docker works.
 For accounts, e-mail and backups see [administration.md](administration.md).
@@ -9,8 +9,8 @@ For accounts, e-mail and backups see [administration.md](administration.md).
 
 | Setting | Meaning |
 |---|---|
-| `SITE_URL` | The address people type, e.g. `https://watchit.example.com` (no path). Sets the allowed host name, secure cookies and HSTS for https, and the links in invitation and password reset e-mails. |
-| `TRUSTED_PROXY_COUNT` | How many reverse proxies sit in front of watchit (usually `1`). Only then does watchit believe the `X-Forwarded-For` and `X-Forwarded-Proto` headers. |
+| `SITE_URL` | The address people type, e.g. `https://couchowl.example.com` (no path). Sets the allowed host name, secure cookies and HSTS for https, and the links in invitation and password reset e-mails. |
+| `TRUSTED_PROXY_COUNT` | How many reverse proxies sit in front of Couch Owl (usually `1`). Only then does Couch Owl believe the `X-Forwarded-For` and `X-Forwarded-Proto` headers. |
 
 Set both in `.env` and restart the container (`docker compose up -d`).
 
@@ -30,7 +30,7 @@ The reverse proxy accepts HTTPS connections, holds the certificate and forwards 
 `http://<docker host>:8000`.
 
 ```ini
-SITE_URL=https://watchit.example.com
+SITE_URL=https://couchowl.example.com
 TRUSTED_PROXY_COUNT=1
 ```
 
@@ -38,21 +38,21 @@ The proxy must:
 
 - **append** the client address to `X-Forwarded-For`
 - set `X-Forwarded-Proto` to `https`
-- pass on the `Host` header (or at least forward to a host name watchit accepts; links in
+- pass on the `Host` header (or at least forward to a host name Couch Owl accepts; links in
   e-mails always use `SITE_URL`)
-- redirect http to https (watchit doesn't, so the container's own health check can use http)
+- redirect http to https (Couch Owl doesn't, so the container's own health check can use http)
 
 Most proxies do the first two by default. Two examples:
 
 ```caddyfile
 # Caddy: sets all headers itself
-watchit.example.com {
+couchowl.example.com {
     reverse_proxy localhost:8000
 }
 ```
 
 ```nginx
-# nginx (inside the server block for watchit.example.com with ssl)
+# nginx (inside the server block for couchowl.example.com with ssl)
 location / {
     proxy_pass http://127.0.0.1:8000;
     proxy_set_header Host $host;
@@ -66,10 +66,10 @@ the proxy: in `docker-compose.yml` use `"127.0.0.1:8000:8000"` instead of `"8000
 
 ### Why `TRUSTED_PROXY_COUNT` must be right
 
-Behind a proxy, every request seems to come from the proxy. watchit locks a user name after
+Behind a proxy, every request seems to come from the proxy. Couch Owl locks a user name after
 failed logins per client address (brute-force protection) and limits password reset
 requests per address. It needs the real client address for that, which only the proxy knows.
-Each proxy appends the address it saw to `X-Forwarded-For`; watchit takes the entry that
+Each proxy appends the address it saw to `X-Forwarded-For`; Couch Owl takes the entry that
 your proxies added and ignores everything further left, which the client may have made up.
 
 - **Too low** (e.g. `0` behind a proxy): all users share the proxy's address. A few wrong
@@ -86,15 +86,15 @@ not the proxy's. Delete the entry afterwards (or log in correctly).
 
 ### IPv6
 
-watchit handles IPv4 and IPv6 client addresses alike. Without a reverse proxy, though,
-Docker often forwards IPv6 connections through its own helper process, and watchit only
+Couch Owl handles IPv4 and IPv6 client addresses alike. Without a reverse proxy, though,
+Docker often forwards IPv6 connections through its own helper process, and Couch Owl only
 sees Docker's internal address for every visitor (with the lockout problem described above).
-A reverse proxy on the host avoids this: it connects to watchit via IPv4 and passes the
+A reverse proxy on the host avoids this: it connects to Couch Owl via IPv4 and passes the
 real IPv6 address on in `X-Forwarded-For`.
 
 ### HSTS
 
-With an https `SITE_URL`, watchit tells browsers to use only https for this host name for
+With an https `SITE_URL`, Couch Owl tells browsers to use only https for this host name for
 one year (HSTS, only for this exact name, not its subdomains). While you are still setting
 things up, or if your proxy already sends this header, set `HSTS_SECONDS=0`.
 

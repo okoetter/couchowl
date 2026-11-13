@@ -168,8 +168,8 @@ def health(request):
 def manifest(request):
     """PWA web app manifest. Served by Django so name and start URL are translatable."""
     data = {
-        "name": "watchit",
-        "short_name": "watchit",
+        "name": settings.APP_NAME,
+        "short_name": settings.APP_NAME,
         "description": _("Your watchlist for movies and TV shows"),
         "lang": request.LANGUAGE_CODE,
         "start_url": reverse("core:dashboard"),

@@ -12,7 +12,7 @@ from .regions import default_region, tmdb_language_for_region, ui_language_for_r
 
 
 class User(AbstractUser):
-    """watchit user. A custom model from day one makes later changes painless."""
+    """Couch Owl user. A custom model from day one makes later changes painless."""
 
     class Theme(models.TextChoices):
         AUTO = "auto", _("Automatic (system)")

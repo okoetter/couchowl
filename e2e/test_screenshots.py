@@ -185,7 +185,7 @@ def show_upcoming(page, url):
 def show_upcoming_busy(page, url):
     """ "Refresh all" shows a spinner while TMDB is asked."""
     show_upcoming(page, url)
-    # Keep the page: cancel the form submission after watchit.js has handled it
+    # Keep the page: cancel the form submission after couchowl.js has handled it
     # (window listeners run after the document listener)
     page.evaluate("window.addEventListener('submit', (event) => event.preventDefault())")
     page.get_by_role("button", name="Alle aktualisieren").click()

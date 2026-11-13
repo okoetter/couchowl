@@ -9,7 +9,7 @@ from django.core.cache import cache
 def client_ip(request) -> str:
     """The address of the client, also behind TRUSTED_PROXY_COUNT reverse proxies.
 
-    Used for watchit's rate limits and by django-axes (AXES_CLIENT_IP_CALLABLE).
+    Used for Couch Owl's rate limits and by django-axes (AXES_CLIENT_IP_CALLABLE).
 
     Each proxy appends the address it received the request from to X-Forwarded-For, the
     nearest proxy is REMOTE_ADDR. So with n trusted proxies, the client is the n-th entry

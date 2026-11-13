@@ -80,11 +80,11 @@ def test_reset_link_action_shows_link(admin_client, user):
 def test_invitation_link_uses_site_url(admin_client, add_url, settings):
     # Behind a reverse proxy the request may not carry the public host name
     settings.EMAIL_ENABLED = False
-    settings.SITE_URL = "https://watchit.example.com"
+    settings.SITE_URL = "https://couchowl.example.com"
 
     create_invitation(admin_client, add_url)
 
     invitation = Invitation.objects.get()
     change_url = reverse("admin:accounts_invitation_change", args=[invitation.pk])
     content = admin_client.get(change_url).content.decode()
-    assert f"https://watchit.example.com/accounts/register/{invitation.token}/" in content
+    assert f"https://couchowl.example.com/accounts/register/{invitation.token}/" in content

@@ -3,7 +3,7 @@
 <nav class="app-nav" aria-label="{% translate 'Main navigation' %}">
   <a class="app-brand" href="{% url 'core:dashboard' %}">
     <img src="{% static 'core/icon.svg' %}" alt="" width="28" height="28">
-    <strong>watchit</strong>
+    <strong>{{ APP_NAME }}</strong>
   </a>
   {% if user.is_authenticated %}
   <ul>
