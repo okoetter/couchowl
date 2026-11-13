@@ -214,6 +214,14 @@ POSTER_CACHE_DIR = DATA_DIR / "posters"
 # New seasons of followed shows that start within this many months are announced
 ANNOUNCEMENT_MONTHS = env.int("ANNOUNCEMENT_MONTHS", default=3)
 
+# --- About page and legal links ----------------------------------------------------
+# Source code link on the About page. The AGPL requires that users of a modified version
+# can get its source code: whoever runs a changed copy points this to their own code.
+SOURCE_URL = env("SOURCE_URL", default="https://github.com/okoetter/couchowl")
+# Optional links to the operator's legal notice and privacy policy (footer, About page)
+IMPRINT_URL = env("IMPRINT_URL", default="")
+PRIVACY_URL = env("PRIVACY_URL", default="")
+
 # --- Backups --------------------------------------------------------------------
 # `manage.py backup` (nightly in the container) writes a consistent copy of the SQLite
 # database here and keeps the newest BACKUP_KEEP. The host backs up this directory.

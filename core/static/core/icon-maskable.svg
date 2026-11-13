@@ -1,10 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Android "maskable" variant: full-bleed background, motif inside the 80% safe zone. -->
+  <!-- Android "maskable" variant: full-bleed background, motif inside the 80% safe zone.
+       The motif is a copy of the one in icon.svg. -->
   <rect width="512" height="512" fill="#1a2b4a"/>
   <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
-    <path d="M64 256c48-84 116-128 192-128s144 44 192 128c-48 84-116 128-192 128S112 340 64 256z"
-          fill="#ffffff"/>
-    <circle cx="256" cy="256" r="84" fill="#e8a33d"/>
-    <path d="M232 214v84l70-42z" fill="#1a2b4a"/>
+    <!-- couch back -->
+    <rect x="84" y="276" width="344" height="120" rx="36" fill="#b8473a"/>
+    <!-- owl -->
+    <g transform="matrix(0.8 0 0 0.8 51.2 24)">
+      <path d="M138 70 L196 118 Q256 104 316 118 L374 70 Q400 150 400 250 C400 370 340 446 256 446 C172 446 112 370 112 250 Q112 150 138 70 Z"
+            fill="#e8a33d"/>
+      <path d="M112 250 C112 330 132 396 176 432 C150 380 146 320 160 262 Z" fill="#c4842a"/>
+      <path d="M400 250 C400 330 380 396 336 432 C362 380 366 320 352 262 Z" fill="#c4842a"/>
+      <ellipse cx="256" cy="352" rx="76" ry="80" fill="#f7e2b8"/>
+      <path d="M222 336 l14 12 l14 -12 M262 336 l14 12 l14 -12 M242 370 l14 12 l14 -12"
+            fill="none" stroke="#c4842a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="200" cy="206" r="58" fill="#ffffff"/>
+      <circle cx="312" cy="206" r="58" fill="#ffffff"/>
+      <circle cx="206" cy="210" r="30" fill="#1a2b4a"/>
+      <circle cx="318" cy="210" r="30" fill="#1a2b4a"/>
+      <circle cx="215" cy="200" r="9" fill="#ffffff"/>
+      <circle cx="327" cy="200" r="9" fill="#ffffff"/>
+      <path d="M238 252 H274 L256 284 Z" fill="#1a2b4a"/>
+    </g>
+    <!-- seat, armrests and feet in front of the owl -->
+    <rect x="120" y="372" width="272" height="56" rx="18" fill="#d45a4b"/>
+    <rect x="64" y="332" width="72" height="112" rx="30" fill="#d45a4b"/>
+    <rect x="376" y="332" width="72" height="112" rx="30" fill="#d45a4b"/>
+    <rect x="92" y="440" width="20" height="22" rx="6" fill="#8a3329"/>
+    <rect x="400" y="440" width="20" height="22" rx="6" fill="#8a3329"/>
   </g>
 </svg>

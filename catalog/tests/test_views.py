@@ -127,13 +127,6 @@ def test_navigation_links_to_search(auth_client):
     assert f'href="{SEARCH}" aria-current="page"' in content
 
 
-def test_tmdb_attribution_in_footer(auth_client):
-    content = auth_client.get(reverse("core:dashboard")).content.decode()
-
-    assert "catalog/tmdb-logo.svg" in content
-    assert "Dieses Produkt nutzt die TMDB-API" in content
-
-
 # --- Poster proxy -------------------------------------------------------------------------
 
 

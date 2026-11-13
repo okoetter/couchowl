@@ -21,7 +21,7 @@ def test_app_name_appears_in_title_navigation_and_footer(auth_client):
     assert settings.APP_NAME == "Couch Owl"
     assert "· Couch Owl</title>" in content
     assert "<strong>Couch Owl</strong>" in content
-    assert f"<small>Couch Owl {settings.VERSION}</small>" in content
+    assert f"<span>Couch Owl {settings.VERSION}</span>" in content
 
 
 def test_assets_are_served_locally_without_cdn(auth_client):

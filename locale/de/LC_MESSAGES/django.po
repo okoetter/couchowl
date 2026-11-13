@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 21:54+0100\n"
+"POT-Creation-Date: 2026-11-13 22:32+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -1291,6 +1291,81 @@ msgstr "Dashboard"
 msgid "Upcoming"
 msgstr "Demnächst"
 
+#: core/templates/core/about.html:4 templates/base.html:47
+msgid "About"
+msgstr "Über"
+
+#: core/templates/core/about.html:12
+#, python-format
+msgid "Version %(version)s"
+msgstr "Version %(version)s"
+
+#: core/templates/core/about.html:15
+msgid "A self-hosted watchlist for movies and TV shows."
+msgstr "Eine selbst gehostete Watchlist für Filme und Serien."
+
+#: core/templates/core/about.html:18
+msgid "Free software"
+msgstr "Freie Software"
+
+#: core/templates/core/about.html:20
+#, python-format
+msgid ""
+"Couch Owl is free software: you may use, change and share it under the terms "
+"of the <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">GNU "
+"Affero General Public License</a>, version 3 or later."
+msgstr ""
+"Couch Owl ist freie Software: Du darfst sie unter den Bedingungen der <a "
+"href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">GNU Affero "
+"General Public License</a>, Version 3 oder später, nutzen, verändern und "
+"weitergeben."
+
+#: core/templates/core/about.html:27
+msgid ""
+"If you run a changed version for others, you must offer them its source code "
+"too."
+msgstr ""
+"Wer eine veränderte Version für andere betreibt, muss ihnen auch deren "
+"Quellcode anbieten."
+
+#: core/templates/core/about.html:32
+msgid "Source code:"
+msgstr "Quellcode:"
+
+#: core/templates/core/about.html:40
+msgid "Data sources"
+msgstr "Datenquellen"
+
+#: core/templates/core/about.html:47
+msgid ""
+"Movie and show information and posters come from The Movie Database (TMDB)."
+msgstr ""
+"Infos zu Filmen und Serien sowie die Poster stammen von The Movie Database "
+"(TMDB)."
+
+#: core/templates/core/about.html:48
+msgid ""
+"This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr ""
+"Dieses Produkt nutzt die TMDB-API, wird aber nicht von TMDB unterstützt oder "
+"zertifiziert."
+
+#: core/templates/core/about.html:51
+msgid "Streaming providers:"
+msgstr "Streaming-Anbieter:"
+
+#: core/templates/core/about.html:58
+msgid "Legal"
+msgstr "Rechtliches"
+
+#: core/templates/core/about.html:61 templates/base.html:48
+msgid "Legal notice"
+msgstr "Impressum"
+
+#: core/templates/core/about.html:64 templates/base.html:49
+msgid "Privacy"
+msgstr "Datenschutz"
+
 #: core/templates/core/dashboard.html:10
 msgid "Continue watching"
 msgstr "Weiterschauen"
@@ -1377,7 +1452,7 @@ msgid_plural "%(count)s shows refreshed."
 msgstr[0] "%(count)s Serie aktualisiert."
 msgstr[1] "%(count)s Serien aktualisiert."
 
-#: core/views.py:173
+#: core/views.py:186
 msgid "Your watchlist for movies and TV shows"
 msgstr "Deine Watchlist für Filme und Serien"
 
@@ -1391,14 +1466,3 @@ msgid ""
 msgstr ""
 "Schick diesen Link an die Person, die du einladen möchtest. Er kann nur "
 "einmal benutzt werden."
-
-#: templates/base.html:50
-msgid ""
-"This product uses the TMDB API but is not endorsed or certified by TMDB."
-msgstr ""
-"Dieses Produkt nutzt die TMDB-API, wird aber nicht von TMDB unterstützt oder "
-"zertifiziert."
-
-#: templates/base.html:52
-msgid "Streaming providers: JustWatch."
-msgstr "Streaming-Anbieter: JustWatch."

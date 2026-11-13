@@ -15,7 +15,7 @@ You need **git** and **[uv](https://docs.astral.sh/uv/)**. uv installs the right
 Docker: Docker Engine on Linux, Docker Desktop on macOS/Windows.
 
 ```sh
-git clone <repository-url> couchowl && cd couchowl
+git clone https://github.com/okoetter/couchowl.git && cd couchowl
 uv sync                              # creates .venv with all dependencies
 cp .env.example .env                 # Windows: copy .env.example .env
 ```
@@ -115,3 +115,8 @@ rsvg-convert -w 512 -h 512 icon-maskable.svg -o icon-maskable-512.png
   `fake_tmdb.add("/3/search/multi", json=load_tmdb_fixture("search_multi"))`.
   Saved (shortened) real responses live in `catalog/tests/fixtures/`.
 - Keep [CHANGELOG.md](CHANGELOG.md) up to date (Keep a Changelog format).
+
+## License
+
+Couch Owl is licensed under the [GNU Affero General Public License v3.0 or later](LICENSE).
+By contributing, you agree that your contributions are licensed under the same terms.

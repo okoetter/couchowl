@@ -156,6 +156,14 @@
   - **Name nur an einer Stelle:** `APP_NAME` in `config/settings.py`, im Template als `{{ APP_NAME }}` (Titel, Navigation, Fußzeile, PWA-Manifest, Standard-Absender). Interne Namen sind neutral (Context Processor `core.context_processors.app`, `APP_VERSION`, CSS-Variablen `--app-…`), damit eine spätere Umbenennung nichts Technisches mehr anfasst. Übersetzte Sätze enthalten den Namen direkt, weil das Deutsche ihn in Zusammensetzungen braucht.
   - **App-Icon mit Eule** folgt in 7b; bis dahin bleibt das Auge mit Play-Button.
 
+- **2026-11-13 – Meilenstein 7b (Open Source):**
+  - **App-Icon: Eule auf einem Sofa** (passend zum Namen), flache Farben auf dem bisherigen Dunkelblau. Bleibt auch als Favicon erkennbar.
+  - **Lizenz AGPL-3.0-or-later** („Version 3 oder später“, Empfehlung der FSF): Spätere Lizenzversionen lassen sich übernehmen, ohne alle Beitragenden fragen zu müssen. Originaltext von gnu.org als `LICENSE`; Beiträge stehen unter derselben Lizenz (CONTRIBUTING).
+  - **Über-Seite `/about/`, auch ohne Login erreichbar:** Version, Lizenz, Quellcode-Link, TMDB-Logo und -Hinweis, JustWatch. Öffentlich, weil Impressum, Datenschutz und (wegen der AGPL) der Quellcode für alle Besucher erreichbar sein sollen. Die TMDB-Bedingungen verlangen Logo und Hinweis in einem „About“- oder „Credits“-Bereich, deshalb steht beides nicht mehr in der Fußzeile. Die Fußzeile zeigt nur noch „Couch Owl 0.1.0 · Über · Impressum · Datenschutz“. „Quelle: JustWatch“ neben den Streaming-Anbietern auf Detailseiten bleibt.
+  - **`SOURCE_URL`** (Standard `https://github.com/okoetter/couchowl`) ist per Umgebungsvariable überschreibbar: Wer eine veränderte Version betreibt, muss nach der AGPL auf seinen eigenen Quellcode verweisen.
+  - **`IMPRINT_URL` und `PRIVACY_URL`** verlinken auf Seiten, die der Betreiber woanders veröffentlicht; Couch Owl hostet keine Rechtstexte. `docs/deployment.md` listet, welche Daten Couch Owl speichert, als Grundlage für eine Datenschutzerklärung.
+  - **`docs/deployment.md` als vollständige Installationsanleitung** (Voraussetzungen, TMDB-Token, Einstellungen, Updates, Logs). Bis 7c baut Docker das Image aus dem geklonten Repo; mit den Images auf GHCR stellt 7c die Anleitung auf `image: ghcr.io/okoetter/couchowl` um.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -187,7 +195,7 @@ Couch Owl ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft 
     - **Texte und Metadaten** (Titel, Beschreibungen, Staffeln, Folgen, Anbieter): Der Server fragt TMDB ab und speichert die Ergebnisse pro Sprache in der Datenbank; angezeigt wird immer aus der Datenbank
     - **Poster und Bilder:** Der Server lädt sie von TMDB und cacht sie auf der Platte (Volume, nur erlaubte Bildgrößen)
     - **Aktualisierung** über die drei Wege aus „TMDB-Datenabruf“: Der Button „Jetzt aktualisieren“ erneuert Texte **und** Poster eines Titels, „Alle aktualisieren“ und der tägliche Sync entsprechend für alle betroffenen Titel
-  - Optionale Links zu Impressum und Datenschutzerklärung im Footer über `IMPRINT_URL` und `PRIVACY_URL`
+  - Optionale Links zu Impressum und Datenschutzerklärung im Footer und auf der Über-Seite über `IMPRINT_URL` und `PRIVACY_URL`
 - **Mehrsprachigkeit:**
   - keine hartkodierten Texte; Sprachdateien (gettext `.po`); Quelltexte Englisch, **Englisch ist Standard**, Deutsch die erste Übersetzung
   - **Region** (Land für Streaming-Anbieter, Veröffentlichungsdaten, Altersfreigaben) ist die Haupteinstellung:
@@ -407,8 +415,8 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
 7. **Produktionsreife und Open Source** (aufgeteilt, siehe Änderungsprotokoll 2026-11-13)
    - **7a – Betrieb:** Security-Settings hinter dem Reverse Proxy (ohne, einer oder mehrere Proxys; IPv4 und IPv6), echte Client-IP für Brute-Force-Schutz und Drosselung, `backup`-Befehl mit Rotation, eingebunden über supercronic
    - **Namenssuche** und Umbenennung vor 7b → „Couch Owl“ (2026-11-13)
-   - **7b – Open Source:** Eulen-App-Icon, Über-Seite (Version, Lizenz, Link zum Quellcode, TMDB-Logo und -Hinweis, JustWatch), `IMPRINT_URL` und `PRIVACY_URL`, Lizenz AGPL-3.0, README und `docs/deployment.md` (allgemeines Docker-Deployment)
-   - **7c – CI und Release:** GitHub Actions (Tests mit Matrix Ubuntu/macOS/Windows, E2E-Tests, Docker-Smoke-Test), Multi-Arch-Images auf GHCR mit Versions-Tags, `1.0.0-rc.1`; `1.0.0` nach erfolgreichem NAS-Deployment
+   - **7b – Open Source** (erledigt 2026-11-13): Eulen-App-Icon, Über-Seite (Version, Lizenz, Link zum Quellcode, TMDB-Logo und -Hinweis, JustWatch), `IMPRINT_URL` und `PRIVACY_URL`, Lizenz AGPL-3.0, README und `docs/deployment.md` (allgemeines Docker-Deployment)
+   - **7c – CI und Release:** Deployment-Doku auf das GHCR-Image umstellen, GitHub Actions (Tests mit Matrix Ubuntu/macOS/Windows, E2E-Tests, Docker-Smoke-Test), Multi-Arch-Images auf GHCR mit Versions-Tags, `1.0.0-rc.1`; `1.0.0` nach erfolgreichem NAS-Deployment
 
 ## Backlog (ToDo, nach dem MVP)
 Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.

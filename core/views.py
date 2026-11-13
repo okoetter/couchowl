@@ -164,6 +164,19 @@ def health(request):
 
 @login_not_required
 @require_GET
+def about(request):
+    """Version, license, source code and data sources (TMDB, JustWatch). Public, so that
+    the source code (AGPL) and the legal links are available to every visitor."""
+    context = {
+        "source_url": settings.SOURCE_URL,
+        # Shown without "https://", e.g. "github.com/okoetter/couchowl"
+        "source_label": settings.SOURCE_URL.split("://", 1)[-1].rstrip("/"),
+    }
+    return render(request, "core/about.html", context)
+
+
+@login_not_required
+@require_GET
 @cache_control(max_age=86400)
 def manifest(request):
     """PWA web app manifest. Served by Django so name and start URL are translatable."""

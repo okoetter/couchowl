@@ -75,8 +75,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `BACKUP_KEEP` copies (default 3) for the host's backup
 - `docs/deployment.md`: running behind a reverse proxy, IPv6, HSTS; restoring a backup in
   `docs/administration.md`
+- App icon: an owl on a couch
+- About page (also without login): version, license, source code link, TMDB logo and
+  notice, JustWatch credit
+- `IMPRINT_URL` and `PRIVACY_URL`: optional links to the operator's legal notice and
+  privacy policy, in the footer and on the About page
+- `SOURCE_URL`: source code link on the About page (for modified versions, see license)
+- License: GNU Affero General Public License v3.0 or later (`LICENSE`)
+- `docs/deployment.md`: complete installation guide (TMDB token, settings, updates, logs,
+  notes for a privacy policy)
 
 ### Changed
+- The footer only shows the version and links (About, legal notice, privacy); the TMDB and
+  JustWatch credits moved to the About page
 - `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` are optional extras now (`SITE_URL` covers them)
 - gunicorn no longer trusts `X-Forwarded-Proto` from any sender; only Django does, and only
   with `TRUSTED_PROXY_COUNT` set

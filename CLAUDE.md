@@ -49,6 +49,8 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - Proxy/HTTPS settings are derived in `config/security.py` from `SITE_URL` and
   `TRUSTED_PROXY_COUNT`. Client IP for rate limits and axes: always `accounts.throttle.client_ip`.
   Absolute links (e-mails, admin): `accounts.links.base_url`, never `build_absolute_uri`.
+- TMDB logo/notice and the JustWatch credit live on the About page (`core/about.html`, TMDB
+  terms); the footer only links to it. Detail pages keep "Source: JustWatch" next to providers.
 - `manage.py backup` (`core/backups.py`) only makes a consistent SQLite copy; the host backs it up.
 
 ## Commands

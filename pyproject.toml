@@ -3,6 +3,8 @@ name = "couchowl"
 version = "0.1.0"
 description = "Self-hosted watchlist for movies and TV shows, powered by TMDB"
 readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.15"
 dependencies = [
     "babel>=2.18.0",
@@ -14,6 +16,10 @@ dependencies = [
     "httpx>=0.28.1",
     "whitenoise>=6.12.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/okoetter/couchowl"
+Changelog = "https://github.com/okoetter/couchowl/blob/main/CHANGELOG.md"
 
 [tool.uv]
 # Couch Owl is an application, not a library: don't build/install it as a package

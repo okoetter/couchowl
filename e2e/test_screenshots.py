@@ -192,6 +192,23 @@ def show_upcoming_busy(page, url):
     page.wait_for_selector("button[aria-busy='true']")
 
 
+def show_about(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/about/")
+    page.wait_for_load_state("networkidle")
+
+
+def show_about_public(page, url):
+    """Logged out, with legal links configured (footer and "Legal" section)."""
+    from django.test import override_settings
+
+    with override_settings(
+        IMPRINT_URL="https://example.com/impressum", PRIVACY_URL="https://example.com/datenschutz"
+    ):
+        page.goto(f"{url}/about/")
+        page.wait_for_load_state("networkidle")
+
+
 def show_dashboard_empty(page, url):
     from accounts.models import User
     from e2e.conftest import PASSWORD
@@ -228,6 +245,8 @@ PAGES = {
     "dashboard-empty": show_dashboard_empty,
     "upcoming": show_upcoming,
     "upcoming-busy": show_upcoming_busy,
+    "about": show_about,
+    "about-public": show_about_public,
 }
 
 

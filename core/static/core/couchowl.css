@@ -223,21 +223,58 @@ textarea + .errorlist {
   justify-content: center;
 }
 
-/* ---- Footer: TMDB attribution ------------------------------------------------ */
+/* ---- Footer: version and links, separated by dots ---------------------------- */
 
-.tmdb-attribution {
+.site-footer small {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   justify-content: center;
-  gap: 0.25rem 0.5rem;
-  margin-top: 0.25rem;
-  font-size: 0.8em;
+  gap: 0 0.5rem;
 }
 
-.tmdb-attribution img {
+.site-footer small > * + *::before {
+  content: "·";
+  /* Keep the link underline off the dot (Pico lets ::before inherit text-decoration) */
+  display: inline-block;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  color: var(--pico-muted-color);
+}
+
+.site-footer a {
+  color: inherit;
+}
+
+/* ---- About page ------------------------------------------------------------------- */
+
+.about {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+
+.about-header img {
+  border-radius: 22%;
+}
+
+.about-header hgroup {
+  margin: 0;
+}
+
+.about h2 {
+  margin-top: calc(var(--pico-spacing) * 2);
+  font-size: 1.25rem;
+}
+
+.about-tmdb img {
   display: block;
-  height: 0.7rem;
+  height: 1.25rem;
   width: auto;
 }
 

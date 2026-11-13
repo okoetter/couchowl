@@ -10,4 +10,6 @@ def app(request):
         "APP_VERSION": settings.VERSION,
         "theme": theme,
         "email_enabled": settings.EMAIL_ENABLED,
+        "imprint_url": settings.IMPRINT_URL,
+        "privacy_url": settings.PRIVACY_URL,
     }

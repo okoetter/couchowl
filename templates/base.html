@@ -40,17 +40,14 @@
   {# Short messages after htmx actions, e.g. "S2 E5 watched · Undo" (see catalog/_toast.html) #}
   <div id="toast" class="toast-region" aria-live="polite">{% block toast %}{% endblock %}</div>
 
+  {# Version and links; the TMDB and JustWatch credits are on the About page #}
   <footer class="container site-footer">
-    <small>{{ APP_NAME }} {{ APP_VERSION }}</small>
-    {# Required by the TMDB terms of use. The logo is served locally like everything else. #}
-    <p class="tmdb-attribution">
-      <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
-        <img src="{% static 'catalog/tmdb-logo.svg' %}" alt="TMDB" width="80" height="10">
-      </a>
-      <small>{% translate "This product uses the TMDB API but is not endorsed or certified by TMDB." %}</small>
-      {# TMDB terms: streaming providers come from JustWatch and must be attributed #}
-      <small>{% translate "Streaming providers: JustWatch." %}</small>
-    </p>
+    <small>
+      <span>{{ APP_NAME }} {{ APP_VERSION }}</span>
+      <a href="{% url 'core:about' %}">{% translate "About" %}</a>
+      {% if imprint_url %}<a href="{{ imprint_url }}" rel="noopener noreferrer">{% translate "Legal notice" %}</a>{% endif %}
+      {% if privacy_url %}<a href="{{ privacy_url }}" rel="noopener noreferrer">{% translate "Privacy" %}</a>{% endif %}
+    </small>
   </footer>
 </body>
 </html>

@@ -17,10 +17,10 @@
   consistent database copy (`manage.py backup`, rotation) for the host's backup to pick up
 - [x] **Name:** "watchit" was a placeholder; the project is now called **Couch Owl**
   (technical name `couchowl`). The owl app icon follows in 7b
-- [ ] **7b – Open source:** owl app icon, "About" page (version, license, source code link, TMDB logo and
+- [x] **7b – Open source:** owl app icon, "About" page (version, license, source code link, TMDB logo and
   notice, JustWatch credit; the footer shrinks to a link), `IMPRINT_URL`/`PRIVACY_URL`,
   AGPL-3.0 license, README, `docs/deployment.md`
-- [ ] **7c – CI and release:** GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
+- [ ] **7c – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   deployment on the NAS
 

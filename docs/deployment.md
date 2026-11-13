@@ -5,6 +5,67 @@ data in the volume `/data` (database, poster cache, backups). HTTPS comes from a
 proxy in front of it. This guide is independent of the host; any machine with Docker works.
 For accounts, e-mail and backups see [administration.md](administration.md).
 
+## Requirements
+
+- Docker with the Compose plugin (`docker compose version`), on amd64 or arm64.
+  A small NAS or a Raspberry Pi is enough: Couch Owl uses SQLite by default (PostgreSQL is
+  optional) and runs two web server processes (`WEB_WORKERS`) plus a scheduler.
+- A free account at [TMDB](https://www.themoviedb.org/) for the API token (see below).
+- For access from the internet: a domain name and a reverse proxy with HTTPS.
+
+## Installation
+
+1. **Get the files.** Until prebuilt images are published, Docker builds the image from
+   the source code on the first start:
+
+   ```sh
+   git clone https://github.com/okoetter/couchowl.git
+   cd couchowl
+   ```
+
+2. **Configure.** Copy the example configuration and edit it:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+   Every setting is explained in `.env.example`. Set at least:
+
+   | Setting | Value |
+   |---|---|
+   | `SECRET_KEY` | A long random value, e.g. from `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`. Keep it secret; changing it logs everybody out. |
+   | `SITE_URL` | The address people will use, see [below](#two-settings-that-matter). |
+   | `TRUSTED_PROXY_COUNT` | `1` behind a reverse proxy, `0` without. |
+   | `TMDB_API_TOKEN` | Your TMDB token, see [below](#tmdb-api-token). |
+   | `TIME_ZONE` | Your time zone, e.g. `Europe/Berlin` (for "today" and air dates). |
+
+   Optional: `DEFAULT_REGION` (country for new users, e.g. `DE`), `EMAIL_URL` for
+   invitations and password resets by e-mail, `IMPRINT_URL` and `PRIVACY_URL` (see
+   [Legal notice and privacy policy](#legal-notice-and-privacy-policy)).
+
+3. **Start.**
+
+   ```sh
+   docker compose up -d --build
+   ```
+
+   After a minute, `docker compose ps` shows the container as `healthy`, and
+   <http://localhost:8000/healthz/> answers with `{"status": "ok", …}`.
+
+4. **Create the first admin** and invite people, see
+   [administration.md](administration.md#create-the-first-admin).
+
+### TMDB API token
+
+Couch Owl loads all movie and show information from TMDB. Without a token, search and
+detail pages don't work.
+
+1. Create a free account at [themoviedb.org](https://www.themoviedb.org/signup).
+2. Open **Settings → API** and request an API key (type "Developer"; describe it as a
+   personal, non-commercial watchlist).
+3. Copy the **API Read Access Token** (a long value starting with `eyJ`), not the short
+   "API Key", into `TMDB_API_TOKEN`.
+
 ## Two settings that matter
 
 | Setting | Meaning |
@@ -97,6 +158,47 @@ real IPv6 address on in `X-Forwarded-For`.
 With an https `SITE_URL`, Couch Owl tells browsers to use only https for this host name for
 one year (HSTS, only for this exact name, not its subdomains). While you are still setting
 things up, or if your proxy already sends this header, set `HSTS_SECONDS=0`.
+
+## Legal notice and privacy policy
+
+Depending on your country, a website that strangers can reach may need a legal notice
+(e.g. the German "Impressum") or a privacy policy. Couch Owl doesn't host these pages; it
+links to pages you publish elsewhere:
+
+```ini
+IMPRINT_URL=https://example.com/legal-notice
+PRIVACY_URL=https://example.com/privacy
+```
+
+The links appear in the footer of every page and on the About page, also for visitors who
+aren't logged in.
+
+For a privacy policy: Couch Owl stores the account data (user name, optional e-mail
+address, settings), the lists and what was watched when, in its own database. It sets only
+the cookies it needs (login session, form protection, short status messages). Browsers never contact
+TMDB or other third parties; Couch Owl itself talks to TMDB (without any user data) and
+serves the posters itself.
+
+## Updates
+
+Read the [changelog](../CHANGELOG.md) first, then:
+
+```sh
+git pull
+docker compose up -d --build
+```
+
+Database changes (migrations) run automatically when the container starts. Older backups
+can still be restored afterwards: they are brought up to date on the next start.
+
+## Logs
+
+```sh
+docker compose logs -f couchowl
+```
+
+Lines from the web server start with `web |`, those from the nightly jobs (TMDB sync,
+backup) with `cron |`. `LOG_LEVEL=DEBUG` in `.env` shows more.
 
 ## Data and backups
 

@@ -159,9 +159,3 @@ def test_detail_page_without_offers(auth_client, user, fake_tmdb):
     content = content.decode()
 
     assert "Keine Streaming-Angebote in Deutschland bekannt." in content
-
-
-def test_footer_names_justwatch(auth_client):
-    content = auth_client.get(reverse("core:dashboard")).content.decode()
-
-    assert "Streaming-Anbieter: JustWatch." in content

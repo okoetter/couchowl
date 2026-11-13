@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% translate "About" %}{% endblock %}
+
+{% block content %}
+  <div class="about">
+    <header class="about-header">
+      <img src="{% static 'core/icon.svg' %}" alt="" width="96" height="96">
+      <hgroup>
+        <h1>{{ APP_NAME }}</h1>
+        <p>{% blocktranslate with version=APP_VERSION %}Version {{ version }}{% endblocktranslate %}</p>
+      </hgroup>
+    </header>
+    <p>{% translate "A self-hosted watchlist for movies and TV shows." %}</p>
+
+    <section aria-labelledby="about-license">
+      <h2 id="about-license">{% translate "Free software" %}</h2>
+      <p>
+        {% blocktranslate trimmed with url="https://www.gnu.org/licenses/agpl-3.0.html" %}
+          Couch Owl is free software: you may use, change and share it under the terms of the
+          <a href="{{ url }}" target="_blank" rel="noopener noreferrer">GNU Affero General Public
+          License</a>, version 3 or later.
+        {% endblocktranslate %}
+      </p>
+      <p>
+        {% blocktranslate trimmed %}
+          If you run a changed version for others, you must offer them its source code too.
+        {% endblocktranslate %}
+      </p>
+      <p>
+        {% translate "Source code:" %}
+        <a href="{{ source_url }}" target="_blank" rel="noopener noreferrer">{{ source_label }}</a>
+      </p>
+    </section>
+
+    {# Required by the TMDB terms of use (logo and notice in an "About" section). #}
+    {# Streaming providers come from JustWatch via TMDB and must be attributed. #}
+    <section aria-labelledby="about-sources">
+      <h2 id="about-sources">{% translate "Data sources" %}</h2>
+      <p class="about-tmdb">
+        <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">
+          <img src="{% static 'catalog/tmdb-logo.svg' %}" alt="The Movie Database (TMDB)" width="160" height="20">
+        </a>
+      </p>
+      <p>
+        {% translate "Movie and show information and posters come from The Movie Database (TMDB)." %}
+        {% translate "This product uses the TMDB API but is not endorsed or certified by TMDB." %}
+      </p>
+      <p>
+        {% translate "Streaming providers:" %}
+        <a href="https://www.justwatch.com/" target="_blank" rel="noopener noreferrer">JustWatch</a>
+      </p>
+    </section>
+
+    {% if imprint_url or privacy_url %}
+      <section aria-labelledby="about-legal">
+        <h2 id="about-legal">{% translate "Legal" %}</h2>
+        <ul>
+          {% if imprint_url %}
+            <li><a href="{{ imprint_url }}" rel="noopener noreferrer">{% translate "Legal notice" %}</a></li>
+          {% endif %}
+          {% if privacy_url %}
+            <li><a href="{{ privacy_url }}" rel="noopener noreferrer">{% translate "Privacy" %}</a></li>
+          {% endif %}
+        </ul>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}
