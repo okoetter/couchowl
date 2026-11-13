@@ -66,6 +66,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to mark those too (only the same season, or all), with the date "unknown" and "Undo"
 - TMDB ratings ("★ 8.4") on detail pages (with the number of votes), in lists and in
   search; overviews only show ratings with at least 10 votes
+- `SITE_URL` setting: one address for allowed host, trusted origin, secure cookies, HSTS
+  and the links in e-mails
+- Reverse proxy support: `TRUSTED_PROXY_COUNT` makes brute-force protection and rate limits
+  use the real client address (IPv4 and IPv6) from `X-Forwarded-For`; forged entries are
+  ignored
+- Nightly consistent database copy (`manage.py backup`, 03:00 UTC) to `BACKUP_DIR`, keeping
+  `BACKUP_KEEP` copies (default 3) for the host's backup
+- `docs/deployment.md`: running behind a reverse proxy, IPv6, HSTS; restoring a backup in
+  `docs/administration.md`
+
+### Changed
+- `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` are optional extras now (`SITE_URL` covers them)
+- gunicorn no longer trusts `X-Forwarded-Proto` from any sender; only Django does, and only
+  with `TRUSTED_PROXY_COUNT` set
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

@@ -12,7 +12,7 @@
 - [x] Show page: "Mark earlier episodes too?" after marking an episode or season with gaps
   before it
 - [x] TMDB ratings on detail pages, in lists and in search
-- [ ] **7a – Operations:** security settings behind a reverse proxy (with, without or several
+- [x] **7a – Operations:** security settings behind a reverse proxy (with, without or several
   proxies; IPv4 and IPv6), real client IP for brute-force protection and rate limits, nightly
   consistent database copy (`manage.py backup`, rotation) for the host's backup to pick up
 - [ ] **Name:** find the final project name ("watchit" is a placeholder) and rename before 7b

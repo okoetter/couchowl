@@ -1,5 +1,7 @@
 # Scheduled jobs inside the container (run by supercronic). Times are UTC.
-# Milestone 7 adds the database backup.
+
+# Consistent copy of the database to $BACKUP_DIR (default /data/backups) for the host's backup
+0 3 * * * python manage.py backup
 
 # Remove expired login sessions
 15 3 * * * python manage.py clearsessions

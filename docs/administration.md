@@ -70,6 +70,51 @@ docker compose exec watchit python manage.py sync_tmdb --force -v 2 # all shows,
 Users can also reload a single title ("Refresh now" on its page) or all shows they follow
 ("Refresh all" on the page "Upcoming").
 
+## Backups and restore
+
+watchit stores everything in one SQLite file (`/data/db.sqlite3`). Copying that file while
+watchit writes to it can give a broken copy. So every night (03:00 UTC) the container runs
+`manage.py backup`, which writes a consistent copy to `BACKUP_DIR` (default `/data/backups`)
+and keeps the newest `BACKUP_KEEP` copies (default 3):
+
+```
+/data/backups/watchit-20261113-030000.sqlite3
+```
+
+**watchit does not keep your backups safe – that is your host's job.** Include the backup
+folder in your regular backup (another disk, another machine, the cloud), with as many
+versions as you like. Back up the copies, not the live `db.sqlite3`. To make that easier,
+mount a host folder for the copies (see `docker-compose.yml`, then set `BACKUP_DIR`).
+The poster cache needs no backup; posters are downloaded again when needed.
+
+Make a copy by hand, e.g. before an update:
+
+```sh
+docker compose exec watchit python manage.py backup
+```
+
+### Restore
+
+Stop watchit first, so nothing writes to the database while it is replaced. Then copy a
+backup over the database and start watchit again:
+
+```sh
+docker compose stop
+docker compose run --rm --entrypoint cp watchit /data/backups/watchit-20261113-030000.sqlite3 /data/db.sqlite3
+docker compose start
+```
+
+Everything is back to the state of that backup (accounts, lists, watched episodes). On
+start, watchit updates an older backup to the current database schema automatically.
+List the available copies with
+`docker compose run --rm --entrypoint ls watchit -l /data/backups`.
+
+### PostgreSQL
+
+With `DATABASE_URL` pointing to PostgreSQL, `manage.py backup` refuses to run. Use
+PostgreSQL's own tools instead, e.g.
+`docker compose exec db pg_dump -U watchit watchit > watchit.sql`.
+
 ## Set up e-mail
 
 E-mail is optional. Configure it in `.env` (not in the admin) and restart the container:

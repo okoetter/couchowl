@@ -1,2 +1,2 @@
-web: gunicorn config.wsgi --bind 0.0.0.0:8000 --workers ${WEB_WORKERS:-2} --access-logfile - --forwarded-allow-ips="*" --no-control-socket
+web: gunicorn config.wsgi --bind 0.0.0.0:8000 --workers ${WEB_WORKERS:-2} --access-logfile - --no-control-socket
 cron: supercronic -quiet -no-reap /app/docker/crontab

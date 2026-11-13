@@ -17,6 +17,9 @@ services:
       - "8000:8000"
     volumes:
       - watchit-data:/data
+      # Optional: nightly database copies into a host folder your backup already covers
+      # (then set BACKUP_DIR=/backups in .env; the folder must be writable by uid 1000)
+      # - /volume1/backup/watchit:/backups
 
   # Optional: PostgreSQL instead of SQLite. Uncomment, then set in .env:
   # DATABASE_URL=postgres://watchit:change-me@db:5432/watchit

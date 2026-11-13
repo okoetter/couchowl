@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.debug import sensitive_post_parameters
 
-from . import throttle
+from . import links, throttle
 from .forms import ProfileForm, RegistrationForm
 from .models import Invitation
 
@@ -90,6 +90,11 @@ class PasswordResetView(EmailRequiredMixin, auth_views.PasswordResetView):
     subject_template_name = "accounts/email/password_reset_subject.txt"
     email_template_name = "accounts/email/password_reset_body.txt"
     success_url = reverse_lazy("accounts:password_reset_done")
+
+    @property
+    def extra_email_context(self):
+        # Link in the e-mail: SITE_URL if configured (see links.base_url)
+        return {"base_url": links.base_url(self.request)}
 
     def post(self, request, *args, **kwargs):
         allowed = throttle.hit(

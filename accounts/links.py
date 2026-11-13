@@ -1,5 +1,6 @@
 """Build and send invitation and password reset links."""
 
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -9,9 +10,17 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 
+def base_url(request) -> str:
+    """Scheme and host for links in e-mails and the admin, e.g. "https://watchit.example.com".
+
+    SITE_URL if configured: reverse proxies don't always pass on the public host name.
+    """
+    return settings.SITE_URL or f"{request.scheme}://{request.get_host()}"
+
+
 def invitation_url(request, invitation) -> str:
     """Absolute URL of the registration page for this invitation."""
-    return request.build_absolute_uri(invitation.get_absolute_url())
+    return base_url(request) + invitation.get_absolute_url()
 
 
 def password_reset_url(request, user) -> str:
@@ -23,7 +32,7 @@ def password_reset_url(request, user) -> str:
             "token": default_token_generator.make_token(user),
         },
     )
-    return request.build_absolute_uri(path)
+    return base_url(request) + path
 
 
 def send_invitation_email(request, invitation) -> None:

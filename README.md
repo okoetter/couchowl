@@ -18,7 +18,7 @@ A self-hosted watchlist for movies and TV shows.
 ## Quick start (Docker)
 
 ```sh
-cp .env.example .env    # then edit: SECRET_KEY, ALLOWED_HOSTS, TMDB_API_TOKEN
+cp .env.example .env    # then edit: SECRET_KEY, SITE_URL, TMDB_API_TOKEN
 docker compose up -d --build
 ```
 
@@ -28,8 +28,10 @@ Create the first admin account, then open <http://localhost:8000>:
 docker compose exec watchit python manage.py createsuperuser
 ```
 
-All settings are documented in [.env.example](.env.example). Inviting users, password resets
-and e-mail setup are described in [docs/administration.md](docs/administration.md).
+All settings are documented in [.env.example](.env.example). Running watchit behind a
+reverse proxy with HTTPS is described in [docs/deployment.md](docs/deployment.md); inviting
+users, password resets, e-mail setup and backups in
+[docs/administration.md](docs/administration.md).
 
 ## Development
 

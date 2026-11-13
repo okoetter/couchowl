@@ -143,3 +143,69 @@ def test_other_users_are_not_affected_by_a_lockout(client, user, settings):
     response = client.post(login_url, {"username": "anna", "password": PASSWORD})
 
     assert response.status_code == 302
+
+
+# --- Behind a reverse proxy --------------------------------------------------------
+# All requests come from the proxy's address; the client is in X-Forwarded-For.
+
+PROXY = {"REMOTE_ADDR": "172.18.0.1"}
+
+
+def from_client(address):
+    return {**PROXY, "HTTP_X_FORWARDED_FOR": address}
+
+
+def test_lockout_is_per_client_behind_a_proxy(client, user, settings):
+    settings.TRUSTED_PROXY_COUNT = 1
+    login_url = reverse("accounts:login")
+    for _ in range(settings.AXES_FAILURE_LIMIT):
+        client.post(
+            login_url, {"username": "oliver", "password": "wrong"}, **from_client("203.0.113.5")
+        )
+
+    attacker = client.post(
+        login_url, {"username": "oliver", "password": PASSWORD}, **from_client("203.0.113.5")
+    )
+    owner = client.post(
+        login_url, {"username": "oliver", "password": PASSWORD}, **from_client("2001:db8::7")
+    )
+
+    assert attacker.status_code == 429
+    assert owner.status_code == 302
+
+
+def test_forged_forwarded_for_does_not_escape_the_lockout(client, user, settings):
+    settings.TRUSTED_PROXY_COUNT = 1
+    login_url = reverse("accounts:login")
+    for attempt in range(settings.AXES_FAILURE_LIMIT):
+        # The attacker sends a new fake address each time; the proxy appends the real one
+        client.post(
+            login_url,
+            {"username": "oliver", "password": "wrong"},
+            **from_client(f"10.9.9.{attempt}, 203.0.113.5"),
+        )
+
+    response = client.post(
+        login_url, {"username": "oliver", "password": PASSWORD}, **from_client("203.0.113.5")
+    )
+
+    assert response.status_code == 429
+
+
+def test_reset_rate_limit_is_per_client_behind_a_proxy(client, user, settings):
+    settings.TRUSTED_PROXY_COUNT = 1
+    url = reverse("accounts:password_reset")
+    for _ in range(settings.PASSWORD_RESET_RATE_LIMIT + 1):
+        client.post(url, {"email": "oliver@example.com"}, **from_client("203.0.113.5"))
+
+    other = client.post(url, {"email": "oliver@example.com"}, **from_client("198.51.100.8"))
+
+    assert other.status_code == 302
+
+
+def test_reset_email_link_uses_site_url(client, user, settings):
+    settings.SITE_URL = "https://watchit.example.com"
+
+    request_reset(client, "oliver@example.com")
+
+    assert "https://watchit.example.com/accounts/password/reset/" in mail.outbox[0].body

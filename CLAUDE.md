@@ -46,6 +46,10 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
 - UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at
   the images in `screenshots/` (light/dark, desktop/phone) before asking Oliver to test.
 - Form fields render via `core/templates/forms/field.html` (label, input, errors, help text).
+- Proxy/HTTPS settings are derived in `config/security.py` from `SITE_URL` and
+  `TRUSTED_PROXY_COUNT`. Client IP for rate limits and axes: always `accounts.throttle.client_ip`.
+  Absolute links (e-mails, admin): `accounts.links.base_url`, never `build_absolute_uri`.
+- `manage.py backup` (`core/backups.py`) only makes a consistent SQLite copy; the host backs it up.
 
 ## Commands
 - Dev server: `uv run python manage.py runserver` (needs `.env`, copy from `.env.example`, `DEBUG=True`)

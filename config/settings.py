@@ -11,6 +11,7 @@ from pathlib import Path
 import environ
 
 from config.mail import mailer_from_url
+from config.security import security_settings
 from config.version import get_version
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,9 +26,45 @@ VERSION = get_version()
 
 DEBUG = env.bool("DEBUG", default=False)
 SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-only-change-me" if DEBUG else None)
+
+# --- Address, reverse proxy and HTTPS (rules: config/security.py) ------------------
+# SITE_URL: the public address, e.g. https://watchit.example.com. Determines the allowed
+# host, trusted origin for forms, secure cookies and HSTS, and the links in e-mails.
+# TRUSTED_PROXY_COUNT: number of reverse proxies in front of watchit (like Express's
+# "trust proxy"). Only then are X-Forwarded-For/-Proto believed.
+TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT", default=0)
+_security = security_settings(
+    env("SITE_URL", default=""),
+    TRUSTED_PROXY_COUNT,
+    env.int("HSTS_SECONDS", default=None),
+)
+SITE_URL = _security.site_url
 # localhost is always allowed so the container healthcheck works with any configuration
-ALLOWED_HOSTS = [*env.list("ALLOWED_HOSTS", default=[]), "localhost", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+ALLOWED_HOSTS = [
+    *_security.allowed_hosts,
+    *env.list("ALLOWED_HOSTS", default=[]),
+    "localhost",
+    "127.0.0.1",
+]
+CSRF_TRUSTED_ORIGINS = [
+    *_security.csrf_trusted_origins,
+    *env.list("CSRF_TRUSTED_ORIGINS", default=[]),
+]
+SECURE_PROXY_SSL_HEADER = _security.proxy_ssl_header
+# Cookies only travel over https (if SITE_URL uses https)
+SESSION_COOKIE_SECURE = _security.https
+CSRF_COOKIE_SECURE = _security.https
+# HSTS: browsers remember to use only https for this host. Not for subdomains (they may
+# belong to other services) and no preload list (hard to undo).
+SECURE_HSTS_SECONDS = _security.hsts_seconds
+# No http -> https redirect (SECURE_SSL_REDIRECT): the reverse proxy does that, and the
+# container's healthcheck talks plain http.
+# `manage.py check --deploy` warns about these deliberate choices:
+SILENCED_SYSTEM_CHECKS = [
+    "security.W005",  # HSTS without subdomains
+    "security.W021",  # HSTS without preload
+    "security.W008",  # no SSL redirect
+]
 
 # Directory for all runtime data: database, poster cache, backups.
 # In Docker this is a volume mounted at /data.
@@ -125,6 +162,9 @@ AXES_COOLOFF_TIME = timedelta(minutes=env.int("AXES_COOLOFF_MINUTES", default=60
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 AXES_RESET_ON_SUCCESS = True
 AXES_LOCKOUT_TEMPLATE = "accounts/locked_out.html"
+# The real client address behind reverse proxies (TRUSTED_PROXY_COUNT), same as for
+# watchit's own rate limits
+AXES_CLIENT_IP_CALLABLE = "accounts.throttle.client_ip"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -170,6 +210,13 @@ POSTER_CACHE_DIR = DATA_DIR / "posters"
 # --- Dashboard ------------------------------------------------------------------
 # New seasons of followed shows that start within this many months are announced
 ANNOUNCEMENT_MONTHS = env.int("ANNOUNCEMENT_MONTHS", default=3)
+
+# --- Backups --------------------------------------------------------------------
+# `manage.py backup` (nightly in the container) writes a consistent copy of the SQLite
+# database here and keeps the newest BACKUP_KEEP. The host backs up this directory.
+
+BACKUP_DIR = Path(env("BACKUP_DIR", default=str(DATA_DIR / "backups")))
+BACKUP_KEEP = env.int("BACKUP_KEEP", default=3)
 
 # --- Cache ----------------------------------------------------------------------
 # File-based, so all gunicorn worker processes share it (rate limits, TMDB search results).

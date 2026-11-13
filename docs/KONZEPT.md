@@ -141,6 +141,13 @@
   - **Erst `1.0.0-rc.1`:** CI baut das Image, Oliver installiert es auf dem NAS; `1.0.0` folgt erst, wenn es dort läuft.
   - **Content Security Policy ins Backlog:** Die Standardversion von Alpine.js braucht `unsafe-eval`, eine strenge Policy erst mit der CSP-Version von Alpine.
 
+- **2026-11-13 – Meilenstein 7a (Betrieb):**
+  - **`SITE_URL` als eine Einstellung für die Adresse** (z. B. `https://watchit.example.com`, ohne Pfad): Daraus folgen erlaubter Host, vertrauenswürdige Origin für Formulare (CSRF), Secure-Cookies und HSTS bei https sowie die Links in Einladungs- und Reset-Mails. Grund: Getrennt gesetzte `ALLOWED_HOSTS` und `CSRF_TRUSTED_ORIGINS` sind eine typische Stolperfalle (vergisst man das zweite, scheitert hinter HTTPS jedes Formular); beide bleiben als optionale Extras. Links nutzen `SITE_URL`, weil nicht jeder Proxy den öffentlichen Hostnamen weitergibt. Ein `https`-`SITE_URL` ohne Proxy bricht den Start mit einer klaren Meldung ab (watchit selbst spricht nur http).
+  - **`TRUSTED_PROXY_COUNT`** (wie `trust proxy` in Express, Standard 0): Nur dann glaubt watchit `X-Forwarded-For` und `X-Forwarded-Proto`. Die Client-IP ist der Eintrag, den der äußerste vertrauenswürdige Proxy angehängt hat; weiter links stehende (fälschbare) Einträge werden ignoriert. Adressen werden normalisiert (IPv6, Port, IPv4-in-IPv6). django-axes und die Drossel bei „Passwort vergessen“ nutzen dieselbe Funktion. gunicorn vertraut den Headern nicht mehr selbst (vorher von jedem Absender).
+  - **HSTS** bei https standardmäßig 1 Jahr, ohne Subdomains und ohne Preload (andere Subdomains der Domain könnten andere Dienste sein; Preload ist kaum rückgängig zu machen); `HSTS_SECONDS=0` schaltet es ab. **Keine http→https-Umleitung** in watchit: das macht der Proxy, und der Healthcheck im Container nutzt http. Die zugehörigen Warnungen von `check --deploy` sind bewusst stummgeschaltet.
+  - **IPv6 ohne Proxy:** Docker reicht IPv6-Verbindungen oft über einen eigenen Hilfsprozess weiter, watchit sieht dann nur Dockers interne Adresse. Hinweis in `docs/deployment.md`, Empfehlung Reverse Proxy.
+  - **Backup:** `BACKUP_DIR` (Standard `/data/backups`) lässt sich auf einen Host-Ordner legen, den das eigene Backup ohnehin erfasst. Nur Dateien nach dem Muster `watchit-JJJJMMTT-HHMMSS.sqlite3` werden rotiert, eigene Kopien im Ordner bleiben. Wiederherstellen: Container stoppen, Kopie per `docker compose run --rm --entrypoint cp …` zurückkopieren, starten (`migrate` bringt ältere Sicherungen auf Stand).
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -253,6 +260,7 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Version im Footer und im Healthcheck sichtbar
 - **Sicherheit:**
   - Django-Standards (CSRF, sichere Cookies, HSTS hinter dem Proxy)
+  - Hinter Reverse Proxys: `SITE_URL` und `TRUSTED_PROXY_COUNT` (echte Client-IP für Sperren und Drosselung)
   - `django-axes` gegen Brute-Force-Angriffe
   - Einladungstokens mit Ablaufdatum
 - **Tests:** pytest-django
