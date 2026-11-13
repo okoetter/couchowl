@@ -132,6 +132,15 @@
 
 - **2026-11-11 – TMDB-Bewertungen** (eigener Commit vor Meilenstein 7): `vote_average` und `vote_count` kommen ohnehin mit der Detail- und Suchanfrage; gespeichert als `Title.vote_average`/`vote_count`. Anzeige „★ 8,4“ in Suche und Listen (Raster und kompakt) neben dem Jahr, auf der Detailseite mit Stimmenzahl („★ 8,4 (32.000 Stimmen)“). In Suche und Listen erst ab 10 Stimmen (`MIN_VOTES`), weil „10,0 aus 2 Stimmen“ wenig sagt; auf der Detailseite ab 1 Stimme, dort steht die Anzahl dabei. Zahlen im Format der Region (8,4 / 8.4). Aktualisiert wird die Bewertung wie alle Titeldaten (24-h-Regel beim Öffnen, „Jetzt aktualisieren“, Sync für Serien); Filme auf Listen bleiben bis zum nächsten Öffnen auf altem Stand, das ist bei Bewertungen vertretbar. Die Migration markiert alle gespeicherten Titel als veraltet. Sortieren nach Bewertung kommt mit dem Listen-Sortieren aus dem Backlog. Eigene Bewertungen gestrichen (nicht gebraucht).
 
+- **2026-11-13 – Planung Meilenstein 7:**
+  - **Aufgeteilt in 7a (Betrieb), Namenssuche, 7b (Open Source) und 7c (CI und Release).** Der Projektname „watchit“ ist nur ein Platzhalter. 7a hängt nicht am Namen; 7b und 7c schon (Repo, Image-Name, Über-Seite, README, Lizenz). Umbenennen ist jetzt billig (fast nur Texte, die Django-Apps heißen `core`, `accounts`, `catalog`), wird aber teuer nach öffentlichem Repo und Image und nach dem NAS-Deployment (Volume-Name, installierte PWA, Lesezeichen). Deshalb steht der Name vor 7b fest.
+  - **Lizenz AGPL-3.0:** Copyleft auch für Webdienste (wer eine veränderte Version betreibt, muss den Code offenlegen), üblich bei Self-Hosted-Apps. Die Über-Seite verlinkt deshalb den Quellcode.
+  - **Images auf GHCR** (GitHub Container Registry, Login über das automatische `GITHUB_TOKEN`).
+  - **Reverse Proxy generisch:** watchit funktioniert ohne, mit einem oder mit mehreren Proxys, mit IPv4 und IPv6; die Doku bleibt herstellerneutral. Oliver nutzt den Synology-Proxy, sein Zugang (neuer Anschluss, evtl. nur IPv6) ist noch offen.
+  - **Backup: Die App liefert nur eine stimmige Kopie,** das eigentliche Sichern (externe Platte, Cloud, Versionen) macht der Host, z. B. Hyper Backup. Grund: Eine laufende SQLite-Datei einfach zu kopieren kann eine kaputte Kopie ergeben; nur die App kann über die SQLite-Backup-API sicher kopieren. **Kein `restore`-Befehl:** Wiederherstellen heißt Container stoppen und die Datei zurückkopieren, das steht in der Doku. `BACKUP_KEEP` Standard 3 statt 7, die Versionen verwaltet der Host.
+  - **Erst `1.0.0-rc.1`:** CI baut das Image, Oliver installiert es auf dem NAS; `1.0.0` folgt erst, wenn es dort läuft.
+  - **Content Security Policy ins Backlog:** Die Standardversion von Alpine.js braucht `unsafe-eval`, eine strenge Policy erst mit der CSP-Version von Alpine.
+
 ## Context
 Oliver will im leeren Ordner `/home/oliver/Projekte/watchit` zusammen mit Claude per Vibe-Coding eine Webapp bauen. Es ist sein erstes Vibe-Coding-Projekt. Er arbeitet mit EndeavourOS und VSCodium, ist ein erfahrener Programmierer (JavaScript) und lernt gerade Python.
 
@@ -234,8 +243,8 @@ watchit ist eine selbst gehostete Watchlist für Filme und Serien. Sie läuft in
   - Beim Containerstart laufen automatisch `migrate` und `collectstatic`
 - **Backups:**
   - `manage.py backup` sichert konsistent im laufenden Betrieb (SQLite-Backup-API) nach `/data/backups`
-  - Rotation über `BACKUP_KEEP` (Standard 7)
-  - `manage.py restore <datei>` stellt eine Sicherung wieder her
+  - Rotation über `BACKUP_KEEP` (Standard 3); das eigentliche Sichern dieses Ordners macht der Host
+  - kein `restore`-Befehl: Wiederherstellen = Container stoppen, Datei zurückkopieren (dokumentiert)
   - Bei PostgreSQL wird auf `pg_dump` verwiesen
 - **Versionen und Updates:**
   - Semantic Versioning (1.2.3), `CHANGELOG.md` im Format „Keep a Changelog“
@@ -379,13 +388,11 @@ Jeder Meilenstein wird einzeln umgesetzt, getestet und committet.
    - `sync_tmdb`-Befehl für gefolgte und gerade geschaute Serien, eingebunden über supercronic im Container
    - Streaming-Anbieter pro Region
    - Seite „Demnächst“
-7. **Produktionsreife und Open Source**
-   - Security-Settings hinter dem Reverse Proxy, Healthcheck
-   - `backup`/`restore`-Befehle mit Rotation, eingebunden über supercronic
-   - `IMPRINT_URL` und `PRIVACY_URL`
-   - README und `docs/deployment.md` (allgemeines Docker-Deployment), Lizenz
-   - GitHub Actions: Tests (Matrix Ubuntu/macOS/Windows), E2E-Tests, Multi-Arch-Images mit Versions-Tags
-   - Release `1.0.0`
+7. **Produktionsreife und Open Source** (aufgeteilt, siehe Änderungsprotokoll 2026-11-13)
+   - **7a – Betrieb:** Security-Settings hinter dem Reverse Proxy (ohne, einer oder mehrere Proxys; IPv4 und IPv6), echte Client-IP für Brute-Force-Schutz und Drosselung, `backup`-Befehl mit Rotation, eingebunden über supercronic
+   - **Namenssuche** und Umbenennung vor 7b
+   - **7b – Open Source:** Über-Seite (Version, Lizenz, Link zum Quellcode, TMDB-Logo und -Hinweis, JustWatch), `IMPRINT_URL` und `PRIVACY_URL`, Lizenz AGPL-3.0, README und `docs/deployment.md` (allgemeines Docker-Deployment)
+   - **7c – CI und Release:** GitHub Actions (Tests mit Matrix Ubuntu/macOS/Windows, E2E-Tests, Docker-Smoke-Test), Multi-Arch-Images auf GHCR mit Versions-Tags, `1.0.0-rc.1`; `1.0.0` nach erfolgreichem NAS-Deployment
 
 ## Backlog (ToDo, nach dem MVP)
 Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
@@ -402,6 +409,7 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
   - Listen per Ziehen sortieren (bis dahin alphabetisch)
   - Notiz pro Listeneintrag
 - Barrierefreiheit gezielt prüfen und verbessern (Labels, Tastatur, Kontrast, Screenreader bei HTMX-Updates)
+- Content Security Policy (braucht die CSP-Version von Alpine.js)
 - Benachrichtigungen per E-Mail oder Push bei neuen Staffeln
 - Öffentliche JSON-API (z. B. django-ninja)
 - Zeitraum der Ankündigungen pro Nutzer im Profil einstellbar (1/3/6/12 Monate, leer = `ANNOUNCEMENT_MONTHS`)
@@ -409,8 +417,9 @@ Wird in Meilenstein 0 als `docs/ROADMAP.md` angelegt.
 - Poster-Cache aufräumen (Poster, die kein gespeicherter Titel mehr nutzt)
 
 ## Später zu entscheiden
-- Open-Source-Lizenz (z. B. MIT oder AGPL-3.0) → spätestens bei Meilenstein 7
-- Zugang aus dem Internet: Synology-Reverse-Proxy mit Let's Encrypt oder Cloudflare Tunnel → bei Meilenstein 7
+- ~~Open-Source-Lizenz~~ → entschieden: AGPL-3.0 (2026-11-13)
+- Zugang aus dem Internet: watchit bleibt generisch (mit oder ohne Reverse Proxy); Olivers eigener Weg (Synology-Proxy, neuer Anschluss evtl. nur IPv6) ist noch offen
+- Endgültiger Projektname („watchit“ ist ein Platzhalter) → vor Meilenstein 7b
 
 ## Verifikation
 - Pro Meilenstein:

@@ -12,9 +12,16 @@
 - [x] Show page: "Mark earlier episodes too?" after marking an episode or season with gaps
   before it
 - [x] TMDB ratings on detail pages, in lists and in search
-- [ ] **7 – Production and open source:** security behind proxy, backups, docs, license, CI, 1.0.0
-  - "About watchit" page (version, license, TMDB logo and notice, JustWatch credit); the
-    footer may then shrink to a link
+- [ ] **7a – Operations:** security settings behind a reverse proxy (with, without or several
+  proxies; IPv4 and IPv6), real client IP for brute-force protection and rate limits, nightly
+  consistent database copy (`manage.py backup`, rotation) for the host's backup to pick up
+- [ ] **Name:** find the final project name ("watchit" is a placeholder) and rename before 7b
+- [ ] **7b – Open source:** "About" page (version, license, source code link, TMDB logo and
+  notice, JustWatch credit; the footer shrinks to a link), `IMPRINT_URL`/`PRIVACY_URL`,
+  AGPL-3.0 license, README, `docs/deployment.md`
+- [ ] **7c – CI and release:** GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
+  test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
+  deployment on the NAS
 
 ## Backlog (after 1.0)
 
@@ -27,6 +34,8 @@
 - [ ] Lists: multi-select with bulk actions (select all/none, mark as watched, remove)
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
+- [ ] Content Security Policy (needs the CSP build of Alpine.js; the standard build needs
+  `unsafe-eval`)
 - [ ] **Movie announcements on the dashboard:** unwatched movies on any of my lists whose
   release falls within the announcement window (no separate "Follow" for movies: being on
   a list already means "I want to see this")
