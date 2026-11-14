@@ -6,7 +6,7 @@ from accounts.models import User
 
 def save_profile(client, **data):
     payload = {
-        "email": "oliver@example.com",
+        "email": "anna@example.com",
         "ui_language": "",
         "tmdb_language": "",
         "theme": "auto",
@@ -84,13 +84,13 @@ def test_unknown_tmdb_language_is_rejected(auth_client, user):
 
 
 def test_email_of_another_account_is_rejected(auth_client, user):
-    User.objects.create_user(username="anna", email="anna@example.com")
+    User.objects.create_user(username="carla", email="carla@example.com")
 
-    response = save_profile(auth_client, email="anna@example.com")
+    response = save_profile(auth_client, email="carla@example.com")
 
     assert response.status_code == 200
     user.refresh_from_db()
-    assert user.email == "oliver@example.com"
+    assert user.email == "anna@example.com"
 
 
 def test_email_can_be_removed(auth_client, user):

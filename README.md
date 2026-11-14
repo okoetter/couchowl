@@ -44,6 +44,8 @@ API token.
   e-mail, TMDB sync, backups and restore
 - [.env.example](.env.example): all settings
 - [CHANGELOG.md](CHANGELOG.md): what changed in each version
+- [docs/design.md](docs/design.md): design decisions and their reasons
+- [docs/ROADMAP.md](docs/ROADMAP.md): plans and backlog
 
 ## Development
 

@@ -1,18 +1,16 @@
 # CLAUDE.md – Couch Owl
 
 Self-hosted watchlist for movies and TV shows (TMDB). Django + HTMX, SQLite, one Docker container.
-Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `docs/ROADMAP.md`.
+Design decisions and their reasons: `docs/design.md`. Milestones and backlog: `docs/ROADMAP.md`.
 
 ## Hard rules
-- **Never `git push`, never add remotes, never create GitHub repos.** Oliver pushes himself.
-- Commit only after Oliver has tested and said OK. Commits go directly to local `main`.
-- Talk to Oliver in **German**. Code, comments, commit messages, README/CONTRIBUTING/docs: **English**
-  (exception: `docs/KONZEPT.md` is German).
-- Oliver is an experienced JS developer and Python beginner: briefly explain Django/Python concepts
-  the first time they appear. Explain jargon.
-- Work milestone by milestone (see KONZEPT.md). Per milestone: explain → implement + tests →
-  run tests → give concrete browser test steps → Oliver reviews diff → commit after OK.
-- When decisions change, update `docs/KONZEPT.md` (Änderungsprotokoll) in the same change.
+- **Never `git push`, never add remotes, never create GitHub repos.** The maintainer pushes.
+- Commit only after the maintainer has tested and said OK. Commits go directly to local `main`.
+- Code, comments, commit messages, README/CONTRIBUTING/docs: **English**.
+- Work milestone by milestone (see ROADMAP.md). Per milestone: explain → implement + tests →
+  run tests → give concrete browser test steps → maintainer reviews diff → commit after OK.
+- When decisions change, update the matching section of `docs/design.md` in the same change
+  (current state with the reason; note rejected alternatives). New ideas go to the ROADMAP backlog.
   When setup changes, update README/CONTRIBUTING in the same commit.
 
 ## Stack and conventions
@@ -44,7 +42,7 @@ Full concept, decisions and milestones: `docs/KONZEPT.md` (German). Backlog: `do
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.
 - UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at
-  the images in `screenshots/` (light/dark, desktop/phone) before asking Oliver to test.
+  the images in `screenshots/` (light/dark, desktop/phone) before asking for a test.
 - Form fields render via `core/templates/forms/field.html` (label, input, errors, help text).
 - Proxy/HTTPS settings are derived in `config/security.py` from `SITE_URL` and
   `TRUSTED_PROXY_COUNT`. Client IP for rate limits and axes: always `accounts.throttle.client_ip`.

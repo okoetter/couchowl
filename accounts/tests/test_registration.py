@@ -11,11 +11,11 @@ PASSWORD = "Long-enough-Pa55word"
 
 @pytest.fixture
 def invitation(db):
-    return Invitation.objects.create(email="anna@example.com")
+    return Invitation.objects.create(email="carla@example.com")
 
 
 def register(client, invitation, **data):
-    payload = {"username": "anna", "email": "", "password1": PASSWORD, "password2": PASSWORD}
+    payload = {"username": "carla", "email": "", "password1": PASSWORD, "password2": PASSWORD}
     payload.update(data)
     return client.post(reverse("accounts:register", args=[invitation.token]), payload)
 
@@ -34,15 +34,15 @@ def test_registration_form_is_prefilled_with_invitation_email(client, invitation
     response = client.get(reverse("accounts:register", args=[invitation.token]))
 
     assert response.status_code == 200
-    assert 'value="anna@example.com"' in response.content.decode()
+    assert 'value="carla@example.com"' in response.content.decode()
 
 
 def test_registration_creates_user_logs_in_and_uses_invitation(client, invitation):
-    response = register(client, invitation, email="anna@example.com")
+    response = register(client, invitation, email="carla@example.com")
 
     assert response["Location"] == reverse("core:dashboard")
-    user = User.objects.get(username="anna")
-    assert user.email == "anna@example.com"
+    user = User.objects.get(username="carla")
+    assert user.email == "carla@example.com"
     assert user.check_password(PASSWORD)
     invitation.refresh_from_db()
     assert invitation.used_by == user
@@ -55,7 +55,7 @@ def test_registration_creates_user_logs_in_and_uses_invitation(client, invitatio
 def test_email_is_optional(client, invitation):
     register(client, invitation, email="")
 
-    assert User.objects.get(username="anna").email == ""
+    assert User.objects.get(username="carla").email == ""
 
 
 def test_invitation_can_only_be_used_once(client, invitation):
@@ -74,7 +74,7 @@ def test_expired_invitation_is_rejected(client, invitation):
 
     assert client.get(reverse("accounts:register", args=[invitation.token])).status_code == 410
     assert register(client, invitation).status_code == 410
-    assert not User.objects.filter(username="anna").exists()
+    assert not User.objects.filter(username="carla").exists()
 
 
 def test_unknown_token_is_rejected(client, db):
@@ -88,13 +88,13 @@ def test_password_rules_apply(client, invitation):
     response = register(client, invitation, password1="123", password2="123")
 
     assert response.status_code == 200
-    assert not User.objects.filter(username="anna").exists()
+    assert not User.objects.filter(username="carla").exists()
     invitation.refresh_from_db()
     assert invitation.is_usable
 
 
 def test_email_must_not_belong_to_another_account(client, invitation, user):
-    response = register(client, invitation, email="OLIVER@example.com")
+    response = register(client, invitation, email="ANNA@example.com")
 
     assert response.status_code == 200
     assert "bereits von einem anderen Konto verwendet" in response.content.decode()

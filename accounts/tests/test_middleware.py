@@ -8,7 +8,7 @@ from accounts.models import User
 def make_user(db):
     def _make(**kwargs):
         kwargs.setdefault("region", "DE")
-        return User.objects.create_user(username="oliver", password="pw-for-tests", **kwargs)
+        return User.objects.create_user(username="anna", password="pw-for-tests", **kwargs)
 
     return _make
 

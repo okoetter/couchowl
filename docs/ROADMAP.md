@@ -1,5 +1,7 @@
 # Roadmap
 
+The reasons behind finished work are in [design.md](design.md).
+
 ## Milestones to 1.0
 
 - [x] **0 – Project skeleton:** Django, i18n, base layout with navigation, PWA, Docker, tests, pre-commit
@@ -30,7 +32,14 @@
   - watchlists, watched movies/episodes, followed shows
   - match via IMDb ID (TMDB `/find`), else title + year; report unmatched entries
   - open question: how to obtain the export (no official export; GDPR data request?)
+- [ ] **Watch history page:** everything I have watched, independent of lists and follows
+  (watched movies and episodes stay stored when a title leaves a list or a show is
+  unfollowed, but today they are only visible per title)
+  - newest first, grouped by month; episodes of the same show and day collapsed
+    ("Dark · S2 E1–E4"); entries with an unknown date in their own group at the end
+  - filter movies / shows; links to the detail pages
 - [ ] Data export (JSON) and self-service account deletion; later imports (Trakt, TV Time, Letterboxd)
+- [ ] Search: toggle "relevance / newest first"
 - [ ] Lists: sort (date added, title, year, TMDB rating); "already on list X" in search; note per list entry
 - [ ] Lists: multi-select with bulk actions (select all/none, mark as watched, remove)
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)

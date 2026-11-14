@@ -44,7 +44,7 @@ def test_login_redirects_to_next_page(client, user):
 
     response = client.post(
         reverse("accounts:login"),
-        {"username": "oliver", "password": PASSWORD, "next": reverse("catalog:lists")},
+        {"username": "anna", "password": PASSWORD, "next": reverse("catalog:lists")},
     )
 
     assert response.status_code == 302
@@ -59,7 +59,7 @@ def test_logout_requires_post_and_logs_out(auth_client):
 
 
 def test_wrong_password_shows_form_error(client, user):
-    response = client.post(reverse("accounts:login"), {"username": "oliver", "password": "wrong"})
+    response = client.post(reverse("accounts:login"), {"username": "anna", "password": "wrong"})
 
     content = response.content.decode()
     assert response.status_code == 200

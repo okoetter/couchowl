@@ -3,7 +3,7 @@
 Like lists, the dashboard only reads the database and never asks TMDB (new seasons and
 air dates arrive when a show is loaded again, later also via the daily sync).
 
-Rules (see docs/KONZEPT.md):
+Rules (see docs/design.md):
 - "Continue watching": followed shows with status "watching" that have a next episode (the
   first unwatched aired one, see catalog.shows) and at least one watched episode.
   Unfollowing removes a show the user doesn't want to continue. Most recently

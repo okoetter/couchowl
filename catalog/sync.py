@@ -1,6 +1,6 @@
 """Reloading shows from TMDB in bulk: the daily sync and the "Refresh all" button.
 
-Rules (see docs/KONZEPT.md):
+Rules (see docs/design.md):
 - The daily sync (`manage.py sync_tmdb`) reloads every show that someone follows or is
   watching, in the TMDB languages of those users: details, seasons, episodes, air dates and
   streaming providers. Shows loaded recently (MAX_AGE) are skipped, e.g. when someone

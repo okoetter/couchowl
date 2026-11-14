@@ -1,6 +1,6 @@
 """Shows: following, watched episodes and progress. Views stay thin; the rules live here.
 
-Rules (see docs/KONZEPT.md):
+Rules (see docs/design.md):
 - Only episodes that have aired (air date today or earlier) can be marked as watched.
 - Progress and "next episode" ignore specials (season 0).
 - A show counts as watched when all aired episodes (without specials) are watched.

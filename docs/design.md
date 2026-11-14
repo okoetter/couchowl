@@ -1,0 +1,351 @@
+# Design decisions
+
+Why Couch Owl works the way it does. This document describes the current state, ordered by
+topic; each section gives the rules and the reasons behind them, and alternatives that were
+considered and rejected. When a decision changes, the section is updated in the same
+change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and operation see
+[deployment.md](deployment.md) and [administration.md](administration.md).
+
+## Goals
+
+- A self-hosted watchlist for movies and TV shows for a household or a small group of
+  friends: invite-only, reachable from the internet, installable on phones.
+- Small: one Docker container, SQLite, comfortable on a NAS with 2 GB of RAM.
+- Private: browsers never contact third parties. All data from TMDB goes through the
+  server.
+- Plain, server-rendered pages that also work without JavaScript where reasonable.
+
+## Product
+
+### Accounts
+
+- **Invite-only.** Admins create one-time invitation links in the Django admin. After
+  saving, the link is shown right away for copying; with e-mail configured and an address
+  entered, it is also sent automatically (and can be resent via an admin action).
+  Validity: `INVITATION_EXPIRY_DAYS` (default 7). Invitation e-mails use the inviting
+  admin's language.
+- **Every page requires login** (Django's `LoginRequiredMiddleware`). Public are only
+  login, registration by invitation, password reset, the About page, the health check and
+  the PWA manifest.
+- **E-mail is optional.** The address in the profile is optional but unique if set
+  (otherwise a reset mail could go to several accounts). Without `EMAIL_URL`, "Forgot
+  password" is replaced by "ask your administrator"; admins create reset links via an
+  admin action and pass them on any way they like. Reset links are valid for
+  `PASSWORD_RESET_TIMEOUT_HOURS` (default 24). The reset form never reveals whether an
+  address exists.
+- **E-mail configuration lives in environment variables**, not in the admin: secrets stay
+  out of the database, it works before the first login, and it's the Docker convention.
+  `EMAIL_URL` is converted to Django 6.1's `MAILERS` setting (`config/mail.py`).
+- **Brute-force protection** with django-axes: the combination of user name **and** client
+  address is locked after 5 failures for 60 minutes. Locking by address alone would lock
+  everyone out behind a reverse proxy without a correct client address.
+- **Rate limits** (Django's cache, a file cache in `DATA_DIR/cache` so all gunicorn
+  processes share it): "Forgot password" 5 per hour and address, live search 60 per
+  minute and user, "Refresh now" 10 per minute and user, "Refresh all" once per 5 minutes
+  and user.
+
+### Lists
+
+- Any number of private lists per user, each holding movies **and** shows mixed. Names are
+  unique per user regardless of case; lists are sorted alphabetically (drag-and-drop
+  ordering is in the backlog), entries newest first.
+- **The first list creates itself:** without any list, the "Add to list" menu offers
+  "Watchlist", created on the first click. It's an ordinary list afterwards. The Lists page
+  never creates it, otherwise a deleted watchlist would come right back.
+- Adding works from detail pages and with a "+" on every search result. The menu shows
+  all lists as checkboxes plus a "New list" field; an existing name (any case) reuses that
+  list. In search, the menu is loaded on every opening, so it's always current.
+- **View:** poster grid or compact list, one choice per user for all lists
+  (`User.list_layout`). **Filters** "All / Unwatched / Watched" and "All / Movies / Shows"
+  live in the URL (bookmarkable, back button works) and aren't saved; every list starts
+  at "All". Actions keep the filter, so a title marked under "Unwatched" disappears.
+- **Watched button in lists:** a round button on the poster (grid) or next to "×"
+  (compact). For movies it toggles watched with today's date (an existing date is kept).
+  For shows it shows the progress ("12/25") and marks the next episode, followed by a
+  toast "S2 E5 watched · Undo". On hover or focus the progress pill shows the episode it
+  will mark ("S1 E3"); phones have no hover, so the compact view says "Next: S1 E3".
+  Unwatched buttons in the grid only appear on hover, focus or touch devices, to keep the
+  grid calm.
+- **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
+  soon as the user follows a show; same view as other lists without rename, delete,
+  remove and type filter; most recently followed first; can be hidden in the profile
+  (`User.show_followed_list`, default on).
+- Deleting a list asks for confirmation. **Watched data is independent of lists and
+  follows:** removing a title from a list, deleting a list or unfollowing a show keeps what
+  was watched and when.
+- Rejected for now: multi-select with bulk actions (the watched button covers the common
+  case; phones would need a selection mode). Reconsider when lists get large, e.g. after
+  an import.
+
+### Watched state and dates
+
+- Movies, single episodes and whole seasons can be marked as watched. Only the **last**
+  date is stored (marking again overwrites it, no viewing history); unmarking removes it.
+  The date is a day (no time), never in the future, and can be "unknown" (`watched_at`
+  empty, still watched). Marking stores today; clicking the date opens a form to change
+  it (works without JavaScript via `<details>`). The date input is the browser's own;
+  a JavaScript calendar was rejected (worse on phones, one more library).
+- **Only aired episodes** (air date today or earlier) can be marked; upcoming ones show
+  their date and a dashed circle.
+- **Seasons:** marking a season marks all its aired episodes; already watched ones keep
+  their date. A season shows the date of its last watched episode; once complete, its date
+  can be changed for all its episodes. Unmarking a whole season asks first (a misclick
+  would delete all dates).
+- **A show counts as watched when all aired episodes are watched**, specials ("season 0")
+  excluded. A new episode makes it unwatched again.
+- **The next episode** is the first unwatched, aired episode, specials excluded. Lists and
+  the dashboard use the same rule.
+- **"Mark earlier episodes too?"** When marking an episode or season on the show page
+  leaves unwatched aired episodes before it, a prompt asks: "S3 E5 watched. 12 earlier
+  episodes are still unwatched." with [Only season 3 (4)] [All (12)] [No] ("Only season…"
+  only if older seasons have gaps too). It marks first and asks afterwards (no modal
+  before: people who skip episodes on purpose shouldn't be stopped every time). The prompt
+  has no timeout; earlier episodes get the date "unknown". Lists and the dashboard never
+  ask, they always mark the next episode.
+- Episode descriptions are collapsed (spoilers). Dates are formatted for the user's region.
+
+### Following, dashboard and "Upcoming"
+
+- **"Follow" means "belongs on my dashboard"**, for both "Continue watching" and
+  announcements. The button says "Follow" / "Following" (German "Folgen" / "Gefolgt", not
+  "verfolgen", which sounds like chasing).
+- **The first mark on a show follows it automatically**, but only the very first time
+  (while `UserSeries.status` is still empty); after a deliberate unfollow, marking doesn't
+  follow again. Rejected: a separate "Hide" button and "Unfollow" on dashboard cards.
+- **The dashboard never asks TMDB**; it only shows what's in the database.
+- **Continue watching:** followed shows with status "watching" that have at least one
+  watched episode and a next episode; most recently watched first. A check button marks
+  the next episode (today) with "Undo"; only the card's text is replaced (the poster must
+  not flicker). Caught-up shows whose current season is still airing stay as a "waiting"
+  card with the next air date ("in 3 days") instead of the button, after the watchable
+  ones. Without a known date, or when the next season hasn't started, the card disappears;
+  a season start is an announcement.
+- **Announcements:** seasons (no specials) of followed shows starting between today and
+  `ANNOUNCEMENT_MONTHS` months ahead (default 3; months because that's how people think
+  about it), earliest first. A season starts with its first episode; TMDB's season date
+  only counts when no episode has a date (they sometimes differ by a day). Each row names
+  the networks and the subscription/free streaming providers of the user's region
+  (variants of an already named provider are dropped: "Netflix Standard with Ads" after
+  "Netflix", but "ZDFneo" after "ZDF" stays).
+- **"Upcoming" page:** all known season starts of followed shows without a time limit,
+  plus the next episode of seasons currently airing, grouped by month. "Refresh all"
+  reloads the user's followed shows (ended and cancelled ones excluded) in the request.
+
+### Search, ratings and streaming providers
+
+- **Search results aren't stored**; TMDB's response is cached for an hour per query and
+  language. Titles enter the database only when needed (detail page, list). Results show
+  title, type, year, poster, original title if different, rating and watched state, but
+  no description (the search API has no language fallback; the list stays compact).
+- **Ordering:** exact title matches first (translated or original title, ignoring case,
+  accents and spaces), newest first among them; then everything else in TMDB's order.
+  TMDB ranks heavily by popularity ("Dark" was fourth when searching "dark"). Sorting
+  everything by year was rejected: unknown new titles would push out the known ones.
+  The live search waits 300 ms after the last keystroke.
+- **TMDB ratings** ("★ 8.4") in search, lists and on detail pages (with the number of
+  votes). Overviews need at least 10 votes (`MIN_VOTES`; "10.0 from 2 votes" says little).
+  Own ratings were dropped (not needed).
+- **Streaming providers** per region on detail pages ("Available in Germany": subscription,
+  free incl. with ads, rent, buy), with "Source: JustWatch" and a link to all offers on
+  TMDB. They come with the detail request (`append_to_response=watch/providers`), which
+  returns all ~130 regions; only the regions of our users plus `DEFAULT_REGION` are
+  stored, as a JSON field `Title.watch_providers` (always read with the title, never
+  queried across titles, so no separate table). If the user's region is missing (e.g.
+  after changing it), the detail page reloads the title.
+- TMDB statuses are translated ("Ended" → "Beendet").
+
+### Languages and region
+
+- English source strings, **English is the default**, German the first translation
+  (gettext; compiled `.mo` files are committed so nobody needs gettext just to run or
+  build).
+- **The region is the main setting** (country for streaming providers, release dates and
+  date formats). New users get it from the browser on their first request after login
+  (`de-AT` → AT, plain `de` → DE), else `DEFAULT_REGION`, else US. Country names and
+  official languages come from Babel (Unicode CLDR).
+- **Languages follow the region** unless overridden under "Advanced" in the profile:
+  interface = the country's main language if translated, else English; TMDB language =
+  main language + country (AT → `de-AT`). Visitors who aren't logged in get their browser
+  language if translated, else `DEFAULT_LANGUAGE`.
+- **Date and number formats** follow the region: the active language includes the country
+  (`en-gb`, `de-at`); texts come from the language's translation, formats from Django's
+  format for the country, falling back to the language's.
+
+### Look and feel
+
+- Pages: dashboard, lists, upcoming, search, detail pages, profile, About, Django admin.
+  Navigation as a top bar on desktop and a bottom tab bar on phones.
+- Pico CSS (classless, no build step), color scheme follows the system and can be set in
+  the profile. Installable as a PWA (manifest, icons, standalone mode).
+- **Update only what changes:** htmx responses replace the smallest element (a button,
+  one card's text) or remove one entry; re-rendering a whole list rebuilds every poster
+  and makes them flicker. Where a region is refreshed but most entries stay (live search,
+  list filters, "Undo"), Idiomorph merges old and new HTML instead of replacing it.
+- **Toasts** ("S2 E5 watched · Undo") at the bottom disappear after 6 seconds. Without
+  JavaScript, actions fall back to full page loads with a message.
+- Episode codes are always "S1 E3", not "S01E03".
+- Empty states explain how to fill the section.
+- The footer shows only the version and links (About, legal notice, privacy). The TMDB
+  logo and notice and the JustWatch credit are on the About page, because TMDB's terms ask
+  for them in an "About" or "Credits" section.
+
+## TMDB integration
+
+- **Read access token** (`TMDB_API_TOKEN`) sent as a `Bearer` header, never as `?api_key=`
+  in URLs, so it doesn't end up in logs.
+- **HTTP client:** httpx; tests replace the network with a mock transport.
+- **Throttling:** at most 20 requests per second and process; on "429 Too Many Requests"
+  the client waits (at most 10 s) and retries up to twice.
+- **One request per title:** details come with translations, seasons
+  (`append_to_response=season/1,…`, at most 20 per request), streaming providers and
+  ratings.
+- **Language fallback for titles and descriptions** (from the translations list): exact
+  language (`de-AT`) → the language's main country (`de-DE`) → same language, other
+  country → English → original title / empty description. TMDB returns no German
+  description for many shows with `de-AT`, but does with `de-DE`. **Posters belong to the
+  translation** (TMDB has localized posters).
+- **Episodes** have no translations list, and `de-AT` returns placeholders ("Episode 1").
+  Order: exact language → plain language (`de`) → `en-US`; further languages are only
+  requested for seasons still missing descriptions. Name and description always come from
+  the same language. Untranslated season names arrive as the English placeholder
+  "Season 3"; they are stored empty and shown as the translated default name.
+- **Seasons and episodes are identified by their numbers.** Those TMDB no longer lists
+  are deleted, together with their watched marks.
+- **Three ways data is refreshed:**
+  1. **On demand:** opening a detail page or adding a title loads it if missing or older
+     than 24 hours.
+  2. **Daily:** `manage.py sync_tmdb` at 03:30 UTC reloads every show someone follows or
+     is watching, in all their users' TMDB languages; shows loaded in the last 6 hours
+     are skipped (`--force` reloads all). One failing show doesn't stop the run. Movies
+     aren't synced (only with movie announcements, see backlog).
+  3. **Manually:** "Refresh now" on detail pages, "Refresh all" on "Upcoming",
+     `sync_tmdb` on the command line.
+- **Lists, dashboard and "Upcoming" never ask TMDB**; loading many titles at once would be
+  too slow. They show the stored texts, in the nearest stored language if needed.
+- **When TMDB is unreachable**, stale data from the database is shown instead of an error.
+  Without a token, search shows a notice.
+- **Poster proxy** (`/posters/<size>/<file>`): only sizes `w92`, `w185`, `w342`, `w500`
+  and valid TMDB file names, only for logged-in users. Files are stored in
+  `DATA_DIR/posters` once and never change (a new image has a new name), so browsers may
+  cache them for a year. Provider logos use the same proxy.
+- Titles are read-only in the Django admin (the data belongs to TMDB).
+- JustWatch was rejected as a data source: no official API, and its terms forbid
+  unofficial use. Its provider data reaches us through TMDB, with attribution.
+
+## Architecture
+
+- **Django 6.1 + htmx** on Python 3.15 (the newest version Django and all dependencies
+  support), managed with uv. Endpoints return HTML fragments via template partials;
+  Alpine.js where the browser needs a little logic; own JavaScript stays in one small file
+  (`core/static/core/couchowl.js`).
+- **No CDN:** htmx, Idiomorph, Alpine.js and Pico are vendored in `core/static/vendor/`
+  and served with whitenoise.
+- **Apps:** `core` (layout, dashboard, upcoming, About, health, backups), `accounts`
+  (users, invitations, profile, rate limits), `catalog` (TMDB, titles, lists, shows,
+  posters, sync).
+- **Configuration only via environment variables** (django-environ); every variable is
+  documented in `.env.example`. Secrets never go into the repository.
+- **SQLite by default**; PostgreSQL optional via `DATABASE_URL`.
+- **The name appears in one place:** `APP_NAME` in `config/settings.py`. Internal names are
+  neutral (`APP_VERSION`, CSS variables `--app-…`), so a rename touches nothing technical.
+  Translated sentences contain the name directly, because German needs it in compounds
+  ("Couch-Owl-Passwort"). Spelling: "Couch Owl" in texts, `couchowl` for everything
+  technical.
+
+### Data model
+
+- `accounts.User` (custom user model from day one): `region`, `ui_language` and
+  `tmdb_language` (empty = derived from the region), `theme`, `list_layout`,
+  `show_followed_list`.
+- `Invitation`: token, optional e-mail, note, `created_by`, `expires_at`, `used_by`.
+- `Title` (`tmdb_id` + `media_type`) with language-neutral data (dates, status, networks,
+  streaming providers, rating); `TitleTranslation` per language (name, description,
+  poster). `Season` and `Episode` (numbers, air dates, runtime) with translation tables.
+- `UserList` and `ListItem`.
+- `UserSeries`: user, show, `following`, `followed_at`, `status` ("watching" is set on the
+  first mark).
+- `WatchedMovie` and `WatchedEpisode`: user, title/episode, `watched_at` (nullable =
+  unknown date), unique per user.
+- Announcements, "Continue watching" and the followed-shows list are computed by queries,
+  not stored.
+
+## Operations
+
+- **One container** (Compose service `couchowl`): `tini` as PID 1 (forwards signals, reaps
+  processes) → entrypoint runs `migrate` → `honcho` starts `web` (gunicorn, `WEB_WORKERS`)
+  and `cron` (supercronic: TMDB sync, backup). If one process dies, the container exits
+  and Docker restarts it (`restart: unless-stopped`). Logs of both go to `docker logs`.
+- **Image:** `python:3.15-slim`, multi-stage; uv installs dependencies into a venv in the
+  builder; the final stage has no uv or compiler and runs as uid 1000. Static files are
+  collected at build time, so the image stays immutable and the app needs no write access
+  to `/app`. Alpine Linux was rejected (musl, wheel problems), distroless too (no shell,
+  Python version tied to Debian). amd64 and arm64.
+- **`SITE_URL` is the one address setting:** it determines the allowed host, the trusted
+  origin for forms, secure cookies and HSTS for https, and the links in e-mails. Separate
+  `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` are a classic trap (forget the second and
+  every form fails behind HTTPS); both remain as optional extras. Links use `SITE_URL`
+  because not every proxy forwards the public host name. An https `SITE_URL` without a
+  proxy stops the start with a clear message.
+- **`TRUSTED_PROXY_COUNT`** (like Express's `trust proxy`, default 0): only then are
+  `X-Forwarded-For` and `X-Forwarded-Proto` believed. The client address is the entry the
+  outermost trusted proxy appended; entries further left can be forged and are ignored.
+  Addresses are normalized (IPv6, ports, IPv4-mapped IPv6). django-axes and all rate
+  limits use the same function (`accounts.throttle.client_ip`); gunicorn doesn't trust the
+  headers itself. Proxy setups are documented vendor-neutrally.
+- **HSTS** with https: one year, no subdomains (other subdomains may be other services),
+  no preload (hard to undo); `HSTS_SECONDS=0` turns it off. **No http → https redirect**
+  in Couch Owl: the proxy does that, and the container's health check uses http.
+- **IPv6 without a proxy:** Docker often forwards IPv6 through its own helper process, so
+  Couch Owl only sees Docker's internal address. The docs recommend a reverse proxy.
+- **Backups: the app only makes a consistent copy;** keeping it safe (other disk, cloud,
+  versions) is the host's job. Copying a live SQLite file can produce a broken copy; only
+  the app can copy safely via SQLite's backup API. `manage.py backup` runs at 03:00 UTC
+  into `BACKUP_DIR` and keeps `BACKUP_KEEP` copies (default 3; the host keeps versions);
+  only files named `couchowl-YYYYMMDD-HHMMSS.sqlite3` are rotated. **No `restore`
+  command:** restoring means stopping the container and copying the file back; `migrate`
+  brings older copies up to date. PostgreSQL users use `pg_dump`.
+- **Versions:** Semantic Versioning, `CHANGELOG.md` in "Keep a Changelog" format, version
+  in the footer, on the About page and in the health check. An update is a new image plus
+  a restart; migrations run on start. Planned with milestone 7c: multi-arch images on GHCR
+  with the tags `1.2.3`, `1.2` and `latest`, built by GitHub Actions; 1.0 starts as a
+  release candidate that is installed on a real NAS first.
+
+## Security
+
+- Django defaults (CSRF, secure cookies and HSTS with https), django-axes, rate limits,
+  invitation tokens with expiry, poster proxy only for logged-in users.
+- A Content Security Policy is in the backlog: the standard build of Alpine.js needs
+  `unsafe-eval`; a strict policy needs Alpine's CSP build.
+
+## Open source
+
+- **License: AGPL-3.0-or-later.** Copyleft that also covers network use: whoever runs a
+  modified version for others must offer its source code, which is common for self-hosted
+  apps. "Or later" (the FSF's recommendation) allows moving to future versions without
+  asking every contributor. Contributions are under the same license.
+- **About page** (`/about/`, public): version, license, source code link, TMDB logo and
+  notice, JustWatch credit, legal links. Public so that the source code and the legal
+  links reach every visitor. `SOURCE_URL` can point to a modified version's code.
+- **`IMPRINT_URL` and `PRIVACY_URL`** link to pages the operator publishes elsewhere;
+  Couch Owl hosts no legal texts. `docs/deployment.md` lists what Couch Owl stores, as a
+  basis for a privacy policy.
+- **Name:** "Couch Owl" was chosen because nobody in the same field (watchlists,
+  trackers, media servers) uses it; checked on GitHub, the web, app stores and in
+  trademark notices. Rejected because taken or too close in the same field: Couchplan,
+  Sofa…, Snug, CouchSloth, Serialist, Laterna, Couchbuddy, Couchradar (too close to Radarr
+  and CouchPotato). The app icon is an owl on a couch.
+
+## Testing
+
+- **pytest-django**, focused on logic and on request → view → database → template
+  (including access rules: nobody sees other people's lists, and htmx fragments).
+- **TMDB is never called in tests:** the autouse fixture `fake_tmdb` blocks the network
+  and serves saved, shortened real responses from `catalog/tests/fixtures/`.
+- Tests run in German so the translations are exercised too.
+- **Levels:** unit and integration tests (pre-commit hook, with ruff); end-to-end tests
+  with Playwright for core flows and screenshots of important pages in light/dark and
+  desktop/phone (marker `e2e`, too slow for pre-commit); live checks against the real TMDB
+  API (marker `live`, run by hand); a Docker smoke test in CI (milestone 7c).
+- **Cross-platform development:** no bash-only scripts, everything runs via `uv run`;
+  `.python-version`, `.gitattributes` and `.editorconfig`. CI (milestone 7c) runs the
+  tests on Linux, macOS and Windows.

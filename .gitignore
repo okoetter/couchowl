@@ -9,6 +9,8 @@ htmlcov/
 
 # Local configuration and secrets
 .env
+# Personal instructions for Claude Code
+CLAUDE.local.md
 
 # Local runtime data (database, poster cache, backups)
 data/

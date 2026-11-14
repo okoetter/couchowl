@@ -1,6 +1,6 @@
 """Small client for the TMDB API (v3) and the TMDB image server.
 
-Only the server talks to TMDB; browsers never do (see docs/KONZEPT.md, "Datenschutz").
+Only the server talks to TMDB; browsers never do (see docs/design.md, "Goals").
 The read access token is sent as a Bearer header, so it never appears in URLs or logs.
 """
 
