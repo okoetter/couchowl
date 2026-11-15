@@ -109,3 +109,23 @@ class ProfileForm(forms.ModelForm):
 
     def clean_email(self):
         return _check_email_unique(self.cleaned_data.get("email", ""), exclude_pk=self.instance.pk)
+
+
+class ResetDataForm(forms.Form):
+    """Confirms "Reset my data" with the user's password (a misclick must not be enough)."""
+
+    password = forms.CharField(
+        label=_("Your password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not self.user.check_password(password):
+            raise ValidationError(_("The password is incorrect."))
+        return password

@@ -33,4 +33,11 @@
       <button type="submit" class="secondary">{% translate "Log out" %}</button>
     </form>
   </div>
+
+  {# At the very bottom and apart from the rest: rarely needed, and a misclick would be fatal #}
+  <section class="danger-zone" aria-labelledby="danger-zone-title">
+    <h2 id="danger-zone-title">{% translate "Danger zone" %}</h2>
+    <p>{% translate "Delete all your lists, watched movies and episodes and followed shows, e.g. to start over after an import. Your account and settings stay." %}</p>
+    <a href="{% url 'accounts:reset_data' %}" role="button" class="danger outline">{% translate "Reset my data…" %}</a>
+  </section>
 {% endblock %}

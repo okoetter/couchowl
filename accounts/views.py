@@ -14,8 +14,10 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.debug import sensitive_post_parameters
 
+from catalog import reset
+
 from . import links, throttle
-from .forms import ProfileForm, RegistrationForm
+from .forms import ProfileForm, RegistrationForm, ResetDataForm
 from .models import Invitation
 
 
@@ -66,6 +68,28 @@ def profile(request):
     else:
         form = ProfileForm(instance=request.user)
     return render(request, "accounts/profile.html", {"form": form})
+
+
+@sensitive_post_parameters("password")
+def reset_data(request):
+    """Delete all of the user's lists, watched marks and follows after asking for the password."""
+    data = reset.user_data(request.user)
+    form = ResetDataForm(request.user)
+    if request.method == "POST" and not data.is_empty:
+        # Someone with a stolen session must not be able to guess the password here
+        allowed = throttle.hit(
+            f"reset_data:{request.user.pk}",
+            limit=settings.RESET_DATA_RATE_LIMIT,
+            window_seconds=3600,
+        )
+        if not allowed:
+            return render(request, "accounts/rate_limited.html", status=429)
+        form = ResetDataForm(request.user, request.POST)
+        if form.is_valid():
+            reset.reset_user_data(request.user)
+            messages.success(request, _("Your data has been deleted."))
+            return redirect("accounts:profile")
+    return render(request, "accounts/reset_data.html", {"form": form, "data": data})
 
 
 class PasswordChangeView(SuccessMessageMixin, auth_views.PasswordChangeView):

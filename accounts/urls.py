@@ -19,6 +19,7 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("register/<str:token>/", views.register, name="register"),
     path("profile/", views.profile, name="profile"),
+    path("profile/reset/", views.reset_data, name="reset_data"),
     path("password/change/", views.PasswordChangeView.as_view(), name="password_change"),
     path("password/reset/", views.PasswordResetView.as_view(), name="password_reset"),
     path("password/reset/sent/", views.PasswordResetDoneView.as_view(), name="password_reset_done"),

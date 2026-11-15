@@ -344,10 +344,35 @@ svg.icon {
 }
 
 /* Destructive action (Pico has no "danger" variant) */
-button.danger {
+button.danger,
+[role="button"].danger {
   --pico-background-color: var(--app-error-color);
   --pico-border-color: var(--app-error-color);
   --pico-color: #fff;
+}
+
+button.danger.outline,
+[role="button"].danger.outline {
+  --pico-background-color: transparent;
+  --pico-color: var(--app-error-color);
+}
+
+.danger-text {
+  color: var(--app-error-color);
+}
+
+/* Profile: "Reset my data", set apart at the bottom */
+.danger-zone {
+  margin-top: calc(var(--pico-spacing) * 3);
+  padding: var(--pico-spacing);
+  border: 1px solid var(--app-error-color);
+  border-radius: var(--pico-border-radius);
+}
+
+.danger-zone h2 {
+  margin-bottom: calc(var(--pico-spacing) * 0.5);
+  font-size: 1.1rem;
+  color: var(--app-error-color);
 }
 
 .watched-badge {

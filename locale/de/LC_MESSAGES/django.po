@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 22:32+0100\n"
+"POT-Creation-Date: 2026-11-15 14:28+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -108,6 +108,14 @@ msgstr ""
 #, python-format
 msgid "Automatic (%(language)s)"
 msgstr "Automatisch (%(language)s)"
+
+#: accounts/forms.py:118
+msgid "Your password"
+msgstr "Dein Passwort"
+
+#: accounts/forms.py:130
+msgid "The password is incorrect."
+msgstr "Das Passwort ist falsch."
 
 #: accounts/models.py:18
 msgid "Automatic (system)"
@@ -341,6 +349,7 @@ msgid "Change password"
 msgstr "Passwort ändern"
 
 #: accounts/templates/accounts/password_change.html:13
+#: accounts/templates/accounts/reset_data.html:10
 msgid "Back to profile"
 msgstr "Zurück zum Profil"
 
@@ -416,6 +425,20 @@ msgstr "Speichern"
 msgid "Log out"
 msgstr "Abmelden"
 
+#: accounts/templates/accounts/profile.html:39
+msgid "Danger zone"
+msgstr "Gefahrenzone"
+
+#: accounts/templates/accounts/profile.html:40
+msgid ""
+"Delete all your lists, watched movies and episodes and followed shows, e.g. "
+"to start over after an import. Your account and settings stay."
+msgstr "Löscht alle deine Listen, gesehenen Filme und Folgen und gefolgten Serien, z. B. um nach einem Import neu anzufangen. Dein Konto und deine Einstellungen bleiben."
+
+#: accounts/templates/accounts/profile.html:41
+msgid "Reset my data…"
+msgstr "Meine Daten zurücksetzen …"
+
 #: accounts/templates/accounts/rate_limited.html:4
 #: accounts/templates/accounts/rate_limited.html:7
 msgid "Too many requests"
@@ -437,20 +460,91 @@ msgstr ""
 "Du wurdest zu Couch Owl eingeladen. Wähle einen Benutzernamen und ein "
 "Passwort."
 
-#: accounts/views.py:30
+#: accounts/templates/accounts/reset_data.html:4
+#: accounts/templates/accounts/reset_data.html:7
+msgid "Reset my data"
+msgstr "Meine Daten zurücksetzen"
+
+#: accounts/templates/accounts/reset_data.html:9
+msgid ""
+"You have no lists, watched movies or episodes and follow no shows. There is "
+"nothing to delete."
+msgstr "Du hast keine Listen, keine gesehenen Filme oder Folgen und folgst keinen Serien. Es gibt nichts zu löschen."
+
+#: accounts/templates/accounts/reset_data.html:12
+msgid "This deletes:"
+msgstr "Gelöscht werden:"
+
+#: accounts/templates/accounts/reset_data.html:14
+#, python-format
+msgid "%(counter)s list with all its titles"
+msgid_plural "%(counter)s lists with all their titles"
+msgstr[0] "%(counter)s Liste mit allen ihren Titeln"
+msgstr[1] "%(counter)s Listen mit allen ihren Titeln"
+
+#: accounts/templates/accounts/reset_data.html:15
+#, python-format
+msgid "%(counter)s watched movie"
+msgid_plural "%(counter)s watched movies"
+msgstr[0] "%(counter)s gesehener Film"
+msgstr[1] "%(counter)s gesehene Filme"
+
+#: accounts/templates/accounts/reset_data.html:16
+#, python-format
+msgid "%(counter)s watched episode"
+msgid_plural "%(counter)s watched episodes"
+msgstr[0] "%(counter)s gesehene Folge"
+msgstr[1] "%(counter)s gesehene Folgen"
+
+#: accounts/templates/accounts/reset_data.html:17
+#, python-format
+msgid "%(counter)s followed show"
+msgid_plural "%(counter)s followed shows"
+msgstr[0] "%(counter)s gefolgte Serie"
+msgstr[1] "%(counter)s gefolgte Serien"
+
+#: accounts/templates/accounts/reset_data.html:19
+msgid "Your account, password and profile settings stay."
+msgstr "Dein Konto, dein Passwort und deine Profileinstellungen bleiben."
+
+#: accounts/templates/accounts/reset_data.html:21
+msgid "This can't be undone."
+msgstr "Das kann nicht rückgängig gemacht werden."
+
+#: accounts/templates/accounts/reset_data.html:22
+msgid ""
+"Not even your administrator can restore your data alone: backups always "
+"contain all users."
+msgstr "Auch dein Administrator kann nicht nur deine Daten wiederherstellen: Backups enthalten immer alle Benutzer."
+
+#: accounts/templates/accounts/reset_data.html:28
+#: catalog/templates/catalog/list_delete.html:16
+#: catalog/templates/catalog/list_rename.html:13
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: accounts/templates/accounts/reset_data.html:29
+msgid "Delete my data"
+msgstr "Meine Daten löschen"
+
+#: accounts/views.py:32
 msgid "You are already logged in."
 msgstr "Du bist bereits angemeldet."
 
-#: accounts/views.py:48
+#: accounts/views.py:50
 #, python-format
 msgid "Welcome to Couch Owl, %(name)s!"
 msgstr "Willkommen bei Couch Owl, %(name)s!"
 
-#: accounts/views.py:63
+#: accounts/views.py:65
 msgid "Your profile has been saved."
 msgstr "Dein Profil wurde gespeichert."
 
-#: accounts/views.py:74
+#: accounts/views.py:90
+msgid "Your data has been deleted."
+msgstr "Deine Daten wurden gelöscht."
+
+#: accounts/views.py:98
 msgid "Your password has been changed."
 msgstr "Dein Passwort wurde geändert."
 
@@ -1008,11 +1102,6 @@ msgstr[1] "Liste „%(name)s“ mit %(counter)s Titeln löschen?"
 #: catalog/templates/catalog/list_delete.html:12
 msgid "Movies you marked as watched stay watched."
 msgstr "Als gesehen markierte Filme bleiben gesehen."
-
-#: catalog/templates/catalog/list_delete.html:16
-#: catalog/templates/catalog/list_rename.html:13
-msgid "Cancel"
-msgstr "Abbrechen"
 
 #: catalog/templates/catalog/list_detail.html:12
 msgid "Rename"

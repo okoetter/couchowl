@@ -156,6 +156,8 @@ INVITATION_EXPIRY_DAYS = env.int("INVITATION_EXPIRY_DAYS", default=7)
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT_HOURS", default=24) * 3600
 # Max. "forgot password" requests per IP address and hour
 PASSWORD_RESET_RATE_LIMIT = 5
+# Max. attempts to confirm "Reset my data" with the password, per user and hour
+RESET_DATA_RATE_LIMIT = 5
 
 # --- Brute-force protection (django-axes) ---------------------------------------
 # After AXES_FAILURE_LIMIT failed logins, the combination of username and IP address

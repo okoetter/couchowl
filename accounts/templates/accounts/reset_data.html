@@ -1,0 +1,33 @@
+{% extends "accounts/_narrow.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Reset my data" %}{% endblock %}
+
+{% block card %}
+  <h1>{% translate "Reset my data" %}</h1>
+  {% if data.is_empty %}
+    <p>{% translate "You have no lists, watched movies or episodes and follow no shows. There is nothing to delete." %}</p>
+    <a href="{% url 'accounts:profile' %}">{% translate "Back to profile" %}</a>
+  {% else %}
+    <p>{% translate "This deletes:" %}</p>
+    <ul class="reset-summary">
+      <li>{% blocktranslate count counter=data.lists %}{{ counter }} list with all its titles{% plural %}{{ counter }} lists with all their titles{% endblocktranslate %}</li>
+      <li>{% blocktranslate count counter=data.watched_movies %}{{ counter }} watched movie{% plural %}{{ counter }} watched movies{% endblocktranslate %}</li>
+      <li>{% blocktranslate count counter=data.watched_episodes %}{{ counter }} watched episode{% plural %}{{ counter }} watched episodes{% endblocktranslate %}</li>
+      <li>{% blocktranslate count counter=data.followed_shows %}{{ counter }} followed show{% plural %}{{ counter }} followed shows{% endblocktranslate %}</li>
+    </ul>
+    <p class="muted">{% translate "Your account, password and profile settings stay." %}</p>
+    <p class="danger-text">
+      <strong>{% translate "This can't be undone." %}</strong>
+      {% translate "Not even your administrator can restore your data alone: backups always contain all users." %}
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form }}
+      <div class="actions">
+        <a href="{% url 'accounts:profile' %}" role="button" class="secondary outline">{% translate "Cancel" %}</a>
+        <div><button type="submit" class="danger">{% translate "Delete my data" %}</button></div>
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}

@@ -42,7 +42,17 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Rate limits** (Django's cache, a file cache in `DATA_DIR/cache` so all gunicorn
   processes share it): "Forgot password" 5 per hour and address, live search 60 per
   minute and user, "Refresh now" 10 per minute and user, "Refresh all" once per 5 minutes
-  and user.
+  and user, password attempts for "Reset my data" 5 per hour and user.
+- **"Reset my data"** (`/accounts/profile/reset/`, `catalog/reset.py`): deletes all of the
+  user's lists, watched movies and episodes, follows and show statuses, to start over,
+  e.g. after a failed import. Account, password, profile settings and TMDB data (shared by
+  all users) stay. Show statuses go too, so the first mark afterwards follows a show again.
+  The link sits at the bottom of the profile in a separate danger zone (rarely needed, a
+  misclick would be fatal). The page first shows what will be lost ("4 lists, 312 watched
+  movies, …"), says clearly that this can't be undone (the nightly database copy holds all
+  users, so one user can't be restored from it) and asks for the password, so a misclick
+  or an unattended logged-in device isn't enough. The password attempts are rate-limited
+  because a stolen session could otherwise be used to guess the password.
 
 ### Lists
 
@@ -156,7 +166,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   after changing it), the detail page reloads the title.
 - TMDB statuses are translated ("Ended" → "Beendet").
 
-### Batch import (planned, milestone 7c)
+### Batch import (planned, milestone 7c, part 2)
 
 - **Why:** without it, moving to Couch Owl means entering a whole watch history by hand.
   The source is a plain list of titles (notes, a spreadsheet), one per line, optionally
@@ -189,14 +199,9 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   Rejected: one synchronous request, a background thread, a task queue with a worker
   process (one more moving part in the container).
 - **Result:** imported / skipped / not found, with the lines that weren't found to copy.
-- **"Reset my data"** in the profile, at the bottom in a separate danger zone (rarely
-  needed, a misclick would be fatal): deletes all of the user's lists, watched movies and
-  episodes, follows and show statuses, to start over e.g. after a failed import. Account,
-  profile settings and TMDB data (shared by all users) stay. The page first shows what
-  will be lost ("4 lists, 312 watched movies, …") and asks for the password; it says
-  clearly that this can't be undone (the nightly database copy holds all users, so one
-  user can't be restored from it). Rejected for 1.0: "Undo import" (would have to track
-  what an import created, with edge cases once things change afterwards; backlog).
+- **Starting over** after a failed import: "Reset my data" in the profile (see Accounts).
+  Rejected for 1.0: "Undo import" (would have to track what an import created, with edge
+  cases once things change afterwards; backlog).
 
 ### Languages and region
 

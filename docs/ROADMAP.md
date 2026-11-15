@@ -22,7 +22,10 @@ The reasons behind finished work are in [design.md](design.md).
 - [x] **7b – Open source:** owl app icon, "About" page (version, license, source code link, TMDB logo and
   notice, JustWatch credit; the footer shrinks to a link), `IMPRINT_URL`/`PRIVACY_URL`,
   AGPL-3.0 license, README, `docs/deployment.md`
-- [ ] **7c – Batch import:** page `/import/` (linked from the lists overview, a list's menu and
+- [x] **7c, part 1 – Reset my data** in the profile (danger zone, confirmed with the
+  password): deletes all of the user's lists, watched marks and followed shows; account,
+  settings and TMDB data stay
+- [ ] **7c, part 2 – Batch import:** page `/import/` (linked from the lists overview, a list's menu and
   empty states): paste one title per line, optionally with year (`Dark (2017)`), then
   preview, then import
   - options: target list (existing / new / none), watched yes/no as default (switchable
@@ -33,9 +36,6 @@ The reasons behind finished work are in [design.md](design.md).
     afterwards on the show page ("Mark earlier episodes too?")
   - processed in chunks via htmx with a progress bar (gunicorn's 30 s timeout); result:
     imported / skipped / not found, with the lines that weren't found to copy
-  - "Reset my data" in the profile (danger zone, confirmed with the password): deletes all
-    of the user's lists, watched marks and followed shows; account, settings and TMDB data
-    stay
 - [ ] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   deployment on the NAS

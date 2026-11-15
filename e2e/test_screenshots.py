@@ -49,6 +49,16 @@ def show_password_change(page, url):
     page.wait_for_load_state()
 
 
+def show_reset_data(page, url):
+    """ "Reset my data" after a wrong password: what will be lost, with the error."""
+    login(page, url, "anna")
+    page.goto(f"{url}/accounts/profile/")
+    page.get_by_role("button", name="Meine Daten zurücksetzen …").click()
+    page.locator("#id_password").fill("wrong")
+    page.get_by_role("button", name="Meine Daten löschen").click()
+    page.wait_for_load_state()
+
+
 def show_search(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/search/")
@@ -223,6 +233,7 @@ PAGES = {
     "register-error": show_register,
     "profile": show_profile,
     "password-change-error": show_password_change,
+    "reset-data-error": show_reset_data,
     "search": show_search,
     "search-error": show_search_error,
     "search-menu": show_search_menu,
