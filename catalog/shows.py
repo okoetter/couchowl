@@ -77,12 +77,19 @@ def followed_shows(user):
 
 
 def mark_episodes(
-    user, episodes, watched_at=None, *, unknown_date=False, keep_existing=False
+    user,
+    episodes,
+    watched_at=None,
+    *,
+    unknown_date=False,
+    keep_existing=False,
+    start_watching=True,
 ) -> list[Episode]:
     """Mark the aired ones of `episodes` as watched; returns those that were marked.
 
     Default date: today; `unknown_date` stores no date. `keep_existing` leaves episodes
     that are already watched (and their dates) alone, otherwise their date is replaced.
+    `start_watching=False` skips the automatic follow on the first mark (batch import).
     """
     today = timezone.localdate()
     aired = [episode for episode in episodes if episode.has_aired(today)]
@@ -102,7 +109,8 @@ def mark_episodes(
             unique_fields=["user", "episode"],
             update_fields=["watched_at"],
         )
-    _start_watching(user, aired[0].season.show_id)
+    if start_watching:
+        _start_watching(user, aired[0].season.show_id)
     return aired
 
 
@@ -161,6 +169,31 @@ def _start_watching(user, show_id: int) -> None:
             series.following = True
             series.followed_at = timezone.now()
         series.save(update_fields=["status", "following", "followed_at"])
+
+
+def mark_show_watched(user, show: Title, *, follow: bool) -> list[Episode]:
+    """Batch import: mark all aired episodes (without specials) as watched, date unknown.
+
+    Already watched episodes keep their date. Unlike the first mark on the show page,
+    this doesn't follow the show: the import's "Follow" checkbox decides (`follow`).
+    The status still becomes "watching", so a later mark doesn't follow it either.
+    """
+    episodes = list(
+        Episode.objects.filter(_regular_aired(timezone.localdate()), season__show=show)
+        .select_related("season")
+        .order_by("season__number", "number")
+    )
+    marked = mark_episodes(
+        user, episodes, unknown_date=True, keep_existing=True, start_watching=False
+    )
+    if episodes:
+        series, _created = UserSeries.objects.get_or_create(user=user, title=show)
+        if not series.status:
+            series.status = UserSeries.Status.WATCHING
+            series.save(update_fields=["status"])
+    if follow:
+        set_following(user, show, True)
+    return marked
 
 
 def watch_next(user, show: Title) -> Episode | None:

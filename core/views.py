@@ -15,7 +15,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from accounts.throttle import hit
 from catalog import dashboard as dashboard_rules
-from catalog import shows, sync, tmdb
+from catalog import reset, shows, sync, tmdb
 from catalog.models import Episode, MediaType, Title
 
 
@@ -34,6 +34,9 @@ def _dashboard_context(request) -> dict:
         "announcements": dashboard_rules.announcements(request.user, language),
         "announcement_months": settings.ANNOUNCEMENT_MONTHS,
         "follows_shows": shows.followed_shows(request.user).exists(),
+        # Nothing entered yet (no lists, nothing watched or followed): point to the import.
+        # Not for everyone without a show in progress, e.g. people who only track movies.
+        "has_no_data": reset.user_data(request.user).is_empty,
     }
 
 
@@ -104,6 +107,9 @@ def upcoming(request):
     context = {
         "entries": dashboard_rules.upcoming(request.user, language),
         "follows_shows": shows.followed_shows(request.user).exists(),
+        # Nothing entered yet (no lists, nothing watched or followed): point to the import.
+        # Not for everyone without a show in progress, e.g. people who only track movies.
+        "has_no_data": reset.user_data(request.user).is_empty,
     }
     return render(request, "core/upcoming.html", context)
 

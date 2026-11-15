@@ -4,7 +4,12 @@
 {% block title %}{% translate "Lists" %}{% endblock %}
 
 {% block content %}
-  <h1>{% translate "Lists" %}</h1>
+  <div class="list-header">
+    <h1>{% translate "Lists" %}</h1>
+    <div class="list-header-links">
+      <a href="{% url 'imports:page' %}">{% translate "Import titles" %}</a>
+    </div>
+  </div>
 
   {% if lists or followed.item_count %}
     <ul class="list-index">
@@ -28,6 +33,10 @@
     </ul>
   {% else %}
     <p class="muted">{% translate "You don't have any lists yet. Create one below, or add a title from the search: a “Watchlist” is created for you." %}</p>
+    <p class="muted">
+      {% url 'imports:page' as import_url %}
+      {% blocktranslate %}Moving from another app? <a href="{{ import_url }}">Import a list of titles.</a>{% endblocktranslate %}
+    </p>
   {% endif %}
 
   <form method="post" class="new-list">

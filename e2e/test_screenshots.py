@@ -228,6 +228,98 @@ def show_dashboard_empty(page, url):
     page.goto(f"{url}/")
 
 
+IMPORT_LINES = [
+    "Dark",
+    "Darkk Matter",
+    "The Dark Knight",
+    "Heat (1995)",
+    "Dark Winds",
+    "Dark Shadows",
+    "Dark Shadows 1966",
+]
+
+
+def sample_import(state):
+    """An import of anna's with IMPORT_LINES, searched (see import_search) and in `state`."""
+    from accounts.models import User
+    from imports import rules
+    from imports.models import Import, ImportLine
+
+    user = User.objects.get(username="anna")
+    batch = rules.create_import(
+        user, IMPORT_LINES, list_name="Watchlist", watched=True, follow=False
+    )
+    if state == Import.State.ANALYZING:
+        # Three lines searched; another tab "works" on the rest, so the bar stays
+        rules.CHUNK_SIZE, size = 3, rules.CHUNK_SIZE
+        rules.step(user, batch)
+        rules.CHUNK_SIZE = size
+        batch.lines.filter(status=ImportLine.Status.PENDING).update(claimed_at=timezone_now())
+        return
+    while batch.state == Import.State.ANALYZING:
+        rules.step(user, batch)
+    if state == Import.State.DONE:
+        results = ["missing", "missing", "existing"] + ["imported"] * 3 + ["duplicate"]
+        for line, result in zip(batch.lines.all(), results, strict=True):
+            line.result = result
+            line.save()
+        batch.state = state
+        batch.save()
+
+
+def timezone_now():
+    from django.utils import timezone
+
+    return timezone.now()
+
+
+def show_import(page, url):
+    """The paste form with "New list" chosen (shows the name field)."""
+    login(page, url, "anna")
+    page.goto(f"{url}/import/")
+    page.locator("#id_lines").fill("\n".join(IMPORT_LINES))
+    page.locator("#id_target").select_option(label="Neue Liste …")
+    page.locator("#id_new_list").fill("Gesehen")
+
+
+def show_import_progress(page, url):
+    from imports.models import Import
+
+    sample_import(Import.State.ANALYZING)
+    login(page, url, "anna")
+    page.goto(f"{url}/import/")
+    page.locator("progress").wait_for()
+
+
+def show_import_preview(page, url):
+    from imports.models import Import
+
+    sample_import(Import.State.PREVIEW)
+    login(page, url, "anna")
+    page.goto(f"{url}/import/")
+    page.wait_for_load_state("networkidle")
+
+
+def show_import_change(page, url):
+    """A matched line with "Change" opened, and its watched switch turned off."""
+    show_import_preview(page, url)
+    line = page.locator(".import-line", has_text="Dark Winds")
+    line.get_by_role("switch", name="Gesehen").click()
+    page.wait_for_load_state("networkidle")
+    line.get_by_text("Ändern").click()
+    page.wait_for_load_state("networkidle")
+
+
+def show_import_result(page, url):
+    from imports.models import Import
+
+    sample_import(Import.State.DONE)
+    login(page, url, "anna")
+    page.goto(f"{url}/import/")
+    page.get_by_text("2 übersprungen").click()  # the collapsed list of skipped lines
+    page.wait_for_timeout(300)  # let Pico's chevron animation finish
+
+
 PAGES = {
     "login-error": show_login_error,
     "register-error": show_register,
@@ -258,6 +350,11 @@ PAGES = {
     "upcoming-busy": show_upcoming_busy,
     "about": show_about,
     "about-public": show_about_public,
+    "import": show_import,
+    "import-progress": show_import_progress,
+    "import-preview": show_import_preview,
+    "import-change": show_import_change,
+    "import-result": show_import_result,
 }
 
 
@@ -274,6 +371,42 @@ def fake_search(fake_tmdb):
                     content=tiny_png(color),
                     headers={"Content-Type": "image/png"},
                 )
+
+
+def import_search(fake_tmdb):
+    """Search results per query for IMPORT_LINES: "Dark" is ambiguous (show and movie),
+    "Darkk Matter" finds nothing, the rest one title each."""
+    data = load_tmdb_fixture("search_multi")
+    by_id = {item["id"]: item for item in data["results"]}
+    dark_movie = {
+        "media_type": "movie",
+        "id": 500,
+        "title": "Dark",
+        "original_title": "Dark",
+        "release_date": "2005-03-10",
+        "poster_path": by_id[196322]["poster_path"],
+        "vote_average": 5.1,
+        "vote_count": 120,
+    }
+    heat = {
+        "media_type": "movie",
+        "id": 158,
+        "title": "Heat",
+        "original_title": "Heat",
+        "release_date": "1995-12-15",
+        "poster_path": None,
+    }
+    results = {
+        "dark": [by_id[155], by_id[70523], dark_movie, by_id[196322]],
+        "the dark knight": [by_id[155]],
+        "heat": [heat],
+        "dark winds": [by_id[128904]],
+        "dark shadows": [by_id[2883]],
+    }
+    fake_tmdb.add(
+        "/3/search/multi",
+        json=lambda request: {"results": results.get(request.url.params["query"].lower(), [])},
+    )
 
 
 def sample_lists(fake_tmdb, user):
@@ -408,6 +541,8 @@ def test_screenshot(live_server, member, browser, fake_tmdb, name, device, schem
     if name.startswith(("dashboard", "upcoming")):
         sample_dashboard(fake_tmdb, member)
     provider_logos(fake_tmdb)
+    if name.startswith("import"):
+        import_search(fake_tmdb)
     if name == "search-error":
         fake_tmdb.add("/3/search/multi", json={}, status=503)
     # Phones are touch devices: no hover, so hover-only elements must stay visible there

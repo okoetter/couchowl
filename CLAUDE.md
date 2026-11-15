@@ -38,6 +38,9 @@ Design decisions and their reasons: `docs/design.md`. Milestones and backlog: `d
   `dashboard.py` (continue watching, announcements, upcoming; database only, never asks TMDB),
   `providers.py` (streaming providers per region for display, stored in `Title.watch_providers`),
   `sync.py` (bulk reload: `manage.py sync_tmdb`, "Refresh all").
+- Batch import lives in the `imports` app: `parsing.py` (pasted text → lines, year rules),
+  `rules.py` (search per line, preview states, chunked processing with line claims, import),
+  page `/import/` with htmx progress loop (`imports:step`).
   Fake shows in tests: `fake_tmdb.add_show()` (details and season requests share a path).
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.

@@ -1,0 +1,23 @@
+{% load i18n catalog %}
+{% comment %}
+  One title found on TMDB (catalog.services.SearchResult): poster, name, type, year,
+  rating and the original title if different. Like a search result, but not a link:
+  it sits inside a radio button's label.
+{% endcomment %}
+<span class="import-candidate">
+  {% poster option.poster_path "w92" as thumb %}
+  {% if thumb %}
+    {% poster option.poster_path "w185" as thumb_2x %}
+    <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+         alt="" width="46" height="69" loading="lazy" class="poster">
+  {% else %}
+    <span class="poster poster-missing" aria-hidden="true"></span>
+  {% endif %}
+  <span>
+    <strong>{{ option.title }}</strong>
+    <small>
+      {{ option.media_type_label }}{% if option.year %} · {{ option.year }}{% endif %}{% rating option as stars %}{% if stars %} · {{ stars }}{% endif %}
+      {% if option.original_title != option.title %}<br>{{ option.original_title }}{% endif %}
+    </small>
+  </span>
+</span>

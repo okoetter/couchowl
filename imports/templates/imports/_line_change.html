@@ -1,0 +1,37 @@
+{% load i18n %}
+{% comment %}
+  Preview: choose another candidate, skip the line, or search again. Every change is
+  saved right away and only this line is re-rendered ("morph" keeps the posters).
+{% endcomment %}
+<form method="post" action="{% url 'imports:line' line.pk %}" class="import-choices"
+      hx-post="{% url 'imports:line' line.pk %}" hx-trigger="change, submit"
+      hx-target="#line-{{ line.pk }}" hx-swap="morph:outerHTML">
+  {% csrf_token %}
+  {% if line.options %}
+    <fieldset>
+      <legend class="visually-hidden">{% blocktranslate with text=line.text %}Which title do you mean with “{{ text }}”?{% endblocktranslate %}</legend>
+      {% for option in line.options %}
+        <label class="import-option">
+          <input type="radio" name="choice" value="{{ option.key }}"{% if line.choice == option.key %} checked{% endif %}>
+          {% include "imports/_candidate.html" %}
+        </label>
+      {% endfor %}
+      <label class="import-option">
+        <input type="radio" name="choice" value="skip"{% if line.choice == "skip" %} checked{% endif %}>
+        {% translate "Skip this line" %}
+      </label>
+    </fieldset>
+    <noscript><button type="submit" class="secondary outline">{% translate "Save" %}</button></noscript>
+  {% elif line.choice != "skip" %}
+    <button type="submit" name="choice" value="skip" class="secondary outline">{% translate "Skip" %}</button>
+  {% endif %}
+</form>
+<form method="post" action="{% url 'imports:line' line.pk %}" class="import-search" role="search"
+      hx-post="{% url 'imports:line' line.pk %}" hx-target="#line-{{ line.pk }}" hx-swap="morph:outerHTML">
+  {% csrf_token %}
+  <fieldset role="group">
+    <input type="search" name="query" value="{{ line.query }}" required
+           aria-label="{% blocktranslate with number=line.number %}Search again for line {{ number }}{% endblocktranslate %}">
+    <button type="submit" class="secondary">{% translate "Search again" %}</button>
+  </fieldset>
+</form>

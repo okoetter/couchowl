@@ -1,12 +1,14 @@
 """Deleting all of a user's own data ("Reset my data" in the profile), to start over.
 
-Lists, watched movies and episodes, follows and show statuses are deleted. The account,
-its settings and the TMDB data (titles are shared by all users) stay.
+Lists, watched movies and episodes, follows, show statuses and a batch import are deleted.
+The account, its settings and the TMDB data (titles are shared by all users) stay.
 """
 
 from dataclasses import dataclass
 
 from django.db import transaction
+
+from imports.models import Import
 
 from .models import UserList, UserSeries, WatchedEpisode, WatchedMovie
 
@@ -46,3 +48,5 @@ def reset_user_data(user) -> None:
         # All rows, not only followed shows: the status ("watching") goes too, so the
         # first mark after the reset follows a show again
         UserSeries.objects.filter(user=user).delete()
+        # An unfinished import would otherwise bring titles back
+        Import.objects.filter(user=user).delete()

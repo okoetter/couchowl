@@ -13,6 +13,8 @@ A self-hosted watchlist for movies and TV shows, for you and the people you invi
 
 - Your own private lists ("My watchlist", "Watch with family", …) with movies and shows
   mixed, filled via the built-in search; grid or compact view, filters for watched and type
+- Batch import: paste the titles from another app or a spreadsheet, check the matches,
+  done
 - Track TV shows episode by episode or mark whole seasons as watched, with the date you
   watched them
 - Dashboard with the next episode of every show you are watching, one click to mark it

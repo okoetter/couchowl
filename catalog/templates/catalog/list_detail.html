@@ -9,6 +9,7 @@
     {# System lists ("Followed shows") are computed: nothing to rename or delete #}
     {% if not list.is_system %}
       <div class="list-header-links">
+        <a href="{% url 'imports:page' %}?list={{ list.pk }}">{% translate "Import" %}</a>
         <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
         <a href="{% url 'catalog:list_delete' list.pk %}">{% translate "Delete" %}</a>
       </div>
@@ -136,6 +137,8 @@
         <p class="muted">
           {% url 'catalog:search' as search_url %}
           {% blocktranslate %}This list is empty. Use the <a href="{{ search_url }}">search</a> to add movies and TV shows.{% endblocktranslate %}
+          {% url 'imports:page' as import_url %}
+          {% blocktranslate with list_pk=list.pk %}Or <a href="{{ import_url }}?list={{ list_pk }}">import a list of titles</a>.{% endblocktranslate %}
         </p>
       {% endif %}
     {% endpartialdef %}

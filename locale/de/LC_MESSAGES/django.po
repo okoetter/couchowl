@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 14:28+0100\n"
+"POT-Creation-Date: 2026-11-15 19:51+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -29,7 +29,7 @@ msgid "Password reset link for %(user)s"
 msgstr "Link zum Zurücksetzen des Passworts für %(user)s"
 
 #: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:30
-#: catalog/models.py:336
+#: catalog/models.py:336 imports/models.py:76
 msgid "status"
 msgstr "Status"
 
@@ -203,7 +203,7 @@ msgstr "Nur für Admins sichtbar."
 msgid "created by"
 msgstr "erstellt von"
 
-#: accounts/models.py:117 catalog/models.py:130
+#: accounts/models.py:117 catalog/models.py:130 imports/models.py:35
 msgid "created at"
 msgstr "erstellt am"
 
@@ -418,6 +418,8 @@ msgstr "Erweitert"
 
 #: accounts/templates/accounts/profile.html:25
 #: catalog/templates/catalog/list_rename.html:14
+#: imports/templates/imports/_line_change.html:24
+#: imports/templates/imports/import.html:167
 msgid "Save"
 msgstr "Speichern"
 
@@ -433,7 +435,10 @@ msgstr "Gefahrenzone"
 msgid ""
 "Delete all your lists, watched movies and episodes and followed shows, e.g. "
 "to start over after an import. Your account and settings stay."
-msgstr "Löscht alle deine Listen, gesehenen Filme und Folgen und gefolgten Serien, z. B. um nach einem Import neu anzufangen. Dein Konto und deine Einstellungen bleiben."
+msgstr ""
+"Löscht alle deine Listen, gesehenen Filme und Folgen und gefolgten Serien, "
+"z. B. um nach einem Import neu anzufangen. Dein Konto und deine "
+"Einstellungen bleiben."
 
 #: accounts/templates/accounts/profile.html:41
 msgid "Reset my data…"
@@ -469,7 +474,9 @@ msgstr "Meine Daten zurücksetzen"
 msgid ""
 "You have no lists, watched movies or episodes and follow no shows. There is "
 "nothing to delete."
-msgstr "Du hast keine Listen, keine gesehenen Filme oder Folgen und folgst keinen Serien. Es gibt nichts zu löschen."
+msgstr ""
+"Du hast keine Listen, keine gesehenen Filme oder Folgen und folgst keinen "
+"Serien. Es gibt nichts zu löschen."
 
 #: accounts/templates/accounts/reset_data.html:12
 msgid "This deletes:"
@@ -515,11 +522,15 @@ msgstr "Das kann nicht rückgängig gemacht werden."
 msgid ""
 "Not even your administrator can restore your data alone: backups always "
 "contain all users."
-msgstr "Auch dein Administrator kann nicht nur deine Daten wiederherstellen: Backups enthalten immer alle Benutzer."
+msgstr ""
+"Auch dein Administrator kann nicht nur deine Daten wiederherstellen: Backups "
+"enthalten immer alle Benutzer."
 
 #: accounts/templates/accounts/reset_data.html:28
 #: catalog/templates/catalog/list_delete.html:16
 #: catalog/templates/catalog/list_rename.html:13
+#: imports/templates/imports/import.html:73
+#: imports/templates/imports/import.html:180
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -704,11 +715,11 @@ msgid "Pilot"
 msgstr "Pilotfolge"
 
 #: catalog/models.py:125 catalog/models.py:174 catalog/models.py:321
-#: catalog/models.py:352
+#: catalog/models.py:352 imports/models.py:22
 msgid "user"
 msgstr "Benutzer"
 
-#: catalog/models.py:133 catalog/models.py:150
+#: catalog/models.py:133 catalog/models.py:150 imports/models.py:31
 msgid "list"
 msgstr "Liste"
 
@@ -845,16 +856,16 @@ msgstr "Leihen"
 msgid "Buy"
 msgstr "Kaufen"
 
-#: catalog/shows.py:257
+#: catalog/shows.py:290
 msgid "Specials"
 msgstr "Specials"
 
-#: catalog/shows.py:258
+#: catalog/shows.py:291
 #, python-format
 msgid "Season %(number)s"
 msgstr "Staffel %(number)s"
 
-#: catalog/shows.py:274
+#: catalog/shows.py:307
 #, python-format
 msgid "Episode %(number)s"
 msgstr "Folge %(number)s"
@@ -911,7 +922,7 @@ msgid "Add “%(name)s” to a list"
 msgstr "„%(name)s“ zu einer Liste hinzufügen"
 
 #: catalog/templates/catalog/_list_dropdown.html:15
-#: catalog/templates/catalog/_list_dropdown.html:19
+#: catalog/templates/catalog/_list_dropdown.html:19 imports/forms.py:22
 msgid "Add to list"
 msgstr "Zu Liste hinzufügen"
 
@@ -924,11 +935,11 @@ msgid "Watchlist"
 msgstr "Watchlist"
 
 #: catalog/templates/catalog/_list_menu.html:39
-#: catalog/templates/catalog/lists.html:35
+#: catalog/templates/catalog/lists.html:44
 msgid "New list"
 msgstr "Neue Liste"
 
-#: catalog/templates/catalog/_list_menu.html:40
+#: catalog/templates/catalog/_list_menu.html:40 imports/forms.py:25
 msgid "Name of the new list"
 msgstr "Name der neuen Liste"
 
@@ -984,6 +995,7 @@ msgstr[1] "%(counter)s Folgen"
 #: catalog/templates/catalog/_watched_badge.html:2
 #: catalog/templates/catalog/search.html:45
 #: catalog/templates/catalog/title_detail.html:82 catalog/views.py:207
+#: imports/templates/imports/import.html:157
 msgid "Watched"
 msgstr "Gesehen"
 
@@ -1104,49 +1116,53 @@ msgid "Movies you marked as watched stay watched."
 msgstr "Als gesehen markierte Filme bleiben gesehen."
 
 #: catalog/templates/catalog/list_detail.html:12
+msgid "Import"
+msgstr "Importieren"
+
+#: catalog/templates/catalog/list_detail.html:13
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: catalog/templates/catalog/list_detail.html:13
+#: catalog/templates/catalog/list_detail.html:14
 msgid "Delete"
 msgstr "Löschen"
 
-#: catalog/templates/catalog/list_detail.html:27
+#: catalog/templates/catalog/list_detail.html:28
 msgid "Show"
 msgstr "Anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:35
+#: catalog/templates/catalog/list_detail.html:36
 msgid "Type"
 msgstr "Art"
 
-#: catalog/templates/catalog/list_detail.html:47
+#: catalog/templates/catalog/list_detail.html:48
 msgid "View"
 msgstr "Ansicht"
 
-#: catalog/templates/catalog/list_detail.html:95
+#: catalog/templates/catalog/list_detail.html:96
 #, python-format
 msgid "Remove “%(name)s” from the list"
 msgstr "„%(name)s“ von der Liste entfernen"
 
-#: catalog/templates/catalog/list_detail.html:96
+#: catalog/templates/catalog/list_detail.html:97
 msgid "Remove from list"
 msgstr "Von der Liste entfernen"
 
-#: catalog/templates/catalog/list_detail.html:131
+#: catalog/templates/catalog/list_detail.html:132
 msgid "No titles match this filter."
 msgstr "Keine Titel für diesen Filter."
 
-#: catalog/templates/catalog/list_detail.html:132
+#: catalog/templates/catalog/list_detail.html:133
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:135
+#: catalog/templates/catalog/list_detail.html:136
 msgid "You don't follow any shows. Use the “Follow” button on a show's page."
 msgstr ""
 "Du folgst keiner Serie. Auf der Seite einer Serie gibt es dafür den Button "
 "„Folgen“."
 
-#: catalog/templates/catalog/list_detail.html:139
+#: catalog/templates/catalog/list_detail.html:140
 #, python-format
 msgid ""
 "This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
@@ -1155,31 +1171,46 @@ msgstr ""
 "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du "
 "Filme und Serien hinzu."
 
+#: catalog/templates/catalog/list_detail.html:142
+#, python-format
+msgid ""
+"Or <a href=\"%(import_url)s?list=%(list_pk)s\">import a list of titles</a>."
+msgstr ""
+"Oder <a href=\"%(import_url)s?list=%(list_pk)s\">importiere eine Liste von "
+"Titeln</a>."
+
 #: catalog/templates/catalog/list_rename.html:4
 #: catalog/templates/catalog/list_rename.html:8
 msgid "Rename list"
 msgstr "Liste umbenennen"
 
 #: catalog/templates/catalog/lists.html:4
-#: catalog/templates/catalog/lists.html:7 core/templates/core/_nav.html:19
+#: catalog/templates/catalog/lists.html:8 core/templates/core/_nav.html:19
 msgid "Lists"
 msgstr "Listen"
 
-#: catalog/templates/catalog/lists.html:16
+#: catalog/templates/catalog/lists.html:10
+#: imports/templates/imports/import.html:4
+#: imports/templates/imports/import.html:9
+#: imports/templates/imports/import.html:34
+msgid "Import titles"
+msgstr "Titel importieren"
+
+#: catalog/templates/catalog/lists.html:21
 #, python-format
 msgid "%(counter)s show"
 msgid_plural "%(counter)s shows"
 msgstr[0] "%(counter)s Serie"
 msgstr[1] "%(counter)s Serien"
 
-#: catalog/templates/catalog/lists.html:24
+#: catalog/templates/catalog/lists.html:29
 #, python-format
 msgid "%(counter)s title"
 msgid_plural "%(counter)s titles"
 msgstr[0] "%(counter)s Titel"
 msgstr[1] "%(counter)s Titel"
 
-#: catalog/templates/catalog/lists.html:30
+#: catalog/templates/catalog/lists.html:35
 msgid ""
 "You don't have any lists yet. Create one below, or add a title from the "
 "search: a “Watchlist” is created for you."
@@ -1188,6 +1219,16 @@ msgstr ""
 "Suche hinzu: Dann wird automatisch eine „Watchlist“ angelegt."
 
 #: catalog/templates/catalog/lists.html:38
+#: core/templates/core/dashboard.html:73
+#, python-format
+msgid ""
+"Moving from another app? <a href=\"%(import_url)s\">Import a list of titles."
+"</a>"
+msgstr ""
+"Du kommst von einer anderen App? <a href=\"%(import_url)s\">Importiere eine "
+"Liste von Titeln.</a>"
+
+#: catalog/templates/catalog/lists.html:47
 msgid "Create"
 msgstr "Anlegen"
 
@@ -1222,6 +1263,7 @@ msgid "Following"
 msgstr "Gefolgt"
 
 #: catalog/templates/catalog/title_detail.html:46
+#: imports/templates/imports/import.html:164
 msgid "Follow"
 msgstr "Folgen"
 
@@ -1302,7 +1344,7 @@ msgstr ""
 "eingerichtet."
 
 #: catalog/views.py:55 catalog/views.py:380 catalog/views.py:427
-#: core/views.py:128
+#: core/views.py:134 imports/views.py:39
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
 "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
@@ -1328,7 +1370,7 @@ msgstr "Filme"
 msgid "TV shows"
 msgstr "Serien"
 
-#: catalog/views.py:245 core/views.py:69
+#: catalog/views.py:245 core/views.py:72
 #, python-format
 msgid "%(episode)s watched."
 msgstr "%(episode)s gesehen."
@@ -1342,7 +1384,8 @@ msgstr "Liste umbenannt."
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:377 catalog/views.py:424 core/views.py:125
+#: catalog/views.py:377 catalog/views.py:424 core/views.py:131
+#: imports/views.py:38
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
@@ -1470,22 +1513,22 @@ msgstr ""
 "Such dir eine Serie über die <a href=\"%(search_url)s\">Suche</a> und hak "
 "die erste Folge ab."
 
-#: core/templates/core/dashboard.html:79
+#: core/templates/core/dashboard.html:83
 msgid "Announcements"
 msgstr "Ankündigungen"
 
-#: core/templates/core/dashboard.html:80
+#: core/templates/core/dashboard.html:84
 #, python-format
 msgid "New seasons of followed shows in the next month"
 msgid_plural "New seasons of followed shows in the next %(months)s months"
 msgstr[0] "Neue Staffeln gefolgter Serien im nächsten Monat"
 msgstr[1] "Neue Staffeln gefolgter Serien in den nächsten %(months)s Monaten"
 
-#: core/templates/core/dashboard.html:88
+#: core/templates/core/dashboard.html:92
 msgid "All upcoming dates"
 msgstr "Alle Termine"
 
-#: core/templates/core/dashboard.html:90
+#: core/templates/core/dashboard.html:94
 #, python-format
 msgid "No new seasons announced for the next month."
 msgid_plural "No new seasons announced for the next %(months)s months."
@@ -1493,7 +1536,7 @@ msgstr[0] "Keine neuen Staffeln im nächsten Monat angekündigt."
 msgstr[1] ""
 "Keine neuen Staffeln in den nächsten %(months)s Monaten angekündigt."
 
-#: core/templates/core/dashboard.html:92 core/templates/core/upcoming.html:36
+#: core/templates/core/dashboard.html:96 core/templates/core/upcoming.html:36
 msgid ""
 "Follow shows to see their new seasons here. Use the “Follow” button on a "
 "show's page."
@@ -1517,11 +1560,11 @@ msgstr ""
 "Noch keine Termine bekannt. Neue Staffeln und Folgen erscheinen hier, sobald "
 "TMDB ein Datum für sie hat."
 
-#: core/views.py:120
+#: core/views.py:126
 msgid "Everything was just refreshed. Please wait a few minutes."
 msgstr "Gerade erst aktualisiert. Bitte warte ein paar Minuten."
 
-#: core/views.py:134
+#: core/views.py:140
 #, python-format
 msgid ""
 "%(updated)s of %(total)s show refreshed. The others could not be loaded."
@@ -1534,16 +1577,420 @@ msgstr[1] ""
 "%(updated)s von %(total)s Serien aktualisiert. Die übrigen konnten nicht "
 "geladen werden."
 
-#: core/views.py:143
+#: core/views.py:149
 #, python-format
 msgid "%(count)s show refreshed."
 msgid_plural "%(count)s shows refreshed."
 msgstr[0] "%(count)s Serie aktualisiert."
 msgstr[1] "%(count)s Serien aktualisiert."
 
-#: core/views.py:186
+#: core/views.py:192
 msgid "Your watchlist for movies and TV shows"
 msgstr "Deine Watchlist für Filme und Serien"
+
+#: imports/apps.py:9
+msgid "Batch import"
+msgstr "Import"
+
+#: imports/forms.py:17
+msgid "Titles"
+msgstr "Titel"
+
+#: imports/forms.py:30
+msgid "Mark all as watched"
+msgstr "Alle als gesehen markieren"
+
+#: imports/forms.py:33
+msgid ""
+"Can be changed per title before importing. The date stays unknown; shows are "
+"marked as completely watched."
+msgstr ""
+"Lässt sich vor dem Import pro Titel ändern. Das Datum bleibt unbekannt; "
+"Serien werden als komplett gesehen markiert."
+
+#: imports/forms.py:38
+msgid "Follow imported shows"
+msgstr "Importierten Serien folgen"
+
+#: imports/forms.py:41
+msgid ""
+"Can be changed per show before importing. Also shows you unfollowed. "
+"Followed shows appear on the dashboard."
+msgstr ""
+"Lässt sich vor dem Import pro Serie ändern. Auch Serien, denen du nicht mehr "
+"folgst. Gefolgte Serien erscheinen auf dem Dashboard."
+
+#: imports/forms.py:50
+#, python-format
+msgid ""
+"One movie or TV show per line, optionally with the year: “Dark (2017)”. At "
+"most %(max)s lines. Nothing is imported before you have checked the matches."
+msgstr ""
+"Ein Film oder eine Serie pro Zeile, gern mit Jahr: „Dark (2017)“. Höchstens "
+"%(max)s Zeilen. Importiert wird erst, nachdem du die Treffer geprüft hast."
+
+#: imports/forms.py:55
+msgid "No list"
+msgstr "Keine Liste"
+
+#: imports/forms.py:57
+msgid "New list …"
+msgstr "Neue Liste …"
+
+#: imports/forms.py:63
+msgid "Paste at least one title."
+msgstr "Füge mindestens einen Titel ein."
+
+#: imports/forms.py:67
+#, python-format
+msgid ""
+"At most %(max)s lines, this is %(count)s line. Import the list in parts."
+msgid_plural ""
+"At most %(max)s lines, these are %(count)s lines. Import the list in parts."
+msgstr[0] ""
+"Höchstens %(max)s Zeilen, dies ist %(count)s Zeile. Importiere die Liste in "
+"Teilen."
+msgstr[1] ""
+"Höchstens %(max)s Zeilen, dies sind %(count)s Zeilen. Importiere die Liste "
+"in Teilen."
+
+#: imports/forms.py:82
+msgid "Enter a name for the new list."
+msgstr "Gib einen Namen für die neue Liste ein."
+
+#: imports/forms.py:86
+msgid ""
+"Choose a list, mark the titles as watched or follow the shows; otherwise the "
+"import has nothing to do."
+msgstr ""
+"Wähle eine Liste, markiere die Titel als gesehen oder folge den Serien – "
+"sonst hat der Import nichts zu tun."
+
+#: imports/models.py:15
+msgid "Analyzing"
+msgstr "Wird gesucht"
+
+#: imports/models.py:16
+msgid "Preview"
+msgstr "Vorschau"
+
+#: imports/models.py:17
+msgid "Importing"
+msgstr "Wird importiert"
+
+#: imports/models.py:18
+msgid "Done"
+msgstr "Fertig"
+
+#: imports/models.py:27
+msgid "state"
+msgstr "Zustand"
+
+#: imports/models.py:33 imports/models.py:82
+msgid "mark as watched"
+msgstr "als gesehen markieren"
+
+#: imports/models.py:34
+msgid "follow shows"
+msgstr "Serien folgen"
+
+#: imports/models.py:38 imports/models.py:68
+msgid "import"
+msgstr "Import"
+
+#: imports/models.py:39
+msgid "imports"
+msgstr "Importe"
+
+#: imports/models.py:49
+msgid "Not searched yet"
+msgstr "Noch nicht gesucht"
+
+#: imports/models.py:50 imports/templates/imports/import.html:112
+msgid "Found"
+msgstr "Gefunden"
+
+#: imports/models.py:51
+msgid "Ambiguous"
+msgstr "Mehrdeutig"
+
+#: imports/models.py:52 imports/templates/imports/import.html:111
+#: imports/templates/imports/import.html:123
+msgid "Not found"
+msgstr "Nicht gefunden"
+
+#: imports/models.py:55
+msgid "Imported"
+msgstr "Importiert"
+
+#: imports/models.py:57 imports/templates/imports/import.html:125
+msgid "Already there"
+msgstr "Schon vorhanden"
+
+#: imports/models.py:58
+msgid "Same title as an earlier line"
+msgstr "Gleicher Titel wie eine frühere Zeile"
+
+#: imports/models.py:59
+msgid "Skipped by you"
+msgstr "Von dir übersprungen"
+
+#: imports/models.py:61
+msgid "Not imported"
+msgstr "Nicht importiert"
+
+#: imports/models.py:70
+msgid "position"
+msgstr "Position"
+
+#: imports/models.py:72
+msgid "line"
+msgstr "Zeile"
+
+#: imports/models.py:74
+msgid "search"
+msgstr "Suche"
+
+#: imports/models.py:79
+msgid "candidates"
+msgstr "Kandidaten"
+
+#: imports/models.py:81
+msgid "choice"
+msgstr "Auswahl"
+
+#: imports/models.py:84
+msgid "follow"
+msgstr "folgen"
+
+#: imports/models.py:86
+msgid "result"
+msgstr "Ergebnis"
+
+#: imports/models.py:88
+msgid "claimed at"
+msgstr "in Arbeit seit"
+
+#: imports/models.py:91
+msgid "import line"
+msgstr "Importzeile"
+
+#: imports/models.py:92
+msgid "import lines"
+msgstr "Importzeilen"
+
+#: imports/templates/imports/_line_change.html:12
+#, python-format
+msgid "Which title do you mean with “%(text)s”?"
+msgstr "Welchen Titel meinst du mit „%(text)s“?"
+
+#: imports/templates/imports/_line_change.html:21
+msgid "Skip this line"
+msgstr "Diese Zeile überspringen"
+
+#: imports/templates/imports/_line_change.html:26
+msgid "Skip"
+msgstr "Überspringen"
+
+#: imports/templates/imports/_line_change.html:34
+#, python-format
+msgid "Search again for line %(number)s"
+msgstr "Zeile %(number)s neu suchen"
+
+#: imports/templates/imports/_line_change.html:35
+msgid "Search again"
+msgstr "Neu suchen"
+
+#: imports/templates/imports/import.html:10
+msgid ""
+"Moving from another app, a spreadsheet or your notes? Paste your movies and "
+"TV shows here. Couch Owl looks them up on TMDB, and you check the matches "
+"before anything is imported."
+msgstr ""
+"Du kommst von einer anderen App, einer Tabelle oder deinen Notizen? Füge "
+"deine Filme und Serien hier ein. Couch Owl sucht sie bei TMDB, und du prüfst "
+"die Treffer, bevor etwas importiert wird."
+
+#: imports/templates/imports/import.html:29
+msgid "Look up titles"
+msgstr "Titel suchen"
+
+#: imports/templates/imports/import.html:47
+#, python-format
+msgid "Looking up titles on TMDB: %(done)s of %(total)s lines"
+msgstr "Titel werden bei TMDB gesucht: %(done)s von %(total)s Zeilen"
+
+#: imports/templates/imports/import.html:49
+#, python-format
+msgid "Importing: %(done)s of %(total)s lines"
+msgstr "Wird importiert: %(done)s von %(total)s Zeilen"
+
+#: imports/templates/imports/import.html:57
+msgid "Try again"
+msgstr "Erneut versuchen"
+
+#: imports/templates/imports/import.html:63
+msgid "Continue"
+msgstr "Weiter"
+
+#: imports/templates/imports/import.html:67
+msgid ""
+"This only continues while the page is open. You can leave it and come back "
+"later."
+msgstr ""
+"Das läuft nur weiter, solange die Seite offen ist. Du kannst sie verlassen "
+"und später zurückkommen."
+
+#: imports/templates/imports/import.html:73
+msgid "Stop import"
+msgstr "Import abbrechen"
+
+#: imports/templates/imports/import.html:77
+msgid "Titles imported so far stay when you stop."
+msgstr "Bereits importierte Titel bleiben erhalten, wenn du abbrichst."
+
+#: imports/templates/imports/import.html:82
+msgid "Check the matches"
+msgstr "Treffer prüfen"
+
+#: imports/templates/imports/import.html:85
+#, python-format
+msgid "Titles are added to the list “%(name)s”."
+msgstr "Die Titel kommen auf die Liste „%(name)s“."
+
+#: imports/templates/imports/import.html:87
+msgid "Titles aren't added to a list."
+msgstr "Die Titel kommen auf keine Liste."
+
+#: imports/templates/imports/import.html:89
+msgid ""
+"Watched titles get an unknown date; shows are marked as completely watched."
+msgstr ""
+"Gesehene Titel bekommen ein unbekanntes Datum; Serien werden als komplett "
+"gesehen markiert."
+
+#: imports/templates/imports/import.html:95
+#, python-format
+msgid "%(counter)s title will be imported"
+msgid_plural "%(counter)s titles will be imported"
+msgstr[0] "%(counter)s Titel wird importiert"
+msgstr[1] "%(counter)s Titel werden importiert"
+
+#: imports/templates/imports/import.html:96
+#: imports/templates/imports/import.html:200
+#: imports/templates/imports/import.html:215
+#, python-format
+msgid "%(counter)s skipped"
+msgid_plural "%(counter)s skipped"
+msgstr[0] "%(counter)s übersprungen"
+msgstr[1] "%(counter)s übersprungen"
+
+#: imports/templates/imports/import.html:97
+#, python-format
+msgid "%(counter)s not found"
+msgid_plural "%(counter)s not found"
+msgstr[0] "%(counter)s nicht gefunden"
+msgstr[1] "%(counter)s nicht gefunden"
+
+#: imports/templates/imports/import.html:101
+#, python-format
+msgid "%(counter)s line still needs a choice. Without one it is skipped."
+msgid_plural ""
+"%(counter)s lines still need a choice. Without one they are skipped."
+msgstr[0] ""
+"%(counter)s Zeile braucht noch eine Auswahl. Ohne wird sie übersprungen."
+msgstr[1] ""
+"%(counter)s Zeilen brauchen noch eine Auswahl. Ohne werden sie übersprungen."
+
+#: imports/templates/imports/import.html:110
+msgid "Which title do you mean?"
+msgstr "Welcher Titel ist gemeint?"
+
+#: imports/templates/imports/import.html:113
+#: imports/templates/imports/import.html:127
+msgid "Skipped"
+msgstr "Übersprungen"
+
+#: imports/templates/imports/import.html:122
+msgid "Choose one"
+msgstr "Bitte auswählen"
+
+#: imports/templates/imports/import.html:124
+msgid "Will be imported"
+msgstr "Wird importiert"
+
+#: imports/templates/imports/import.html:126
+#, python-format
+msgid "Same as line %(number)s"
+msgstr "Wie Zeile %(number)s"
+
+#: imports/templates/imports/import.html:131
+#, python-format
+msgid "Searched for “%(query)s”"
+msgstr "Gesucht nach „%(query)s“"
+
+#: imports/templates/imports/import.html:143
+msgid "Change"
+msgstr "Ändern"
+
+#: imports/templates/imports/import.html:185
+#, python-format
+msgid "Import %(counter)s title"
+msgid_plural "Import %(counter)s titles"
+msgstr[0] "%(counter)s Titel importieren"
+msgstr[1] "%(counter)s Titel importieren"
+
+#: imports/templates/imports/import.html:193
+msgid "Import finished"
+msgstr "Import abgeschlossen"
+
+#: imports/templates/imports/import.html:195
+#, python-format
+msgid "<strong>%(counter)s</strong> title imported"
+msgid_plural "<strong>%(counter)s</strong> titles imported"
+msgstr[0] "<strong>%(counter)s</strong> Titel importiert"
+msgstr[1] "<strong>%(counter)s</strong> Titel importiert"
+
+#: imports/templates/imports/import.html:206
+#, python-format
+msgid "same as line %(number)s"
+msgstr "wie Zeile %(number)s"
+
+#: imports/templates/imports/import.html:207
+msgid "already there"
+msgstr "schon vorhanden"
+
+#: imports/templates/imports/import.html:208
+msgid "skipped by you"
+msgstr "von dir übersprungen"
+
+#: imports/templates/imports/import.html:218
+#, python-format
+msgid "%(counter)s not imported (not found or no title chosen)"
+msgid_plural "%(counter)s not imported (not found or no title chosen)"
+msgstr[0] ""
+"%(counter)s nicht importiert (nicht gefunden oder kein Titel ausgewählt)"
+msgstr[1] ""
+"%(counter)s nicht importiert (nicht gefunden oder kein Titel ausgewählt)"
+
+#: imports/templates/imports/import.html:221
+msgid "Lines that weren't imported"
+msgstr "Nicht importierte Zeilen"
+
+#: imports/templates/imports/import.html:223
+msgid "Copy them to add them by hand, or try them again in a new import."
+msgstr ""
+"Kopiere sie, um sie von Hand hinzuzufügen oder in einem neuen Import noch "
+"einmal zu versuchen."
+
+#: imports/templates/imports/import.html:227
+#, python-format
+msgid "Open “%(name)s”"
+msgstr "„%(name)s“ öffnen"
+
+#: imports/templates/imports/import.html:231
+msgid "New import"
+msgstr "Neuer Import"
 
 #: templates/admin/accounts/invitation/change_form.html:8
 msgid "Invitation link"

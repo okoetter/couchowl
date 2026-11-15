@@ -115,14 +115,19 @@ def sort_results(results: list[SearchResult], query: str) -> list[SearchResult]:
     Among exact matches (remakes, new editions) the most recent one usually is wanted.
     Exact matches without a year come after the dated ones.
     """
-    wanted = _comparable(query)
 
     def key(result: SearchResult) -> tuple[int, int]:
-        if wanted in (_comparable(result.title), _comparable(result.original_title)):
+        if is_exact_match(result, query):
             return (0, -(result.year or 0))
         return (1, 0)  # sorted() keeps the original order for equal keys
 
     return sorted(results, key=key)
+
+
+def is_exact_match(result: SearchResult, query: str) -> bool:
+    """Whether the translated or original title equals `query` (see _comparable)."""
+    wanted = _comparable(query)
+    return wanted in (_comparable(result.title), _comparable(result.original_title))
 
 
 def _comparable(text: str) -> str:

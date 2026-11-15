@@ -1,0 +1,7 @@
+{% comment %}
+  Answer to a change in the preview: the line (replaces itself) plus the counts at the
+  top and the import button at the bottom ("out of band", by their ids).
+{% endcomment %}
+{% include "imports/import.html#line" %}
+{% include "imports/import.html#summary" with oob=True %}
+{% include "imports/import.html#actions" with oob=True %}

@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load i18n catalog %}
+
+{% block title %}{% translate "Import titles" %}{% endblock %}
+
+{% block content %}
+  {% if not batch %}
+    {# --- 1. Paste the titles --- #}
+    <h1>{% translate "Import titles" %}</h1>
+    <p>{% translate "Moving from another app, a spreadsheet or your notes? Paste your movies and TV shows here. Couch Owl looks them up on TMDB, and you check the matches before anything is imported." %}</p>
+    {# Alpine.js shows the name field only for "New list" (always visible without JavaScript) #}
+    <form method="post" class="import-form" data-busy
+          x-data="{ target: '{{ form.target.value|default_if_none:''|escapejs }}' }">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {{ form.lines.as_field_group }}
+      <div class="grid">
+        <div>{{ form.target.as_field_group }}</div>
+        <div x-show="target === 'new'">{{ form.new_list.as_field_group }}</div>
+      </div>
+      <div>
+        <label>{{ form.watched }} {{ form.watched.label }}</label>
+        <div class="helptext" id="id_watched_helptext">{{ form.watched.help_text }}</div>
+      </div>
+      <div>
+        <label>{{ form.follow }} {{ form.follow.label }}</label>
+        <div class="helptext" id="id_follow_helptext">{{ form.follow.help_text }}</div>
+      </div>
+      <button type="submit">{% translate "Look up titles" %}</button>
+    </form>
+
+  {% elif batch.state == "analyzing" or batch.state == "importing" %}
+    {# --- 2. and 4. Searching / importing in chunks --- #}
+    <h1>{% translate "Import titles" %}</h1>
+    {% comment %}
+      The progress bar asks for the next chunk as soon as it is shown (hx-trigger="load")
+      and is replaced by the answer, which asks for the next one, and so on. After the
+      last chunk the server reloads the page ("HX-Redirect").
+    {% endcomment %}
+    {% partialdef progress inline %}
+      <div id="import-progress" class="import-progress"
+           {% if not error %}hx-post="{% url 'imports:step' %}" hx-trigger="load{% if progress.waiting %} delay:1s{% endif %}" hx-swap="outerHTML"{% endif %}>
+        <progress value="{{ progress.done }}" max="{{ progress.total }}"></progress>
+        <p>
+          {% if batch.state == "analyzing" %}
+            {% blocktranslate with done=progress.done total=progress.total %}Looking up titles on TMDB: {{ done }} of {{ total }} lines{% endblocktranslate %}
+          {% else %}
+            {% blocktranslate with done=progress.done total=progress.total %}Importing: {{ done }} of {{ total }} lines{% endblocktranslate %}
+          {% endif %}
+        </p>
+        {% if error %}
+          <article class="message message-error" role="alert">{{ error }}</article>
+          <form method="post" action="{% url 'imports:step' %}"
+                hx-post="{% url 'imports:step' %}" hx-target="#import-progress" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button type="submit">{% translate "Try again" %}</button>
+          </form>
+        {% else %}
+          <noscript>
+            <form method="post" action="{% url 'imports:step' %}">
+              {% csrf_token %}
+              <button type="submit">{% translate "Continue" %}</button>
+            </form>
+          </noscript>
+        {% endif %}
+        <p class="muted">{% translate "This only continues while the page is open. You can leave it and come back later." %}</p>
+      </div>
+    {% endpartialdef %}
+    <form method="post" action="{% url 'imports:discard' %}">
+      {% csrf_token %}
+      <button type="submit" class="secondary outline">
+        {% if batch.state == "analyzing" %}{% translate "Cancel" %}{% else %}{% translate "Stop import" %}{% endif %}
+      </button>
+    </form>
+    {% if batch.state == "importing" %}
+      <p class="muted">{% translate "Titles imported so far stay when you stop." %}</p>
+    {% endif %}
+
+  {% elif batch.state == "preview" %}
+    {# --- 3. Check the matches --- #}
+    <h1>{% translate "Check the matches" %}</h1>
+    <p class="muted">
+      {% if batch.list_name %}
+        {% blocktranslate with name=batch.list_name %}Titles are added to the list “{{ name }}”.{% endblocktranslate %}
+      {% else %}
+        {% translate "Titles aren't added to a list." %}
+      {% endif %}
+      {% translate "Watched titles get an unknown date; shows are marked as completely watched." %}
+    </p>
+
+    {% partialdef summary inline %}
+      <div id="import-summary" class="import-summary"{% if oob %} hx-swap-oob="true"{% endif %}>
+        <p>
+          {% blocktranslate count counter=summary.to_import %}{{ counter }} title will be imported{% plural %}{{ counter }} titles will be imported{% endblocktranslate %}
+          {% if summary.skipped %}· {% blocktranslate count counter=summary.skipped %}{{ counter }} skipped{% plural %}{{ counter }} skipped{% endblocktranslate %}{% endif %}
+          {% if summary.not_found %}· {% blocktranslate count counter=summary.not_found %}{{ counter }} not found{% plural %}{{ counter }} not found{% endblocktranslate %}{% endif %}
+        </p>
+        {% if summary.choose %}
+          <article class="message message-warning" role="status">
+            {% blocktranslate count counter=summary.choose %}{{ counter }} line still needs a choice. Without one it is skipped.{% plural %}{{ counter }} lines still need a choice. Without one they are skipped.{% endblocktranslate %}
+          </article>
+        {% endif %}
+      </div>
+    {% endpartialdef %}
+
+    {% regroup lines by group as groups %}
+    {% for group in groups %}
+      <h2 class="import-group">
+        {% if group.grouper == "choose" %}{% translate "Which title do you mean?" %}
+        {% elif group.grouper == "not_found" %}{% translate "Not found" %}
+        {% elif group.grouper == "import" %}{% translate "Found" %}
+        {% else %}{% translate "Skipped" %}{% endif %}
+      </h2>
+      <ul class="import-lines">
+        {% for line in group.list %}
+          {% partialdef line inline %}
+            <li id="line-{{ line.pk }}" class="import-line">
+              <div class="import-line-head">
+                <span><small class="muted">{{ line.number }}.</small> {{ line.text }}</span>
+                <span class="import-badge import-badge-{{ line.state }}">
+                  {% if line.state == "choose" %}{% translate "Choose one" %}
+                  {% elif line.state == "not_found" %}{% translate "Not found" %}
+                  {% elif line.state == "import" %}{% translate "Will be imported" %}
+                  {% elif line.state == "existing" %}{% translate "Already there" %}
+                  {% elif line.state == "duplicate" %}{% blocktranslate with number=line.duplicate_of.number %}Same as line {{ number }}{% endblocktranslate %}
+                  {% else %}{% translate "Skipped" %}{% endif %}
+                </span>
+              </div>
+              {% if line.query != line.text %}
+                <small class="muted">{% blocktranslate with query=line.query %}Searched for “{{ query }}”{% endblocktranslate %}</small>
+              {% endif %}
+              {% if line_error %}<p class="import-line-error" role="alert">{{ line_error }}</p>{% endif %}
+
+              {% if line.chosen_option %}
+                {% include "imports/_candidate.html" with option=line.chosen_option only %}
+              {% endif %}
+
+              {% if line.state == "choose" or line.state == "not_found" %}
+                {% include "imports/_line_change.html" %}
+              {% else %}
+                <details class="import-change">
+                  <summary>{% translate "Change" %}</summary>
+                  {% include "imports/_line_change.html" %}
+                </details>
+              {% endif %}
+
+              {% if line.options and line.state != "skip" %}
+                <form method="post" action="{% url 'imports:line' line.pk %}" class="import-switches"
+                      hx-post="{% url 'imports:line' line.pk %}" hx-trigger="change"
+                      hx-target="#line-{{ line.pk }}" hx-swap="morph:outerHTML">
+                  {% csrf_token %}
+                  {# Unchecked boxes send nothing: the hidden "0" comes first, the box's "1" wins #}
+                  <input type="hidden" name="watched" value="0">
+                  <label>
+                    <input type="checkbox" role="switch" name="watched" value="1"{% if line.watched %} checked{% endif %}>
+                    {% translate "Watched" %}
+                  </label>
+                  {# Only shows can be followed; appears once a show is chosen #}
+                  {% if line.chosen_option.media_type == "tv" %}
+                    <input type="hidden" name="follow" value="0">
+                    <label>
+                      <input type="checkbox" role="switch" name="follow" value="1"{% if line.follow %} checked{% endif %}>
+                      {% translate "Follow" %}
+                    </label>
+                  {% endif %}
+                  <noscript><button type="submit" class="secondary outline">{% translate "Save" %}</button></noscript>
+                </form>
+              {% endif %}
+            </li>
+          {% endpartialdef %}
+        {% endfor %}
+      </ul>
+    {% endfor %}
+
+    {% partialdef actions inline %}
+      <div id="import-actions" class="actions import-actions"{% if oob %} hx-swap-oob="true"{% endif %}>
+        <form method="post" action="{% url 'imports:discard' %}">
+          {% csrf_token %}
+          <button type="submit" class="secondary outline">{% translate "Cancel" %}</button>
+        </form>
+        <form method="post" action="{% url 'imports:start' %}" data-busy>
+          {% csrf_token %}
+          <button type="submit"{% if not summary.to_import %} disabled{% endif %}>
+            {% blocktranslate count counter=summary.to_import %}Import {{ counter }} title{% plural %}Import {{ counter }} titles{% endblocktranslate %}
+          </button>
+        </form>
+      </div>
+    {% endpartialdef %}
+
+  {% else %}
+    {# --- 5. Result --- #}
+    <h1>{% translate "Import finished" %}</h1>
+    <ul class="import-result">
+      <li>{% blocktranslate count counter=result.imported %}<strong>{{ counter }}</strong> title imported{% plural %}<strong>{{ counter }}</strong> titles imported{% endblocktranslate %}</li>
+      <li>
+        {% if result.skipped %}
+          {# Collapsed: these lines need nothing more, the list only answers "why?" #}
+          <details class="import-skipped">
+            <summary>{% blocktranslate count counter=result.skipped|length %}{{ counter }} skipped{% plural %}{{ counter }} skipped{% endblocktranslate %}</summary>
+            <ul>
+              {% for line in result.skipped %}
+                <li>
+                  {% if line.title_url %}<a href="{{ line.title_url }}">{{ line.text }}</a>{% else %}{{ line.text }}{% endif %}
+                  <small class="muted">–
+                    {% if line.result == "duplicate" %}{% blocktranslate with number=line.duplicate_of.number %}same as line {{ number }}{% endblocktranslate %}
+                    {% elif line.result == "existing" %}{% translate "already there" %}
+                    {% else %}{% translate "skipped by you" %}{% endif %}
+                  </small>
+                </li>
+              {% endfor %}
+            </ul>
+          </details>
+        {% else %}
+          {% blocktranslate count counter=0 %}{{ counter }} skipped{% plural %}{{ counter }} skipped{% endblocktranslate %}
+        {% endif %}
+      </li>
+      <li>{% blocktranslate count counter=result.missing|length %}{{ counter }} not imported (not found or no title chosen){% plural %}{{ counter }} not imported (not found or no title chosen){% endblocktranslate %}</li>
+    </ul>
+    {% if result.missing %}
+      <label for="import-missing">{% translate "Lines that weren't imported" %}</label>
+      <textarea id="import-missing" readonly rows="{% if result.missing|length > 10 %}10{% else %}{{ result.missing|length }}{% endif %}" aria-describedby="import-missing-help">{{ result.missing_text }}</textarea>
+      <div class="helptext" id="import-missing-help">{% translate "Copy them to add them by hand, or try them again in a new import." %}</div>
+    {% endif %}
+    <div class="actions">
+      {% if target %}
+        <a href="{{ target.get_absolute_url }}" role="button">{% blocktranslate with name=target.name %}Open “{{ name }}”{% endblocktranslate %}</a>
+      {% endif %}
+      <form method="post" action="{% url 'imports:discard' %}">
+        {% csrf_token %}
+        <button type="submit" class="secondary outline">{% translate "New import" %}</button>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}

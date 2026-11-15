@@ -44,9 +44,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   minute and user, "Refresh now" 10 per minute and user, "Refresh all" once per 5 minutes
   and user, password attempts for "Reset my data" 5 per hour and user.
 - **"Reset my data"** (`/accounts/profile/reset/`, `catalog/reset.py`): deletes all of the
-  user's lists, watched movies and episodes, follows and show statuses, to start over,
-  e.g. after a failed import. Account, password, profile settings and TMDB data (shared by
-  all users) stay. Show statuses go too, so the first mark afterwards follows a show again.
+  user's lists, watched movies and episodes, follows, show statuses and a batch import, to
+  start over, e.g. after a failed import. Account, password, profile settings and TMDB
+  data (shared by all users) stay. Show statuses go too, so the first mark afterwards
+  follows a show again.
   The link sits at the bottom of the profile in a separate danger zone (rarely needed, a
   misclick would be fatal). The page first shows what will be lost ("4 lists, 312 watched
   movies, …"), says clearly that this can't be undone (the nightly database copy holds all
@@ -166,39 +167,110 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   after changing it), the detail page reloads the title.
 - TMDB statuses are translated ("Ended" → "Beendet").
 
-### Batch import (planned, milestone 7c, part 2)
+### Batch import
 
 - **Why:** without it, moving to Couch Owl means entering a whole watch history by hand.
   The source is a plain list of titles (notes, a spreadsheet), one per line, optionally
-  with the year (`Dark (2017)`, `Dark 2017`); bullets and empty lines are ignored.
+  with the year (`Dark (2017)`, `Dark 2017`); bullets (`-`, `*`, `•`, `1.`, `1)`) and
+  empty lines are ignored, at most 500 lines.
   Rejected: importing exports of other apps (JustWatch, Trakt, TV Time, Letterboxd);
   their titles can be pasted like any other list.
+- **Years:** `(2017)` in parentheses is always a year. A trailing number without
+  parentheses is ambiguous ("Wonder Woman 1984", "Blade Runner 2049", "1917"): it is not
+  a year when it's the whole line or lies in the future, and when "title without the
+  number + year" finds no exact match, the whole line is searched again. The year must
+  match exactly; one year off (festival vs. cinema release) makes the line ambiguous
+  with the right candidate on top. Rejected: ±1 tolerance (silently matches remakes).
 - **Paste → preview → import**, all on page `/import/` (linked from the lists overview, a
-  list's menu and empty states; not hidden in the profile). Every line shows its state:
-  matched (preselected, changeable), ambiguous (the top candidates with poster, year and
-  type to choose from), not found (search again or skip), already there or duplicate
-  (skipped). A line counts as matched when exactly one result matches the title exactly
-  (same comparison as search ordering), and the year if one is given.
+  list's menu ("Import" preselects the list), the empty states of lists, and the empty
+  "Continue watching" as long as the user has no data at all; not hidden in the profile).
+  The dashboard hint disappears once there is anything: "Continue watching" is also empty
+  for people who only track movies or are between shows, and a permanent import hint on
+  the start page would be noise. Every line shows its state,
+  problem lines first: ambiguous (the top 5 candidates with poster, year and type to
+  choose from), not found (search again or skip), matched (preselected, changeable),
+  already there or duplicate (skipped).
+  - **Matched:** exactly one result matches the title exactly (translated or original
+    title, same comparison as search ordering), and the year if one is given.
+  - **Ambiguous:** several exact matches, no exact match among the results, or the year
+    doesn't match. **Not found:** no results at all.
+  - **Duplicate:** resolves to the same title as an earlier line. Two lines switched to
+    the same title in the preview are merged during the import (counted as duplicate):
+    the earlier line is imported, marked as watched or followed if any of them is.
+  - **Already there:** importing the line would change nothing (on the target list or no
+    list chosen, already watched or not marked as watched, already followed or "follow"
+    off). "Only already on the list" would be wrong: importing a watch history into the
+    watchlist must still mark titles that are on it as watched. Recomputed whenever the
+    line changes.
+  - **Every change in the preview is saved right away** (choosing a candidate, the
+    watched and follow switches, searching again) by a small htmx request that
+    re-renders only that line. Rejected: one big form at the end (500 lines × 3 fields
+    exceed Django's `DATA_UPLOAD_MAX_NUMBER_FIELDS` of 1000, and the choices would be
+    lost when the page is left, which the design promises to survive). Every line can be
+    searched again or skipped; matched lines keep their candidates behind "Change". The
+    updated line is merged with Idiomorph (posters stay); other lines keep their state
+    label until the page is reloaded (e.g. a line that becomes a duplicate of the
+    changed one), the import itself always uses the current state.
+  - Ambiguous lines without a choice are skipped on import and end up in the result's
+    list to copy; a notice counts them before ("3 lines still need a choice").
   Rejected: asking about each ambiguous title one by one (ambiguity is common: "Dark" is
   a movie and a show; slow with long lists).
-- **Options:** target list (existing, new or none; preselected when opened from a list),
-  watched yes/no as default with a per-line switch in the preview (mixed lists in one
-  pass), watched date "unknown" by default (today would distort "Continue watching" and
-  any history), "Follow shows" for all shows, ended and cancelled ones included. For
-  watched shows the checkbox decides instead of the automatic follow on the first mark.
-- **Shows are either watched completely or not started.** Partly watched shows are marked
+- **Options** (on the paste form): target list (existing, new or none; preselected when
+  opened from a list), watched yes/no and "Follow imported shows" as defaults, each with
+  a per-line switch in the preview (mixed lists in one pass). **Imported watched marks always
+  get the date "unknown"** (today would distort "Continue watching" and any history; a
+  common date for a whole history would be just as wrong); dates are set afterwards on
+  the detail pages. A form where neither a list, "watched" nor "follow" is chosen is
+  rejected, since the import would change nothing. A new list is created when the import
+  starts, not on the paste form, so a cancelled import leaves no empty list behind; the
+  target is stored by name, so a list deleted in the meantime comes back.
+- **Following is decided per show.** "Follow imported shows" on the paste form is off by
+  default and only presets the "Follow" switch, which the preview shows next to
+  "Watched" once a line's choice is a show. A watch history mixes running shows (worth
+  following) and ended ones; the earlier plan, one checkbox for all shows and a second
+  run for those that shouldn't be followed, was clumsy for exactly that normal case.
+  A switched-on line follows the show even if it is ended, cancelled or was unfollowed
+  before. Help text: "Can be changed per show before importing. Also shows you
+  unfollowed. Followed shows appear on the dashboard." Following is undone with one
+  click, unlike lost dates, so "nothing existing is changed" doesn't need to cover it.
+  For watched shows the switch decides instead of the automatic follow on the first mark
+  (the import marks episodes without `_start_watching` following the show, but sets the
+  status to "watching", so a later mark doesn't follow it either).
+  Rejected: leaving shows with an existing `UserSeries` alone (an exception the UI would
+  have to explain); a smart default (follow running, not ended shows), because the search
+  doesn't return a show's status and asking TMDB per show would slow the search phase
+  down; a "you unfollowed this" note per line (too much in the preview).
+- **Shows are either watched completely or not started.** "Watched" marks all aired
+  episodes outside of specials (season 0, consistent with when a show counts as watched)
+  with an unknown date, keeping existing dates. Partly watched shows are marked
   afterwards on the show page: marking the last watched episode offers "Mark earlier
-  episodes too?". Rejected: a line syntax like `Breaking Bad: S3E5` (few shows are
-  in progress at once; the existing prompt is enough).
+  episodes too?". Rejected: a line syntax like `Breaking Bad: S3E5` (few shows are in
+  progress at once; the existing prompt is enough).
 - **Nothing existing is changed:** list entries stay, watched dates of movies and
-  episodes are kept, the same title twice is imported once.
-- **Processed in chunks** of about 10 lines via htmx (each response triggers the next
-  request) with a progress bar; the import and its lines are stored in the database, so
-  the page can be left and resumed. One running import per user, at most about 500 lines.
+  episodes are kept, the same title twice is imported once. Each line is imported in its
+  own transaction (never half a line).
+- **Processed in chunks** of about 10 lines via htmx with a progress bar, for both the
+  analysis (one search per line) and the import (loading each title with its seasons):
+  an element with `hx-trigger="load"` posts the next step, each response returns the
+  element again with the new progress, the last one redirects. The import and its lines
+  are stored in the database (models `Import` and `ImportLine` in their own app
+  `imports`), so the page can be left and resumed. Lines are claimed with a conditional
+  update, so two open tabs don't process the same line; a claim older than two minutes
+  counts as abandoned (e.g. after a worker restart). A chunk ends after 10 lines or
+  10 seconds. When TMDB fails, the loop stops with "Try again" and the line stays
+  pending. One import per user. The loop only runs while the page is open (said on the
+  page); without JavaScript a "Continue" button runs one chunk per click. An import can
+  be cancelled at any time; titles imported so far stay.
   300 lines need around 600 TMDB requests, more than fits into gunicorn's 30 s timeout.
   Rejected: one synchronous request, a background thread, a task queue with a worker
   process (one more moving part in the container).
-- **Result:** imported / skipped / not found, with the lines that weren't found to copy.
+- **Result:** imported / skipped / not found, with the lines that weren't imported in a
+  read-only text field to copy. The skipped lines are listed collapsed with their reason
+  (already there, same as line N, skipped by you) and a link to the title: "already
+  there" is checked again when importing and can differ from the preview, and otherwise
+  a missing title raises "why?". They aren't in the text field, which is for lines that
+  still need something done. "New import" deletes the finished import and its lines.
+  "Reset my data" deletes imports too.
 - **Starting over** after a failed import: "Reset my data" in the profile (see Accounts).
   Rejected for 1.0: "Undo import" (would have to track what an import created, with edge
   cases once things change afterwards; backlog).
@@ -291,7 +363,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   and served with whitenoise.
 - **Apps:** `core` (layout, dashboard, upcoming, About, health, backups), `accounts`
   (users, invitations, profile, rate limits), `catalog` (TMDB, titles, lists, shows,
-  posters, sync).
+  posters, sync), `imports` (batch import).
 - **Configuration only via environment variables** (django-environ); every variable is
   documented in `.env.example`. Secrets never go into the repository.
 - **SQLite by default**; PostgreSQL optional via `DATABASE_URL`.
@@ -315,6 +387,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   first mark).
 - `WatchedMovie` and `WatchedEpisode`: user, title/episode, `watched_at` (nullable =
   unknown date), unique per user.
+- `Import` (one per user: state, target list name, defaults) and `ImportLine` (pasted
+  text, query, search status, up to 5 candidates as JSON, choice, watched, follow,
+  result, `claimed_at`). Candidates are stored, not searched again, so the preview stays as it
+  was even after TMDB's search cache expires.
 - Announcements, "Continue watching" and the followed-shows list are computed by queries,
   not stored.
 

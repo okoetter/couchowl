@@ -67,6 +67,10 @@
           <p class="muted">
             {% url 'catalog:search' as search_url %}
             {% blocktranslate %}Shows you are watching appear here with their next episode. Find a show in the <a href="{{ search_url }}">search</a> and mark the first episode as watched.{% endblocktranslate %}
+            {% if has_no_data %}
+              {% url 'imports:page' as import_url %}
+              {% blocktranslate %}Moving from another app? <a href="{{ import_url }}">Import a list of titles.</a>{% endblocktranslate %}
+            {% endif %}
           </p>
         {% endif %}
       {% endpartialdef %}

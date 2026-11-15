@@ -81,6 +81,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IMPRINT_URL` and `PRIVACY_URL`: optional links to the operator's legal notice and
   privacy policy, in the footer and on the About page
 - `SOURCE_URL`: source code link on the About page (for modified versions, see license)
+- "Reset my data" in the profile: deletes all of your lists, watched movies and episodes
+  and followed shows after asking for your password
+- Batch import (`/import/`): paste a list of movies and TV shows, one per line (optionally
+  with the year), check the matches, then add them to a list, mark them as watched (date
+  unknown; shows completely) and/or follow the shows, each switchable per title
 - License: GNU Affero General Public License v3.0 or later (`LICENSE`)
 - `docs/deployment.md`: complete installation guide (TMDB token, settings, updates, logs,
   notes for a privacy policy)

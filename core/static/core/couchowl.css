@@ -1388,3 +1388,174 @@ button.progress-button:focus-visible .progress-next {
 .rating {
   white-space: nowrap;
 }
+
+/* ---- Batch import ------------------------------------------------------------- */
+
+/* "3 lines still need a choice" */
+.message-warning {
+  border-left: 4px solid var(--app-warning-color);
+}
+
+:root {
+  --app-warning-color: #d89b00;
+}
+
+.import-progress progress {
+  margin-bottom: 0.5rem;
+}
+
+.import-summary {
+  margin-bottom: var(--pico-spacing);
+}
+
+.import-group {
+  margin: calc(var(--pico-spacing) * 1.5) 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.import-lines {
+  padding: 0;
+}
+
+.import-line {
+  list-style: none;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.import-line-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem var(--pico-spacing);
+  overflow-wrap: anywhere;
+}
+
+/* State of a line: a small pill, colored for lines that need attention */
+.import-badge {
+  padding: 0.05rem 0.6rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  color: var(--pico-muted-color);
+}
+
+.import-badge-choose {
+  border-color: var(--app-warning-color);
+  color: inherit;
+}
+
+.import-badge-not_found {
+  border-color: var(--app-error-color);
+  color: var(--app-error-color);
+}
+
+.import-badge-import {
+  border-color: var(--pico-ins-color);
+  color: var(--pico-ins-color);
+}
+
+.import-line-error {
+  margin: 0.5rem 0 0;
+  color: var(--app-error-color);
+}
+
+/* A found title: poster thumbnail with name, type and year (like a search result) */
+.import-candidate {
+  display: flex;
+  align-items: center;
+  gap: var(--pico-spacing);
+  margin-top: 0.5rem;
+}
+
+.import-candidate small {
+  display: block;
+  color: var(--pico-muted-color);
+}
+
+.import-choices fieldset {
+  margin-bottom: 0.5rem;
+}
+
+/* Radio button in front of a candidate */
+.import-option {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.import-option .import-candidate {
+  margin-top: 0;
+}
+
+.import-choices > button {
+  width: auto;
+  margin: 0.5rem 0;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.import-search {
+  margin: 0;
+}
+
+.import-search fieldset {
+  margin-bottom: 0;
+}
+
+.import-search button {
+  white-space: nowrap;
+}
+
+.import-change {
+  margin: 0.5rem 0 0;
+}
+
+.import-change > summary {
+  font-size: 0.875rem;
+  color: var(--pico-muted-color);
+}
+
+/* "Watched" and, for shows, "Follow" switches next to each other */
+.import-switches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem calc(var(--pico-spacing) * 1.5);
+  margin: 0.5rem 0 0;
+}
+
+.import-switches label {
+  margin: 0;
+}
+
+.import-actions {
+  margin-top: calc(var(--pico-spacing) * 1.5);
+}
+
+.import-result {
+  padding-left: 1.25rem;
+}
+
+/* Result: the skipped lines with their reason, collapsed */
+.import-skipped {
+  margin: 0;
+}
+
+/* The chevron right after the text, not at the far right edge (Pico floats it) */
+.import-skipped > summary {
+  display: inline-flex;
+  align-items: center;
+}
+
+.import-skipped > summary::after {
+  float: none;
+}
+
+.import-skipped ul {
+  margin: 0.25rem 0 0;
+}

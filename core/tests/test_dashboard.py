@@ -49,6 +49,17 @@ def test_empty_dashboard_explains_both_sections(auth_client):
     assert "Ankündigungen" in content
     assert "Neue Staffeln gefolgter Serien in den nächsten 3 Monaten" in content
     assert "Folge Serien, um ihre neuen Staffeln hier zu sehen." in content
+    assert reverse("imports:page") in content
+
+
+def test_import_hint_only_while_the_user_has_no_data(auth_client, user):
+    """Not for everyone without a show in progress, e.g. not for people with lists."""
+    user.lists.create(name="Watchlist")
+
+    content = auth_client.get(reverse("core:dashboard")).content.decode()
+
+    assert "erscheinen hier mit ihrer nächsten Folge" in content
+    assert reverse("imports:page") not in content
 
 
 def test_dashboard_shows_next_episode_and_announcement(auth_client, user, show, fake_tmdb):
