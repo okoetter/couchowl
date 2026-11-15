@@ -22,26 +22,41 @@ The reasons behind finished work are in [design.md](design.md).
 - [x] **7b – Open source:** owl app icon, "About" page (version, license, source code link, TMDB logo and
   notice, JustWatch credit; the footer shrinks to a link), `IMPRINT_URL`/`PRIVACY_URL`,
   AGPL-3.0 license, README, `docs/deployment.md`
-- [ ] **7c – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
+- [ ] **7c – Batch import:** page `/import/` (linked from the lists overview, a list's menu and
+  empty states): paste one title per line, optionally with year (`Dark (2017)`), then
+  preview, then import
+  - options: target list (existing / new / none), watched yes/no as default (switchable
+    per line in the preview), watched date "unknown" by default, "Follow shows"
+  - preview: matched (preselected, changeable), ambiguous (choose among the top
+    candidates), not found (search again or skip), already there or duplicate (skipped)
+  - shows are either watched completely or not started; partly watched ones are marked
+    afterwards on the show page ("Mark earlier episodes too?")
+  - processed in chunks via htmx with a progress bar (gunicorn's 30 s timeout); result:
+    imported / skipped / not found, with the lines that weren't found to copy
+  - "Reset my data" in the profile (danger zone, confirmed with the password): deletes all
+    of the user's lists, watched marks and followed shows; account, settings and TMDB data
+    stay
+- [ ] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   deployment on the NAS
 
 ## Backlog (after 1.0)
 
-- [ ] **JustWatch import (CLI only):** `manage.py import_justwatch <file> --user <name> [--dry-run]`
-  - watchlists, watched movies/episodes, followed shows
-  - match via IMDb ID (TMDB `/find`), else title + year; report unmatched entries
-  - open question: how to obtain the export (no official export; GDPR data request?)
+- [ ] Batch import: "Undo import"
+- [ ] **Overview of all followed shows** for unfollowing by hand, e.g. with the TMDB status
+  (running / ended / cancelled); details and how it differs from the system list
+  "Followed shows" still to be decided
 - [ ] **Watch history page:** everything I have watched, independent of lists and follows
   (watched movies and episodes stay stored when a title leaves a list or a show is
   unfollowed, but today they are only visible per title)
   - newest first, grouped by month; episodes of the same show and day collapsed
     ("Dark · S2 E1–E4"); entries with an unknown date in their own group at the end
   - filter movies / shows; links to the detail pages
-- [ ] Data export (JSON) and self-service account deletion; later imports (Trakt, TV Time, Letterboxd)
+- [ ] Data export (JSON) and self-service account deletion (can reuse the reset from 7c)
 - [ ] Search: toggle "relevance / newest first"
 - [ ] Lists: sort (date added, title, year, TMDB rating); "already on list X" in search; note per list entry
 - [ ] Lists: multi-select with bulk actions (select all/none, mark as watched, remove)
+  (more important once lists grow through the batch import)
 - [ ] Reorder lists by drag and drop (sorted alphabetically for now)
 - [ ] Accessibility review (labels, keyboard, contrast, screen readers with HTMX updates)
 - [ ] Content Security Policy (needs the CSP build of Alpine.js; the standard build needs

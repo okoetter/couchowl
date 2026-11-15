@@ -112,6 +112,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **The first mark on a show follows it automatically**, but only the very first time
   (while `UserSeries.status` is still empty); after a deliberate unfollow, marking doesn't
   follow again. Rejected: a separate "Hide" button and "Unfollow" on dashboard cards.
+- **Unfollowing never happens automatically**, only by the user. Ended or cancelled shows
+  stay followed: nobody knows whether a new season comes after all.
 - **The dashboard never asks TMDB**; it only shows what's in the database.
 - **Continue watching:** followed shows with status "watching" that have at least one
   watched episode and a next episode; most recently watched first. A check button marks
@@ -153,6 +155,48 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   queried across titles, so no separate table). If the user's region is missing (e.g.
   after changing it), the detail page reloads the title.
 - TMDB statuses are translated ("Ended" → "Beendet").
+
+### Batch import (planned, milestone 7c)
+
+- **Why:** without it, moving to Couch Owl means entering a whole watch history by hand.
+  The source is a plain list of titles (notes, a spreadsheet), one per line, optionally
+  with the year (`Dark (2017)`, `Dark 2017`); bullets and empty lines are ignored.
+  Rejected: importing exports of other apps (JustWatch, Trakt, TV Time, Letterboxd);
+  their titles can be pasted like any other list.
+- **Paste → preview → import**, all on page `/import/` (linked from the lists overview, a
+  list's menu and empty states; not hidden in the profile). Every line shows its state:
+  matched (preselected, changeable), ambiguous (the top candidates with poster, year and
+  type to choose from), not found (search again or skip), already there or duplicate
+  (skipped). A line counts as matched when exactly one result matches the title exactly
+  (same comparison as search ordering), and the year if one is given.
+  Rejected: asking about each ambiguous title one by one (ambiguity is common: "Dark" is
+  a movie and a show; slow with long lists).
+- **Options:** target list (existing, new or none; preselected when opened from a list),
+  watched yes/no as default with a per-line switch in the preview (mixed lists in one
+  pass), watched date "unknown" by default (today would distort "Continue watching" and
+  any history), "Follow shows" for all shows, ended and cancelled ones included. For
+  watched shows the checkbox decides instead of the automatic follow on the first mark.
+- **Shows are either watched completely or not started.** Partly watched shows are marked
+  afterwards on the show page: marking the last watched episode offers "Mark earlier
+  episodes too?". Rejected: a line syntax like `Breaking Bad: S3E5` (few shows are
+  in progress at once; the existing prompt is enough).
+- **Nothing existing is changed:** list entries stay, watched dates of movies and
+  episodes are kept, the same title twice is imported once.
+- **Processed in chunks** of about 10 lines via htmx (each response triggers the next
+  request) with a progress bar; the import and its lines are stored in the database, so
+  the page can be left and resumed. One running import per user, at most about 500 lines.
+  300 lines need around 600 TMDB requests, more than fits into gunicorn's 30 s timeout.
+  Rejected: one synchronous request, a background thread, a task queue with a worker
+  process (one more moving part in the container).
+- **Result:** imported / skipped / not found, with the lines that weren't found to copy.
+- **"Reset my data"** in the profile, at the bottom in a separate danger zone (rarely
+  needed, a misclick would be fatal): deletes all of the user's lists, watched movies and
+  episodes, follows and show statuses, to start over e.g. after a failed import. Account,
+  profile settings and TMDB data (shared by all users) stay. The page first shows what
+  will be lost ("4 lists, 312 watched movies, …") and asks for the password; it says
+  clearly that this can't be undone (the nightly database copy holds all users, so one
+  user can't be restored from it). Rejected for 1.0: "Undo import" (would have to track
+  what an import created, with edge cases once things change afterwards; backlog).
 
 ### Languages and region
 
@@ -306,7 +350,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   brings older copies up to date. PostgreSQL users use `pg_dump`.
 - **Versions:** Semantic Versioning, `CHANGELOG.md` in "Keep a Changelog" format, version
   in the footer, on the About page and in the health check. An update is a new image plus
-  a restart; migrations run on start. Planned with milestone 7c: multi-arch images on GHCR
+  a restart; migrations run on start. Planned with milestone 7d: multi-arch images on GHCR
   with the tags `1.2.3`, `1.2` and `latest`, built by GitHub Actions; 1.0 starts as a
   release candidate that is installed on a real NAS first.
 
@@ -345,7 +389,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Levels:** unit and integration tests (pre-commit hook, with ruff); end-to-end tests
   with Playwright for core flows and screenshots of important pages in light/dark and
   desktop/phone (marker `e2e`, too slow for pre-commit); live checks against the real TMDB
-  API (marker `live`, run by hand); a Docker smoke test in CI (milestone 7c).
+  API (marker `live`, run by hand); a Docker smoke test in CI (milestone 7d).
 - **Cross-platform development:** no bash-only scripts, everything runs via `uv run`;
-  `.python-version`, `.gitattributes` and `.editorconfig`. CI (milestone 7c) runs the
+  `.python-version`, `.gitattributes` and `.editorconfig`. CI (milestone 7d) runs the
   tests on Linux, macOS and Windows.
