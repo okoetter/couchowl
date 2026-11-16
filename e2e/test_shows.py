@@ -158,3 +158,53 @@ def test_no_closes_the_question(live_server, member, page, fake_tmdb):
 
     expect(page.locator(".toast")).to_have_count(0)
     assert WatchedEpisode.objects.count() == 1
+
+
+def test_mark_the_whole_show_as_not_watched(live_server, member, page, fake_tmdb):
+    """From the list (completely watched) and from the show page, after confirming."""
+    from catalog import lists as list_rules
+    from catalog import services, shows
+
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    show = services.get_title("tv", 70523, "de-DE").title
+    watchlist = member.lists.create(name="Watchlist")
+    list_rules.add_to_list(watchlist, show)
+    for season in show.seasons.all():
+        shows.mark_season(member, season)
+    url = live_server.url
+    login(page, url, "anna")
+    dialogs = []
+    answer = {"accept": False}
+
+    def on_dialog(dialog):
+        dialogs.append(dialog.message)
+        dialog.accept() if answer["accept"] else dialog.dismiss()
+
+    page.on("dialog", on_dialog)
+
+    # List: dismissing the question changes nothing
+    page.goto(url + watchlist.get_absolute_url())
+    button = page.get_by_role("button", name="„Dark“ als nicht gesehen markieren")
+    button.click()
+    expect(button).to_be_visible()
+    assert dialogs == ["Alle Folgen von „Dark“ als nicht gesehen markieren?"]
+    assert WatchedEpisode.objects.exists()
+
+    answer["accept"] = True
+    button.click()
+    page.mouse.move(0, 0)  # on hover the button shows the next episode instead
+    expect(page.get_by_text("0/26")).to_be_visible()
+    assert not WatchedEpisode.objects.exists()
+
+    # Show page: seasons and progress line follow without a reload
+    shows.mark_season(member, show.seasons.get(number=1))
+    page.goto(f"{url}/tv/70523/")
+    expect(page.locator("#season-1-info")).to_contain_text("Gesehen")
+    page.get_by_role("button", name="Alle als nicht gesehen markieren").click()
+    expect(page.get_by_text("0 von 26 Folgen gesehen")).to_be_visible()
+    assert dialogs[-1] == "Alle Folgen dieser Serie als nicht gesehen markieren?"
+    expect(page.locator("#season-1-info")).not_to_contain_text("Gesehen")
+    expect(page.get_by_role("button", name="Alle als nicht gesehen markieren")).to_have_count(0)
+    assert not WatchedEpisode.objects.exists()

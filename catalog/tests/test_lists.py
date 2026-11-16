@@ -570,7 +570,29 @@ def test_completely_watched_show_counts_as_watched(auth_client, user, mixed_list
     content = content.decode()
 
     assert shown_names(content) == ["Dark", "The Dark Knight"]
-    assert "26 von 26 Folgen gesehen" in content  # the button is a plain check mark now
+    assert "26 von 26 Folgen gesehen" in content
+
+
+def test_completely_watched_show_can_be_marked_as_not_watched(auth_client, user, show):
+    from catalog import shows
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, user_list.items.get().pk])
+    for season in show.seasons.all():
+        shows.mark_season(user, season)
+
+    content = auth_client.get(user_list.get_absolute_url()).content.decode()
+    # A misclick would delete all dates: asks first
+    assert "Alle Folgen von „Dark“ als nicht gesehen markieren?" in content
+    assert 'name="unwatched"' in content
+
+    content = auth_client.post(url, {"unwatched": "1"}, headers=HTMX).content.decode()
+
+    assert not user.watched_episodes.exists()
+    assert "0/26" in content
+    assert "<img" not in content
+    assert 'id="toast" hx-swap-oob="innerHTML"' in content  # an old "Undo" disappears
 
 
 def test_watched_button_on_other_users_list_is_404(auth_client, user, other_user, movie):

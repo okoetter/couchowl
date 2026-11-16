@@ -1,0 +1,8 @@
+{% comment %}
+  Answer to "Mark all episodes as not watched" on the detail page: the seasons replace
+  themselves (morph), the progress line is updated by its id and an open "Mark earlier
+  episodes too?" prompt disappears.
+{% endcomment %}
+{% include "catalog/_seasons.html" %}
+{% include "catalog/title_detail.html#show-progress" with oob=True %}
+{% include "catalog/_earlier.html#region" %}

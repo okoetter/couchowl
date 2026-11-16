@@ -53,24 +53,36 @@
       {% if not title.is_movie %}
         {% partialdef show-progress inline %}
           {# "12 of 26 episodes watched · Next: S2 E5 …"; updated after every change below #}
-          <p id="show-progress" class="show-progress"{% if oob %} hx-swap-oob="true"{% endif %}>
-            {% if progress.aired %}
-              {% if progress.complete %}
-                <span class="watched-badge">✓ {% translate "All episodes watched" %}</span>
-              {% else %}
-                {% blocktranslate trimmed with watched=progress.watched aired=progress.aired %}
-                  {{ watched }} of {{ aired }} episodes watched
-                {% endblocktranslate %}
-                {% if progress.next_episode %}
-                  <br>{% translate "Next:" %}
-                  <a href="?season={{ progress.next_episode.season.number }}#episode-{{ progress.next_episode.season.number }}-{{ progress.next_episode.number }}">
-                    <strong>{{ progress.next_episode.code }}</strong>{% if next_name %} {{ next_name }}{% endif %}</a>
+          <div id="show-progress" class="show-progress"{% if oob %} hx-swap-oob="true"{% endif %}>
+            <p>
+              {% if progress.aired %}
+                {% if progress.complete %}
+                  <span class="watched-badge">✓ {% translate "All episodes watched" %}</span>
+                {% else %}
+                  {% blocktranslate trimmed with watched=progress.watched aired=progress.aired %}
+                    {{ watched }} of {{ aired }} episodes watched
+                  {% endblocktranslate %}
+                  {% if progress.next_episode %}
+                    <br>{% translate "Next:" %}
+                    <a href="?season={{ progress.next_episode.season.number }}#episode-{{ progress.next_episode.season.number }}-{{ progress.next_episode.number }}">
+                      <strong>{{ progress.next_episode.code }}</strong>{% if next_name %} {{ next_name }}{% endif %}</a>
+                  {% endif %}
                 {% endif %}
+              {% else %}
+                <span class="muted">{% translate "No episodes have aired yet." %}</span>
               {% endif %}
-            {% else %}
-              <span class="muted">{% translate "No episodes have aired yet." %}</span>
+            </p>
+            {% if progress.started %}
+              {# Undo the whole show at once, e.g. after an import marked it by mistake #}
+              <form method="post" action="{% url 'catalog:show_unwatched' title.tmdb_id %}"
+                    hx-post="{% url 'catalog:show_unwatched' title.tmdb_id %}"
+                    hx-target="#seasons" hx-swap="morph:outerHTML"
+                    hx-confirm="{% translate 'Mark all episodes of this show as not watched?' %}">
+                {% csrf_token %}
+                <button type="submit" class="secondary outline">{% translate "Mark all as not watched" %}</button>
+              </form>
             {% endif %}
-          </p>
+          </div>
         {% endpartialdef %}
       {% endif %}
 

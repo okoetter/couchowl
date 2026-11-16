@@ -86,6 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Batch import (`/import/`): paste a list of movies and TV shows, one per line (optionally
   with the year), check the matches, then add them to a list, mark them as watched (date
   unknown; shows completely) and/or follow the shows, each switchable per title
+- Mark a whole show as not watched, after confirming: "Mark all as not watched" on the show
+  page, or the check mark of a completely watched show in a list
 - License: GNU Affero General Public License v3.0 or later (`LICENSE`)
 - `docs/deployment.md`: complete installation guide (TMDB token, settings, updates, logs,
   notes for a privacy policy)

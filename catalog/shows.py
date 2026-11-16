@@ -156,6 +156,15 @@ def unmark_season(user, season: Season) -> None:
     WatchedEpisode.objects.filter(user=user, episode__season=season).delete()
 
 
+def unmark_show(user, show: Title) -> None:
+    """Mark the whole show as not watched, specials included.
+
+    Following, lists and the show's status stay (like unmarking a season), so marking
+    episodes again later doesn't follow the show a second time.
+    """
+    WatchedEpisode.objects.filter(user=user, episode__season__show=show).delete()
+
+
 def _start_watching(user, show_id: int) -> None:
     """The first watched episode makes a show "currently watching" and follows it.
 

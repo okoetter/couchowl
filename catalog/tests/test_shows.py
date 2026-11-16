@@ -323,6 +323,20 @@ def test_unmark_season(user, show):
     assert list(WatchedEpisode.objects.values_list("episode__season__number", flat=True)) == [2]
 
 
+def test_unmark_show_keeps_following_and_other_users(user, other_user, show):
+    for season in show.seasons.all():  # specials included
+        shows.mark_season(user, season)
+        shows.mark_season(other_user, season)
+    status = UserSeries.objects.get(user=user).status
+
+    shows.unmark_show(user, show)
+
+    assert not WatchedEpisode.objects.filter(user=user).exists()
+    assert WatchedEpisode.objects.filter(user=other_user).exists()
+    assert shows.is_following(user, show)
+    assert UserSeries.objects.get(user=user).status == status
+
+
 def test_follow_and_unfollow(user, show):
     shows.set_following(user, show, True)
     assert shows.is_following(user, show)
@@ -487,6 +501,35 @@ def test_mark_and_unmark_season(auth_client, user, show):
     assert "hx-confirm" in content  # undoing a whole season asks first
 
     auth_client.post(season_url(1), {"action": "unmark"}, headers=HTMX)
+    assert not WatchedEpisode.objects.exists()
+
+
+def test_mark_whole_show_as_not_watched(auth_client, user, show):
+    url = reverse("catalog:show_unwatched", args=[70523])
+    assert url not in auth_client.get(show.get_absolute_url()).content.decode()
+    shows.mark_season(user, show.seasons.get(number=1))
+    shows.mark_episode(user, episode(show, 2, 1))
+
+    content = auth_client.get(show.get_absolute_url()).content.decode()
+    assert url in content
+    assert "Alle Folgen dieser Serie als nicht gesehen markieren?" in content  # asks first
+
+    content = auth_client.post(url, headers=HTMX).content.decode()
+
+    assert not WatchedEpisode.objects.exists()
+    assert '<section id="seasons"' in content
+    assert 'id="show-progress" class="show-progress" hx-swap-oob="true"' in content
+    assert "0 von 26 Folgen gesehen" in content
+    assert url not in content  # nothing left to unmark
+    assert 'id="toast" hx-swap-oob="innerHTML"' in content  # an open prompt disappears
+
+
+def test_mark_whole_show_as_not_watched_without_javascript(auth_client, user, show):
+    shows.mark_episode(user, episode(show, 1, 1))
+
+    response = auth_client.post(reverse("catalog:show_unwatched", args=[70523]))
+
+    assert response.url == show.get_absolute_url()
     assert not WatchedEpisode.objects.exists()
 
 

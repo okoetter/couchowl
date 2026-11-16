@@ -68,6 +68,7 @@ urlpatterns = [
     path("movie/<int:tmdb_id>/watched/", views.movie_watched, name="movie_watched"),
     # Shows: following, seasons and episodes
     path("tv/<int:tmdb_id>/follow/", views.show_follow, name="show_follow"),
+    path("tv/<int:tmdb_id>/unwatched/", views.show_unwatched, name="show_unwatched"),
     path("tv/<int:tmdb_id>/seasons/<int:season>/", views.season_episodes, name="season_episodes"),
     path(
         "tv/<int:tmdb_id>/seasons/<int:season>/watched/",

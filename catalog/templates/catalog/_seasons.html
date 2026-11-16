@@ -7,7 +7,7 @@
   Only the open season comes with its episodes; the others load them when opened
   ("toggle" event of <details>). Without JavaScript the link ?season=N opens that season.
 {% endcomment %}
-<section class="seasons" aria-labelledby="seasons-heading">
+<section id="seasons" class="seasons" aria-labelledby="seasons-heading">
   <h2 id="seasons-heading">{% translate "Seasons" %}</h2>
   {% for season in seasons %}
     <div class="season" id="season-{{ season.number }}">

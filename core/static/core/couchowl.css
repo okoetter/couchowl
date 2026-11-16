@@ -778,6 +778,22 @@ details.dropdown.list-dropdown-compact > summary + ul {
   margin-bottom: var(--pico-spacing);
 }
 
+.show-progress p {
+  margin-bottom: 0.5rem;
+}
+
+/* "Mark all as not watched": small, it's rarely needed and deletes all dates */
+.show-progress form {
+  margin: 0;
+}
+
+.show-progress button {
+  width: auto;
+  margin: 0;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.875rem;
+}
+
 /* ---- Seasons and episodes -------------------------------------------------------- */
 
 .seasons {
@@ -1019,12 +1035,6 @@ details.episode-watched > summary::after {
   box-shadow: none;
 }
 
-.progress-button.is-complete {
-  --pico-background-color: var(--pico-ins-color);
-  --pico-border-color: var(--pico-ins-color);
-  --pico-color: #fff;
-}
-
 /* "12/26" and "S1 E3" in the same grid cell: the button is as wide as the longer one
    and doesn't jump when the label changes on hover */
 .progress-labels {
@@ -1061,8 +1071,7 @@ button.progress-button:focus-visible .progress-next {
 
 /* Grid: a pill on the poster instead of the round movie button
    (repeats the selectors of the round button so these rules win) */
-.watched-toggle-corner button.progress-button,
-.watched-toggle-corner span.progress-button {
+.watched-toggle-corner button.progress-button {
   display: inline-flex;
   width: auto;
   margin: 0;
@@ -1076,13 +1085,6 @@ button.progress-button:focus-visible .progress-next {
   transition: background-color 0.15s, opacity 0.15s;
 }
 
-.watched-toggle-corner span.progress-button.is-complete {
-  width: 2rem;
-  padding: 0;
-  justify-content: center;
-  background: var(--pico-ins-color);
-}
-
 .poster-grid .watched-toggle-corner button.progress-button:is(:hover, :focus-visible) {
   width: auto;
   margin: 0;
@@ -1092,7 +1094,7 @@ button.progress-button:focus-visible .progress-next {
 
 /* Like the movie button: not started yet = only visible on hover (with a mouse) */
 @media (hover: hover) {
-  .watched-toggle-corner .progress-button:not(.is-started, .is-complete) {
+  .watched-toggle-corner .progress-button:not(.is-started) {
     opacity: 0;
   }
 

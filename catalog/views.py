@@ -329,7 +329,7 @@ def list_item_watched(request, pk, item_pk):
 
     Movies: `watched` present = mark (today), missing = undo.
     Shows: mark the next episode (today) and show "S2 E5 watched · Undo";
-    `undo=<episode id>` takes that back.
+    `undo=<episode id>` takes that back; `unwatched` marks the whole show as not watched.
     """
     user_list = _user_list(request, pk)
     item = get_object_or_404(user_list.items.select_related("title"), pk=item_pk)
@@ -354,6 +354,13 @@ def _show_item_watched(request, user_list, item):
         # ("morph" keeps the posters); the empty toast hides the message
         response = _render_list(request, user_list, full_page=False)
         response.content += _toast(request, user_list, item.pk, None).encode()
+        return response
+    if request.POST.get("unwatched"):
+        shows.unmark_show(request.user, item.title)
+        response = _item_response(request, user_list, item.pk)
+        if _is_htmx_fragment_request(request):
+            # An "S3 E10 watched · Undo" still shown would undo nothing any more
+            response.content += _toast(request, user_list, item.pk, None).encode()
         return response
     episode = shows.watch_next(request.user, item.title)
     return _item_response(request, user_list, item.pk, toast=episode)
@@ -687,6 +694,20 @@ def episode_watched(request, tmdb_id, season, episode):
         messages.error(request, " ".join(e for errors in form.errors.values() for e in errors))
     _remember_earlier_prompt(request, earlier)
     return redirect(_season_anchor_url(show, season, f"episode-{season}-{episode}"))
+
+
+@require_POST
+def show_unwatched(request, tmdb_id):
+    """Mark the whole show as not watched (asks first, see the progress line).
+
+    htmx gets the seasons (morphed, so unchanged parts stay) and the progress line.
+    """
+    show = _show(tmdb_id)
+    shows.unmark_show(request.user, show)
+    if not _is_htmx_fragment_request(request):
+        return redirect(show)
+    context = {**_show_context(request, show), "earlier": None}
+    return render(request, "catalog/_show_unwatched_response.html", context)
 
 
 @require_POST

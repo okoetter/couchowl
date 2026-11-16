@@ -75,6 +75,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   For shows it shows the progress ("12/25") and marks the next episode, followed by a
   toast "S2 E5 watched · Undo". On hover or focus the progress pill shows the episode it
   will mark ("S1 E3"); phones have no hover, so the compact view says "Next: S1 E3".
+  A completely watched show shows a check mark like a watched movie; clicking it marks
+  the whole show as not watched after asking (a misclick would delete all dates).
+  Earlier this check couldn't be clicked, so undoing a show marked by mistake (e.g. by an
+  import) took one click and one question per season on the show page.
   Unwatched buttons in the grid only appear on hover, focus or touch devices, to keep the
   grid calm.
 - **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
@@ -102,6 +106,12 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   their date. A season shows the date of its last watched episode; once complete, its date
   can be changed for all its episodes. Unmarking a whole season asks first (a misclick
   would delete all dates).
+- **A whole show** can be marked as not watched: "Mark all as not watched" under the
+  progress line of the show page (as soon as one episode is watched, so it also works
+  after a new episode has aired) and the check mark of a completely watched show in
+  lists. Both ask first. Specials go too; following, lists and the show's status stay
+  (like unmarking a season), so marking episodes again later doesn't follow it again.
+  The button is small: it's rarely needed and shouldn't compete with marking episodes.
 - **A show counts as watched when all aired episodes are watched**, specials ("season 0")
   excluded. A new episode makes it unwatched again.
 - **The next episode** is the first unwatched, aired episode, specials excluded. Lists and

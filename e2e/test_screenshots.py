@@ -336,11 +336,15 @@ PAGES = {
     "list-grid-hover-show": show_list_grid_hover_show,
     "list-compact": show_list_compact,
     "list-filtered": show_list_filtered,
+    # "Dark" completely watched (see watch_dark): the check mark undoes the whole show
+    "list-grid-complete": show_list_grid,
+    "list-compact-complete": show_list_compact,
     "movie": show_movie,
     "show": show_show,
     "show-details": show_show_details,
     "show-jump": show_show_jump,
     "show-earlier": show_show_earlier,
+    "show-complete": show_show,
     "list-toast": show_list_toast,
     "followed": show_followed,
     "dashboard": show_dashboard,
@@ -455,6 +459,15 @@ def sample_lists(fake_tmdb, user):
             )
 
 
+def watch_dark(user):
+    """All aired episodes of "Dark" watched."""
+    from catalog import shows
+    from catalog.models import Title
+
+    for season in Title.objects.get(tmdb_id=70523).seasons.all():
+        shows.mark_season(user, season)
+
+
 def sample_dashboard(fake_tmdb, user):
     """More shows for the dashboard: one being watched, one waiting for its next episode,
     two with announced seasons."""
@@ -538,6 +551,8 @@ def provider_logos(fake_tmdb):
 def test_screenshot(live_server, member, browser, fake_tmdb, name, device, scheme):
     fake_search(fake_tmdb)
     sample_lists(fake_tmdb, member)
+    if name.endswith("-complete"):
+        watch_dark(member)
     if name.startswith(("dashboard", "upcoming")):
         sample_dashboard(fake_tmdb, member)
     provider_logos(fake_tmdb)
