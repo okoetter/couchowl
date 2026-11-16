@@ -1,0 +1,10 @@
+# Build the Couch Owl image from the source code instead of downloading it
+# (development, or testing changes in the production image):
+#
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+#
+# Docker Compose merges this file into docker-compose.yml.
+services:
+  couchowl:
+    build: .
+    image: couchowl:local

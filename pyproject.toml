@@ -46,6 +46,7 @@ ignore = ["S101"]  # assert is fine in tests
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S105", "S106"]  # hardcoded test passwords
+"scripts/smoke_test.py" = ["S603", "S607"]  # runs the docker CLI with fixed arguments
 
 [dependency-groups]
 dev = [
@@ -54,4 +55,10 @@ dev = [
     "pytest-django>=4.14.0",
     "pytest-playwright>=0.10.0",
     "ruff>=0.17.4",
+]
+# Linters for .github/workflows, installed on demand by the pre-commit hooks
+# (`uv run --group workflows`): actionlint-py downloads its binary when installed
+workflows = [
+    "actionlint-py>=1.7.12.25",
+    "zizmor>=1.32.0",
 ]

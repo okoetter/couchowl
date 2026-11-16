@@ -58,10 +58,20 @@ Design decisions and their reasons: `docs/design.md`. Milestones and backlog: `d
 - Dev server: `uv run python manage.py runserver` (needs `.env`, copy from `.env.example`, `DEBUG=True`)
 - Tests: `uv run pytest` · Lint/format: `uv run ruff check --fix . && uv run ruff format .`
 - All pre-commit hooks: `uv run pre-commit run --all-files`
-- Docker (production-like): `docker compose up -d --build`, check `http://localhost:8000/healthz/`
+- Docker (production-like): `docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`
+  (plain `docker-compose.yml` pulls `ghcr.io/okoetter/couchowl`), check `http://localhost:8000/healthz/`
+- Docker smoke test: `uv run python scripts/smoke_test.py` (also in CI)
 
 ## Container layout
 `Dockerfile` (multi-stage, python:3.15-slim, non-root uid 1000) → `tini` → `docker/entrypoint.sh`
 (runs `migrate`) → `honcho` with `docker/Procfile`: `web` (gunicorn) + `cron` (supercronic,
 `docker/crontab`). If one process dies, the container exits and Docker restarts it.
 Runtime data lives in `/data` (DB, poster cache, backups).
+
+## CI and releases
+`.github/workflows/ci.yml` (lint, tests on Linux/macOS/Windows, E2E, Docker smoke test) on
+push to main and PRs. `release.yml` on tags `v1.2.3`/`v1.2.3-rc.1`: `scripts/release_check.py`
+(tag = pyproject version, CHANGELOG section), CI incl. arm64 smoke test, multi-arch push to
+`ghcr.io/okoetter/couchowl`, GitHub Release. Actions pinned to commit SHAs (Dependabot);
+workflow changes must pass `actionlint` and `zizmor` (pre-commit, `uv run --group workflows`).
+Release tags are only set when the maintainer says so.

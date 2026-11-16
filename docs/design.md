@@ -440,10 +440,35 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   command:** restoring means stopping the container and copying the file back; `migrate`
   brings older copies up to date. PostgreSQL users use `pg_dump`.
 - **Versions:** Semantic Versioning, `CHANGELOG.md` in "Keep a Changelog" format, version
-  in the footer, on the About page and in the health check. An update is a new image plus
-  a restart; migrations run on start. Planned with milestone 7d: multi-arch images on GHCR
-  with the tags `1.2.3`, `1.2` and `latest`, built by GitHub Actions; 1.0 starts as a
-  release candidate that is installed on a real NAS first.
+  in the footer, on the About page and in the health check. `pyproject.toml` is the single
+  source of the version. An update is a new image plus a restart; migrations run on start.
+  1.0 starts as a release candidate that is installed on a real NAS first.
+- **Published image:** `ghcr.io/okoetter/couchowl` (GitHub Container Registry), for
+  `linux/amd64` and `linux/arm64` under one tag (multi-arch). GHCR needs no extra account
+  or secret (the workflow's own token pushes) and has no pull limits for public images.
+  Docker Hub as a second registry was rejected for now: another account and token for
+  little gain.
+- **Tags:** the Git tag `v1.2.3` produces the image tags `1.2.3`, `1.2`, `1` and `latest`,
+  so users can pin as tightly as they like (`COUCHOWL_VERSION` in `.env`, default
+  `latest`). Pre-releases (`v1.0.0-rc.1`) get only their own tag and a GitHub
+  "Pre-release", so nobody runs a release candidate by accident. No image per push to main
+  (`edge`): every published image went through a release.
+- **Installation without git:** `docker-compose.yml` pulls the image; the release attaches
+  it and `env.example` (GitHub removes leading dots from file names), so
+  `releases/latest/download/…` always fetches matching files. Building from source is an
+  extra Compose file (`docker-compose.build.yml`): one file with both `image` and `build`
+  would sometimes pull and sometimes build, depending on what is cached.
+- **Release workflow:** a tag starts `release.yml`. `scripts/release_check.py` first checks
+  that tag, `pyproject.toml` and the `CHANGELOG.md` section agree (and turns that section
+  into the release notes); then the whole CI runs, with the Docker smoke test on amd64 and
+  arm64; only then is the image pushed. arm64 is built with QEMU emulation on the normal
+  runners: all dependencies are pure Python, so emulation costs minutes, not hours;
+  native arm64 runners would need an extra merge step for the multi-arch tag. Each release
+  uses its own Docker build cache, so nothing cached by other branches ends up in an image.
+- **Workflow hygiene:** actions are pinned to commit hashes (a tag like `v4` can be moved
+  to other code; a hash can't), Dependabot proposes updates with a week's delay, jobs get
+  only the permissions they need (only publishing may write packages and releases), and
+  actionlint and zizmor check every workflow change.
 
 ## Security
 
@@ -480,7 +505,11 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Levels:** unit and integration tests (pre-commit hook, with ruff); end-to-end tests
   with Playwright for core flows and screenshots of important pages in light/dark and
   desktop/phone (marker `e2e`, too slow for pre-commit); live checks against the real TMDB
-  API (marker `live`, run by hand); a Docker smoke test in CI (milestone 7d).
+  API (marker `live`, run by hand); a Docker smoke test (`scripts/smoke_test.py`) that
+  starts the real image and checks health, version, static files, the non-root user, the
+  crontab and a backup.
 - **Cross-platform development:** no bash-only scripts, everything runs via `uv run`;
-  `.python-version`, `.gitattributes` and `.editorconfig`. CI (milestone 7d) runs the
-  tests on Linux, macOS and Windows.
+  `.python-version`, `.gitattributes` and `.editorconfig`. CI runs the tests on Linux,
+  macOS and Windows; the browser tests only on Linux (they test the browser, not the OS),
+  with the screenshots as a downloadable artifact. The smoke test is a Python script, not
+  a shell script, so it runs on every OS.

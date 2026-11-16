@@ -45,7 +45,8 @@ uv run python manage.py runserver    # http://localhost:8000
 | Lint and format | `uv run ruff check --fix .` and `uv run ruff format .` |
 | All pre-commit checks | `uv run pre-commit run --all-files` |
 | New migration after model changes | `uv run python manage.py makemigrations` |
-| Production-like test in Docker | `docker compose up -d --build`, then open `http://localhost:8000` |
+| Production-like test in Docker | `docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`, then open `http://localhost:8000` |
+| Smoke test of the Docker image | `uv run python scripts/smoke_test.py` (builds the image, starts it and checks it) |
 
 ## Browser tests (end-to-end)
 
@@ -75,6 +76,42 @@ skipped by default and need `TMDB_API_TOKEN` in your `.env`:
 ```sh
 uv run pytest -m live
 ```
+
+## Continuous integration
+
+GitHub Actions run on every push to `main` and every pull request
+(`.github/workflows/ci.yml`):
+
+- **Lint:** the pre-commit checks without the tests
+- **Tests** on Linux, macOS and Windows
+- **Browser tests** on Linux; the screenshots are attached to the run as an artifact
+  ("screenshots", kept 14 days)
+- **Docker smoke test:** builds the image and runs `scripts/smoke_test.py` against it
+
+Changes to `.github/` are checked by two extra pre-commit hooks,
+[actionlint](https://github.com/rhysd/actionlint) and [zizmor](https://docs.zizmor.sh/)
+(security). They are installed on first use (`uv run --group workflows`). Actions are
+pinned to commit hashes; Dependabot proposes updates weekly.
+
+## Releases
+
+Versions follow [Semantic Versioning](https://semver.org/). To release, e.g. `1.2.0`:
+
+1. Set `version = "1.2.0"` in `pyproject.toml` and run `uv lock`.
+2. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [1.2.0] - YYYY-MM-DD` (today) and add
+   a new empty `## [Unreleased]` above it.
+3. Commit, then tag and push: `git tag -a v1.2.0 -m "Couch Owl 1.2.0"` and
+   `git push origin main v1.2.0`.
+
+The tag starts `.github/workflows/release.yml`. It checks that tag, `pyproject.toml` and
+`CHANGELOG.md` agree, runs the whole CI (with the Docker smoke test also on arm64), then
+pushes the image `ghcr.io/okoetter/couchowl` for amd64 and arm64 and creates a GitHub
+Release with the changelog section, `docker-compose.yml` and `env.example`.
+
+| Git tag | Image tags |
+|---|---|
+| `v1.2.0` | `1.2.0`, `1.2`, `1`, `latest` |
+| `v1.3.0-rc.1` (pre-release) | `1.3.0-rc.1` only; the GitHub Release is marked "Pre-release" |
 
 ## Translations
 

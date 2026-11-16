@@ -1,0 +1,16 @@
+# Dependabot opens pull requests when the GitHub Actions used in .github/workflows have
+# new versions (the workflows pin them to commit hashes, so updates are explicit).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Only propose versions that are a week old: a hijacked release is usually found by then
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: CI

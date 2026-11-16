@@ -1,7 +1,8 @@
 # Deployment
 
-Couch Owl runs as a single Docker container. It speaks plain http on port 8000 and keeps all
-data in the volume `/data` (database, poster cache, backups). HTTPS comes from a reverse
+Couch Owl runs as a single Docker container. The image is published at
+`ghcr.io/okoetter/couchowl` for amd64 and arm64. It speaks plain http on port 8000 and keeps
+all data in the volume `/data` (database, poster cache, backups). HTTPS comes from a reverse
 proxy in front of it. This guide is independent of the host; any machine with Docker works.
 For accounts, e-mail and backups see [administration.md](administration.md).
 
@@ -15,21 +16,20 @@ For accounts, e-mail and backups see [administration.md](administration.md).
 
 ## Installation
 
-1. **Get the files.** Until prebuilt images are published, Docker builds the image from
-   the source code on the first start:
+1. **Get the files.** Couch Owl needs only two files from the
+   [latest release](https://github.com/okoetter/couchowl/releases/latest): the Compose file
+   and the example configuration, saved as `.env`:
 
    ```sh
-   git clone https://github.com/okoetter/couchowl.git
-   cd couchowl
+   mkdir couchowl && cd couchowl
+   curl -fLO https://github.com/okoetter/couchowl/releases/latest/download/docker-compose.yml
+   curl -fL https://github.com/okoetter/couchowl/releases/latest/download/env.example -o .env
    ```
 
-2. **Configure.** Copy the example configuration and edit it:
+   (Or download both in the browser from the release page and rename `env.example` to
+   `.env`.)
 
-   ```sh
-   cp .env.example .env
-   ```
-
-   Every setting is explained in `.env.example`. Set at least:
+2. **Configure.** Edit `.env`. Every setting is explained in the file. Set at least:
 
    | Setting | Value |
    |---|---|
@@ -43,10 +43,10 @@ For accounts, e-mail and backups see [administration.md](administration.md).
    invitations and password resets by e-mail, `IMPRINT_URL` and `PRIVACY_URL` (see
    [Legal notice and privacy policy](#legal-notice-and-privacy-policy)).
 
-3. **Start.**
+3. **Start.** Docker downloads the image on the first start:
 
    ```sh
-   docker compose up -d --build
+   docker compose up -d
    ```
 
    After a minute, `docker compose ps` shows the container as `healthy`, and
@@ -54,6 +54,26 @@ For accounts, e-mail and backups see [administration.md](administration.md).
 
 4. **Create the first admin** and invite people, see
    [administration.md](administration.md#create-the-first-admin).
+
+### Versions
+
+By default, Couch Owl runs the newest release (`latest`). To control updates, set
+`COUCHOWL_VERSION` in `.env`:
+
+| Value | Runs |
+|---|---|
+| `latest` (default) | the newest release |
+| `1` | the newest 1.x release; no major upgrade with possibly breaking changes |
+| `1.2` | the newest 1.2.x release (bug fixes only) |
+| `1.2.3` | exactly this version |
+
+Release candidates (e.g. `1.0.0-rc.1`) are only installed when you set them explicitly.
+They are marked "Pre-release" on the [releases page](https://github.com/okoetter/couchowl/releases)
+and aren't found by the `releases/latest` links above: download the two files from the
+release candidate's page instead.
+
+To build the image from the source code instead (e.g. with your own changes), clone the
+repository and use `docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`.
 
 ### TMDB API token
 
@@ -181,12 +201,17 @@ serves the posters itself.
 
 ## Updates
 
-Read the [changelog](../CHANGELOG.md) first, then:
+Read the [changelog](../CHANGELOG.md) or the
+[release notes](https://github.com/okoetter/couchowl/releases) first, then:
 
 ```sh
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
+
+With a fixed `COUCHOWL_VERSION`, change it in `.env` first. If you installed Couch Owl with
+`git clone` before images were published, `git pull` once brings the new
+`docker-compose.yml`; from then on, the commands above work and your data stays as it is.
 
 Database changes (migrations) run automatically when the container starts. Older backups
 can still be restored afterwards: they are brought up to date on the next start.

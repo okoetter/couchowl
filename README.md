@@ -29,15 +29,20 @@ A self-hosted watchlist for movies and TV shows, for you and the people you invi
 
 ## Installation
 
+Couch Owl runs as one Docker container (amd64 and arm64, image
+`ghcr.io/okoetter/couchowl`):
+
 ```sh
-git clone https://github.com/okoetter/couchowl.git && cd couchowl
-cp .env.example .env    # then edit: SECRET_KEY, SITE_URL, TMDB_API_TOKEN, …
-docker compose up -d --build
+mkdir couchowl && cd couchowl
+curl -fLO https://github.com/okoetter/couchowl/releases/latest/download/docker-compose.yml
+curl -fL https://github.com/okoetter/couchowl/releases/latest/download/env.example -o .env
+# edit .env: SECRET_KEY, SITE_URL, TMDB_API_TOKEN, …
+docker compose up -d
 docker compose exec couchowl python manage.py createsuperuser
 ```
 
 Then open <http://localhost:8000>. You need a free [TMDB](https://www.themoviedb.org/)
-API token.
+API token. Details, HTTPS and updates: [docs/deployment.md](docs/deployment.md).
 
 ## Documentation
 

@@ -1,4 +1,5 @@
 .git
+.github
 .venv
 .env
 data/
@@ -10,3 +11,11 @@ staticfiles/
 docs/
 *.md
 !core/static/vendor/README.md
+# Development and CI only
+e2e/
+scripts/
+screenshots/
+test-results/
+conftest.py
+docker-compose*.yml
+.pre-commit-config.yaml

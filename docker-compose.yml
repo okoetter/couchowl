@@ -1,13 +1,15 @@
 # Couch Owl – Docker Compose
 # 1. Copy .env.example to .env and adjust it (at least SECRET_KEY, SITE_URL, TMDB_API_TOKEN).
-#    Full guide: docs/deployment.md
+#    Full guide: https://github.com/okoetter/couchowl/blob/main/docs/deployment.md
 # 2. docker compose up -d
 # 3. Open http://localhost:8000
+# Updates: docker compose pull && docker compose up -d
+# To build the image from the source code instead, see docker-compose.build.yml.
 
 services:
   couchowl:
-    build: .
-    image: couchowl:local
+    # Version: COUCHOWL_VERSION in .env (default: the newest release)
+    image: ghcr.io/okoetter/couchowl:${COUCHOWL_VERSION:-latest}
     container_name: couchowl
     restart: unless-stopped
     env_file: .env

@@ -1,0 +1,110 @@
+# Publishes a release when a version tag is pushed, e.g. `git push origin v1.2.3`:
+# multi-arch image (amd64, arm64) on ghcr.io/okoetter/couchowl and a GitHub Release.
+#
+# Image tags: v1.2.3 -> 1.2.3, 1.2, 1, latest. Pre-releases (v1.0.0-rc.1) get only their own
+# tag, so nobody gets a release candidate by accident.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/okoetter/couchowl
+
+jobs:
+  check:
+    name: Check version and changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      # Tag = version in pyproject.toml, and CHANGELOG.md has a section for it
+      - run: uv run python scripts/release_check.py "$GITHUB_REF_NAME" > release-notes.md
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-notes
+          path: release-notes.md
+
+  ci:
+    name: CI
+    needs: check
+    # Job-level reusable workflows are resolved before any step runs, so "./" is safe here.
+    # The newer "$/" syntax (preferred by zizmor) isn't known to actionlint yet.
+    uses: ./.github/workflows/ci.yml # zizmor: ignore[self-repository]
+    with:
+      docker-arches: '["amd64", "arm64"]'
+      # A fresh build cache for each release: nothing from other branches ends up in the image
+      docker-cache-scope: release-${{ github.ref_name }}
+
+  publish:
+    name: Publish image and GitHub Release
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub Release
+      packages: write # push to ghcr.io
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image tags and labels
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        env:
+          # Description and license also on the multi-arch index (shown by ghcr.io)
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ${{ env.IMAGE }}
+          # major/minor tags are skipped for pre-releases automatically; "latest" explicitly
+          flavor: latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+      - name: Build and push (reuses the layers the smoke tests built)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          cache-from: |
+            type=gha,scope=release-${{ github.ref_name }}-amd64
+            type=gha,scope=release-${{ github.ref_name }}-arm64
+          provenance: mode=max # build record: which commit, which workflow
+          sbom: true # list of the packages in the image, for security scanners
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-notes
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Files for installing without git. A leading dot would be removed by GitHub.
+          cp .env.example env.example
+          prerelease=()
+          if [[ "$TAG" == *-* ]]; then prerelease=(--prerelease); fi
+          gh release create "$TAG" --verify-tag --title "Couch Owl ${TAG#v}" \
+            --notes-file release-notes.md "${prerelease[@]}" docker-compose.yml env.example

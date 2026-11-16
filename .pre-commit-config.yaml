@@ -19,6 +19,16 @@ repos:
         language: system
         pass_filenames: false
         files: \.py$
+      - id: actionlint
+        name: actionlint (GitHub workflows)
+        entry: uv run --group workflows actionlint
+        language: system
+        files: ^\.github/workflows/
+      - id: zizmor
+        name: zizmor (GitHub workflow security)
+        entry: uv run --group workflows zizmor --offline
+        language: system
+        files: ^\.github/
       - id: pytest
         name: pytest
         entry: uv run pytest -q

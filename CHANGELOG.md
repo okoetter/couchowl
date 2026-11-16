@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Prebuilt Docker images for amd64 and arm64 at `ghcr.io/okoetter/couchowl`;
+  `COUCHOWL_VERSION` in `.env` picks the version (`latest`, `1`, `1.2`, `1.2.3`)
+- Continuous integration: tests on Linux, macOS and Windows, browser tests and a Docker
+  smoke test for every change; releases are built and published automatically
 - Invite-only accounts: admins create one-time invitation links in the Django admin
   (optionally sent by e-mail)
 - Login and logout; every page requires login
@@ -98,6 +102,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` are optional extras now (`SITE_URL` covers them)
 - gunicorn no longer trusts `X-Forwarded-Proto` from any sender; only Django does, and only
   with `TRUSTED_PROXY_COUNT` set
+- `docker-compose.yml` uses the published image instead of building from the source code;
+  installing needs only `docker-compose.yml` and `.env` (no `git clone`). To build from
+  source, add `-f docker-compose.build.yml`
 
 ### Removed
 - `DEFAULT_TMDB_LANGUAGE` setting (derived from the region now)

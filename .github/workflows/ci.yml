@@ -1,0 +1,116 @@
+# Tests, browser tests and a Docker smoke test for every push to main and every pull request.
+# The release workflow (release.yml) runs this workflow too, before it publishes anything.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # "Run workflow" button in the Actions tab
+  workflow_call:
+    inputs:
+      docker-arches:
+        description: JSON list of CPU architectures for the Docker smoke test
+        type: string
+        default: '["amd64"]'
+      docker-cache-scope:
+        description: Prefix of the Docker build cache (the release uses its own)
+        type: string
+        default: ci
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push to the same pull request cancels the older run. Not named after
+  # github.workflow: when release.yml calls this workflow, that is "Release", and sharing
+  # the release's group (names are case-insensitive) would make both wait for each other.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      # The same checks as the pre-commit hook, except the tests (they run in their own job)
+      - run: uv run pre-commit run --all-files --show-diff-on-failure
+        env:
+          SKIP: pytest
+
+  test:
+    name: Tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false # show the results of every OS, not just the first failure
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run pytest
+
+  e2e:
+    name: Browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run playwright install --with-deps chromium
+      - run: uv run pytest -m e2e
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 14
+
+  docker:
+    name: Docker smoke test (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Push and pull request: amd64 only; the release adds arm64 (emulated, slower)
+        arch: ${{ fromJSON(inputs.docker-arches || '["amd64"]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up QEMU (emulates other CPU architectures)
+        if: ${{ matrix.arch != 'amd64' }}
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/${{ matrix.arch }}
+          load: true # into the local Docker, for the smoke test
+          tags: couchowl:smoke-test
+          cache-from: type=gha,scope=${{ inputs.docker-cache-scope || 'ci' }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ inputs.docker-cache-scope || 'ci' }}-${{ matrix.arch }}
+      # No uv cache here: this job builds the image that release.yml publishes
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Smoke test
+        run: uv run python scripts/smoke_test.py --image couchowl:smoke-test --platform "linux/$ARCH" --timeout 300
+        env:
+          ARCH: ${{ matrix.arch }}

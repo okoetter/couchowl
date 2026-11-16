@@ -70,4 +70,6 @@ The reasons behind finished work are in [design.md](design.md).
 - [ ] Per-user announcement window in the profile (1/3/6/12 months; empty = `ANNOUNCEMENT_MONTHS`)
 - [ ] Public JSON API (e.g. django-ninja)
 - [ ] More UI languages
+- [ ] Automatic updates also for `uv.lock` and the Docker base images (Dependabot or
+  Renovate), and a vulnerability scan of the published image (e.g. Trivy) in CI
 - [ ] Clean up the poster cache (posters no longer used by any stored title)
