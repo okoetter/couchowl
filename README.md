@@ -6,8 +6,8 @@
 
 A self-hosted watchlist for movies and TV shows, for you and the people you invite.
 
-> **Status:** heading for 1.0 – all planned features are in place, the first release
-> candidate is being prepared. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status:** release candidate `1.0.0-rc.1` – all planned features are in place; 1.0 follows
+> after a test in a real installation. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Features
 

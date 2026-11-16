@@ -442,7 +442,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Versions:** Semantic Versioning, `CHANGELOG.md` in "Keep a Changelog" format, version
   in the footer, on the About page and in the health check. `pyproject.toml` is the single
   source of the version. An update is a new image plus a restart; migrations run on start.
-  1.0 starts as a release candidate that is installed on a real NAS first.
+  1.0 starts as a release candidate that is tested in a real installation first.
 - **Published image:** `ghcr.io/okoetter/couchowl` (GitHub Container Registry), for
   `linux/amd64` and `linux/arm64` under one tag (multi-arch). GHCR needs no extra account
   or secret (the workflow's own token pushes) and has no pull limits for public images.

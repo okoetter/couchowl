@@ -31,7 +31,7 @@ The reasons behind finished work are in [design.md](design.md).
   imported to copy
 - [ ] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
-  deployment on the NAS
+  real-world deployment
 
 ## Backlog (after 1.0)
 

@@ -1,7 +1,7 @@
 """Consistent copies of the SQLite database for the host's backup (`manage.py backup`).
 
 Couch Owl only makes the copy; keeping backups safe (other disk, cloud, versions) is the
-job of the host, e.g. the NAS backup. Copying a SQLite file while Couch Owl writes to it
+job of the host. Copying a SQLite file while Couch Owl writes to it
 can give a broken copy; SQLite's backup API always gives a consistent one.
 """
 

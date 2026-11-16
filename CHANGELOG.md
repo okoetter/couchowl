@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-11-16
+
 ### Added
 - Prebuilt Docker images for amd64 and arm64 at `ghcr.io/okoetter/couchowl`;
   `COUCHOWL_VERSION` in `.env` picks the version (`latest`, `1`, `1.2`, `1.2.3`)
