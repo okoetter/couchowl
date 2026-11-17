@@ -6,15 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.2] - 2026-11-17
+
 ### Changed
-- Deployment guide and README: installing Couch Owl as an app on phones needs HTTPS;
-  over plain http browsers only offer a home screen shortcut
 - Search and batch import ignore punctuation when comparing titles: "Der Hobbit - Eine
   unerwartete Reise" is recognized as "Der Hobbit: Eine unerwartete Reise", "Spiderman"
   as "Spider-Man", so far fewer imported lines need a choice
-
 - Navigation: the current page stands out with a tinted background (on phones behind
   its icon); the other entries are gray
+- Deployment guide and README: installing Couch Owl as an app on phones needs HTTPS;
+  over plain http browsers only offer a home screen shortcut
 
 ### Fixed
 - Phones: the bottom navigation bar is centered; it was shifted to the left, so

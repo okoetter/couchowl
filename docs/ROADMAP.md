@@ -39,6 +39,7 @@ The reasons behind finished work are in [design.md](design.md).
     unerwartete Reise" = "Der Hobbit: Eine unerwartete Reise")
   - [x] Detail page on narrow phones: long titles wrap instead of widening the page
   - [x] Navigation: current page on a tinted background, others gray; bottom bar centered
+  - [x] `1.0.0-rc.2` with the changes above
 
 ## Backlog (after 1.0)
 
