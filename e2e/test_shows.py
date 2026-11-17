@@ -211,11 +211,20 @@ def test_mark_the_whole_show_as_not_watched(live_server, member, page, fake_tmdb
     assert not WatchedEpisode.objects.exists()
 
 
-@pytest.mark.parametrize("width", [320, 360, 390])
+@pytest.mark.parametrize(
+    ("width", "text_size"),
+    [(320, "100%"), (360, "100%"), (390, "100%"), (360, "125%"), (412, "125%")],
+)
 def test_long_title_does_not_widen_the_page_on_phones(
-    live_server, member, browser, fake_tmdb, width
+    live_server, member, browser, fake_tmdb, width, text_size
 ):
-    """A long title with long words ("Abschussliste") wraps; nothing sticks out on the right."""
+    """A long title with long words ("Abschussliste") and the rating with its votes wrap;
+    nothing sticks out on the right.
+
+    Pixel widths depend on the system font (wider on the CI runner than on most desktops),
+    so the page is also checked with larger text, like Android's font size setting: that
+    leaves room for wider fonts (not on 320 px: with 125 % that's like a 256 px screen).
+    """
     show = load_tmdb_fixture("tv_70523")
     fake_tmdb.add_show(show | {"poster_path": None, "watch/providers": {"results": {}}})
     context = browser.new_context(
@@ -228,6 +237,7 @@ def test_long_title_does_not_widen_the_page_on_phones(
     TitleTranslation.objects.update(name="The Terminal List - Die Abschussliste")
     page.reload()
     expect(page.locator("h1")).to_have_text("The Terminal List - Die Abschussliste")
+    page.add_style_tag(content=f"html {{ font-size: {text_size} !important; }}")
 
     overflow = page.evaluate(
         "document.documentElement.scrollWidth - document.documentElement.clientWidth"

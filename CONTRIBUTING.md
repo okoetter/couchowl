@@ -97,10 +97,13 @@ pinned to commit hashes; Dependabot proposes updates weekly.
 
 Versions follow [Semantic Versioning](https://semver.org/). To release, e.g. `1.2.0`:
 
-1. Set `version = "1.2.0"` in `pyproject.toml` and run `uv lock`.
-2. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [1.2.0] - YYYY-MM-DD` (today) and add
+1. Push everything that goes into the release to `main` and wait until CI is green there.
+   Browser tests can fail on the CI runner but not locally (other system fonts, so text
+   has other widths); finding that out before the release commit keeps the tag in place.
+2. Set `version = "1.2.0"` in `pyproject.toml` and run `uv lock`.
+3. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [1.2.0] - YYYY-MM-DD` (today) and add
    a new empty `## [Unreleased]` above it.
-3. Commit, then tag and push: `git tag -a v1.2.0 -m "Couch Owl 1.2.0"` and
+4. Commit, then tag and push: `git tag -a v1.2.0 -m "Couch Owl 1.2.0"` and
    `git push origin main v1.2.0`.
 
 The tag starts `.github/workflows/release.yml`. It checks that tag, `pyproject.toml` and

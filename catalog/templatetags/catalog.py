@@ -36,15 +36,17 @@ def rating(item, votes=False):
         "TMDB rating: %(average)s of 10 (%(count)s votes)",
         count,
     ) % {"average": average, "count": count_text}
-    text = average
+    # "★ 8.4" and "(1,234 votes)" never break apart, but may go to separate lines
+    # (narrow phones, wide fonts)
+    text = format_html('<span class="nowrap">★ {}</span>', average)
     if votes:
-        text = ngettext("%(average)s (%(count)s vote)", "%(average)s (%(count)s votes)", count) % {
-            "average": average,
-            "count": count_text,
+        votes_text = ngettext("(%(count)s vote)", "(%(count)s votes)", count) % {
+            "count": count_text
         }
+        text = format_html('{} <span class="nowrap">{}</span>', text, votes_text)
     # Screen readers get the long label instead of "star 8.4"
     return format_html(
-        '<span class="rating" title="{}"><span aria-hidden="true">★ {}</span>'
+        '<span class="rating" title="{}"><span aria-hidden="true">{}</span>'
         '<span class="visually-hidden">{}</span></span>',
         label,
         text,

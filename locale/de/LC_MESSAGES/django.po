@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 19:32+0100\n"
+"POT-Creation-Date: 2026-11-17 21:44+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -1337,12 +1337,12 @@ msgid_plural "TMDB rating: %(average)s of 10 (%(count)s votes)"
 msgstr[0] "TMDB-Bewertung: %(average)s von 10 (%(count)s Stimme)"
 msgstr[1] "TMDB-Bewertung: %(average)s von 10 (%(count)s Stimmen)"
 
-#: catalog/templatetags/catalog.py:41
+#: catalog/templatetags/catalog.py:43
 #, python-format
-msgid "%(average)s (%(count)s vote)"
-msgid_plural "%(average)s (%(count)s votes)"
-msgstr[0] "%(average)s (%(count)s Stimme)"
-msgstr[1] "%(average)s (%(count)s Stimmen)"
+msgid "(%(count)s vote)"
+msgid_plural "(%(count)s votes)"
+msgstr[0] "(%(count)s Stimme)"
+msgstr[1] "(%(count)s Stimmen)"
 
 #: catalog/views.py:47
 msgid "Too many searches in a short time. Please wait a moment."

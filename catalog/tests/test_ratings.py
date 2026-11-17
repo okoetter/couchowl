@@ -4,6 +4,7 @@ import pytest
 from django.template import Context, Template
 from django.urls import reverse
 from django.utils import translation
+from django.utils.html import strip_tags
 
 from catalog import lists, services
 from catalog.models import Title
@@ -11,6 +12,11 @@ from conftest import load_tmdb_fixture
 
 
 def render_rating(item, votes=False, language="de-de"):
+    """The rating as text (without HTML tags)."""
+    return strip_tags(render_rating_html(item, votes, language))
+
+
+def render_rating_html(item, votes=False, language="de-de"):
     template = Template("{% load catalog %}{% rating item votes=votes %}")
     with translation.override(language):
         return template.render(Context({"item": item, "votes": votes}))
@@ -73,10 +79,16 @@ def test_detail_page_shows_the_votes_from_one_vote():
 
 
 def test_screen_readers_get_a_full_sentence():
-    html = render_rating(Title(vote_average=8.523, vote_count=34121))
+    html = render_rating_html(Title(vote_average=8.523, vote_count=34121))
 
-    assert '<span aria-hidden="true">★ 8,5</span>' in html
+    assert '<span aria-hidden="true"><span class="nowrap">★ 8,5</span></span>' in html
     assert "TMDB-Bewertung: 8,5 von 10 (34.121 Stimmen)" in html
+
+
+def test_votes_may_go_to_the_next_line_but_stay_together():
+    html = render_rating_html(Title(vote_average=8.523, vote_count=34121), votes=True)
+
+    assert '<span class="nowrap">★ 8,5</span> <span class="nowrap">(34.121 Stimmen)</span>' in html
 
 
 # --- Pages -------------------------------------------------------------------------------------
@@ -85,7 +97,7 @@ def test_screen_readers_get_a_full_sentence():
 def test_detail_page(auth_client, movie):
     content = auth_client.get(movie.get_absolute_url()).content.decode()
 
-    assert "★ 8,5 (34.121 Stimmen)" in content
+    assert "★ 8,5 (34.121 Stimmen)" in strip_tags(content)
 
 
 def test_search_page(auth_client, fake_tmdb):

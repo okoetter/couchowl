@@ -19,9 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Phones: the bottom navigation bar is centered; it was shifted to the left, so
-  "Dashboard" could run into a rounded screen corner
+  "Dashboard" could run into a rounded screen corner. With large text it no longer
+  sticks out on the right
 - Detail pages on narrow phones: long titles with long words ("The Terminal List - Die
-  Abschussliste") wrap instead of making the page wider than the screen
+  Abschussliste") and the rating with its number of votes wrap instead of making the page
+  wider than the screen
 
 ## [1.0.0-rc.1] - 2026-11-16
 
