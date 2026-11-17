@@ -131,10 +131,15 @@ def is_exact_match(result: SearchResult, query: str) -> bool:
 
 
 def _comparable(text: str) -> str:
-    """Ignore case, accents and extra spaces: 'Amélie ' == 'amelie'."""
+    """Only letters and digits count, without case and accents:
+    'Der Hobbit: Eine Reise' == 'der hobbit - eine reise', 'Spider-Man' == 'Spiderman'.
+
+    Titles made of punctuation only ('?') are compared without case and extra spaces.
+    """
     decomposed = unicodedata.normalize("NFKD", text)
     without_accents = "".join(c for c in decomposed if not unicodedata.combining(c))
-    return " ".join(without_accents.casefold().split())
+    folded = without_accents.casefold()
+    return "".join(c for c in folded if c.isalnum()) or " ".join(folded.split())
 
 
 # --- Titles --------------------------------------------------------------------------------

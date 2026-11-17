@@ -82,6 +82,27 @@ def test_original_title_matches(searches):
     assert rules.find("Dark", "de-DE").match.key == "tv-70523"
 
 
+def test_punctuation_does_not_matter(searches):
+    searches["der hobbit - eine unerwartete reise"] = [
+        movie(49051, "Der Hobbit: Eine unerwartete Reise", 2012),
+        movie(57158, "Der Hobbit: Smaugs Einöde", 2013),
+    ]
+
+    found = rules.find("Der Hobbit - Eine unerwartete Reise", "de-DE")
+
+    assert found.status == Status.MATCHED
+    assert found.match.key == "movie-49051"
+
+
+def test_titles_differing_only_in_punctuation_are_ambiguous(searches):
+    searches["up"] = [movie(14160, "Up", 2009), movie(800, "Up!", 2009)]
+
+    found = rules.find("Up", "de-DE")
+
+    assert found.status == Status.AMBIGUOUS
+    assert found.match is None
+
+
 def test_year_one_off_is_ambiguous_with_the_closest_on_top(searches):
     found = rules.find("Dark (2016)", "de-DE")
 

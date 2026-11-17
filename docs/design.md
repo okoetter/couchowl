@@ -160,8 +160,11 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   language. Titles enter the database only when needed (detail page, list). Results show
   title, type, year, poster, original title if different, rating and watched state, but
   no description (the search API has no language fallback; the list stays compact).
-- **Ordering:** exact title matches first (translated or original title, ignoring case,
-  accents and spaces), newest first among them; then everything else in TMDB's order.
+- **Ordering:** exact title matches first (translated or original title, comparing only
+  letters and digits: case, accents, spaces and punctuation don't count, so
+  "Der Hobbit - Eine unerwartete Reise" matches "Der Hobbit: Eine unerwartete Reise" and
+  "Spiderman" matches "Spider-Man"; titles made of punctuation only, like "?", are compared
+  as they are), newest first among them; then everything else in TMDB's order.
   TMDB ranks heavily by popularity ("Dark" was fourth when searching "dark"). Sorting
   everything by year was rejected: unknown new titles would push out the known ones.
   The live search waits 300 ms after the last keystroke.
@@ -191,6 +194,13 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   number + year" finds no exact match, the whole line is searched again. The year must
   match exactly; one year off (festival vs. cinema release) makes the line ambiguous
   with the right candidate on top. Rejected: ±1 tolerance (silently matches remakes).
+- **Tolerant titles:** pasted lists rarely use TMDB's exact punctuation, so the
+  comparison ignores it (see search ordering); without that, many correct lines needed a
+  choice. Titles differing only in punctuation ("Up", "Up!") make the line ambiguous.
+  Rejected: typo tolerance (edit distance; "Dark" vs. "Bark"), "&" = "and"/"und"
+  (depends on the language), ignoring articles ("The Batman" vs. "Batman") and roman
+  numerals ("Rocky II" = "Rocky 2"): each would match different titles silently, while
+  an ambiguous line costs one click.
 - **Paste → preview → import**, all on page `/import/` (linked from the lists overview, a
   list's menu ("Import" preselects the list), the empty states of lists, and the empty
   "Continue watching" as long as the user has no data at all; not hidden in the profile).

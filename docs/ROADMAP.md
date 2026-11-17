@@ -32,6 +32,11 @@ The reasons behind finished work are in [design.md](design.md).
 - [ ] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   real-world deployment
+  - [x] `1.0.0-rc.1` published
+  - [ ] Docs: installing as an app needs HTTPS (reverse proxy); over plain http browsers
+    only offer a shortcut
+  - [x] Import and search: compare titles without punctuation ("Der Hobbit - Eine
+    unerwartete Reise" = "Der Hobbit: Eine unerwartete Reise")
 
 ## Backlog (after 1.0)
 
@@ -67,6 +72,10 @@ The reasons behind finished work are in [design.md](design.md).
   - section subtitle covers both, e.g. "New seasons and movie releases in the next 3 months";
     show release dates on the movie detail page too
 - [ ] Notifications (e-mail/push) for new seasons
+- [ ] PWA "Share Target": share a title from another app (browser, TMDB app) to Couch Owl
+  and add it to a list
+- [ ] Offline page via a service worker instead of the browser's error page when the
+  server is unreachable
 - [ ] Per-user announcement window in the profile (1/3/6/12 months; empty = `ANNOUNCEMENT_MONTHS`)
 - [ ] Public JSON API (e.g. django-ninja)
 - [ ] More UI languages

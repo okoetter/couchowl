@@ -89,6 +89,36 @@ def test_exact_match_ignores_case_accents_and_spaces_and_checks_original_title()
     assert services.sort_results(results, "le fabuleux destin d'amelie")[0].year == 2001
 
 
+@pytest.mark.parametrize(
+    ("query", "title"),
+    [
+        ("Der Hobbit - Eine unerwartete Reise", "Der Hobbit: Eine unerwartete Reise"),
+        ("Der Hobbit – Eine unerwartete Reise", "Der Hobbit: Eine unerwartete Reise"),
+        ("Spiderman", "Spider-Man"),
+        ("Spider Man", "Spider-Man"),
+        ("Schindlers List", "Schindler's List"),
+        ("Mission Impossible", "Mission: Impossible"),
+        ("  amelie ", "Amélie"),
+        ("?", "?"),
+    ],
+)
+def test_exact_match_ignores_punctuation_and_spaces(query, title):
+    assert services.is_exact_match(result(title), query)
+
+
+@pytest.mark.parametrize(
+    ("query", "title"),
+    [
+        ("Dark", "Dark Water"),
+        ("Rocky 2", "Rocky II"),
+        ("?", "!"),  # titles made of punctuation only still have to be equal
+        ("?", "Questions"),
+    ],
+)
+def test_exact_match_still_needs_the_same_letters_and_digits(query, title):
+    assert not services.is_exact_match(result(title), query)
+
+
 def test_without_exact_match_tmdb_order_stays():
     results = [result("B", 2001), result("A", 2020), result("C", 1990)]
 
