@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unerwartete Reise" is recognized as "Der Hobbit: Eine unerwartete Reise", "Spiderman"
   as "Spider-Man", so far fewer imported lines need a choice
 
+### Fixed
+- Detail pages on narrow phones: long titles with long words ("The Terminal List - Die
+  Abschussliste") wrap instead of making the page wider than the screen
+
 ## [1.0.0-rc.1] - 2026-11-16
 
 ### Added

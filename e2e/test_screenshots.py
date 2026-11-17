@@ -136,6 +136,16 @@ def show_show(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_show_long_title(page, url):
+    """A long title with a long word must wrap instead of widening the page on phones."""
+    from catalog.models import TitleTranslation
+
+    TitleTranslation.objects.filter(title__tmdb_id=70523).update(
+        name="The Terminal List - Die Abschussliste"
+    )
+    show_show(page, url)
+
+
 def show_show_details(page, url):
     """An episode description and a date form opened, season 1 loaded on demand."""
     show_show(page, url)
@@ -341,6 +351,7 @@ PAGES = {
     "list-compact-complete": show_list_compact,
     "movie": show_movie,
     "show": show_show,
+    "show-long-title": show_show_long_title,
     "show-details": show_show_details,
     "show-jump": show_show_jump,
     "show-earlier": show_show_earlier,

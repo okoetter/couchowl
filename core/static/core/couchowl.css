@@ -715,6 +715,19 @@ details.dropdown.list-dropdown-compact > summary + ul {
   background: var(--pico-muted-border-color);
 }
 
+/* Long titles wrap, even within long words ("Abschussliste"), instead of widening the
+   page on phones. Only long words get hyphens ("Abschuss-liste", not "Ter-minal"); where
+   the browser can't hyphenate, a word that doesn't fit is broken anywhere. */
+.title-detail-info > hgroup {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.title-detail-info > hgroup h1 {
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+}
+
 .title-detail-actions {
   display: flex;
   flex-wrap: wrap;
@@ -746,7 +759,7 @@ details.dropdown.list-dropdown-compact > summary + ul {
 /* Phones: small poster next to the heading, text below */
 @media (max-width: 575px) {
   .title-detail {
-    grid-template-columns: 7rem 1fr;
+    grid-template-columns: 7rem minmax(0, 1fr);
     gap: var(--pico-spacing);
   }
 

@@ -37,6 +37,7 @@ The reasons behind finished work are in [design.md](design.md).
     only offer a shortcut
   - [x] Import and search: compare titles without punctuation ("Der Hobbit - Eine
     unerwartete Reise" = "Der Hobbit: Eine unerwartete Reise")
+  - [x] Detail page on narrow phones: long titles wrap instead of widening the page
 
 ## Backlog (after 1.0)
 

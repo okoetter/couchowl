@@ -3,8 +3,9 @@
 import pytest
 from playwright.sync_api import expect
 
-from catalog.models import WatchedEpisode
-from e2e.conftest import login
+from catalog.models import TitleTranslation, WatchedEpisode
+from conftest import load_tmdb_fixture
+from e2e.conftest import LOCALE, login
 
 pytestmark = pytest.mark.e2e
 
@@ -208,3 +209,28 @@ def test_mark_the_whole_show_as_not_watched(live_server, member, page, fake_tmdb
     expect(page.locator("#season-1-info")).not_to_contain_text("Gesehen")
     expect(page.get_by_role("button", name="Alle als nicht gesehen markieren")).to_have_count(0)
     assert not WatchedEpisode.objects.exists()
+
+
+@pytest.mark.parametrize("width", [320, 360, 390])
+def test_long_title_does_not_widen_the_page_on_phones(
+    live_server, member, browser, fake_tmdb, width
+):
+    """A long title with long words ("Abschussliste") wraps; nothing sticks out on the right."""
+    show = load_tmdb_fixture("tv_70523")
+    fake_tmdb.add_show(show | {"poster_path": None, "watch/providers": {"results": {}}})
+    context = browser.new_context(
+        locale=LOCALE, viewport={"width": width, "height": 800}, is_mobile=True, has_touch=True
+    )
+    page = context.new_page()
+    login(page, live_server.url, "anna")
+
+    page.goto(f"{live_server.url}/tv/70523/")  # loads the show into the database
+    TitleTranslation.objects.update(name="The Terminal List - Die Abschussliste")
+    page.reload()
+    expect(page.locator("h1")).to_have_text("The Terminal List - Die Abschussliste")
+
+    overflow = page.evaluate(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+    )
+    assert overflow == 0
+    context.close()
