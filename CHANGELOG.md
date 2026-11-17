@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unerwartete Reise" is recognized as "Der Hobbit: Eine unerwartete Reise", "Spiderman"
   as "Spider-Man", so far fewer imported lines need a choice
 
+- Navigation: the current page stands out with a tinted background (on phones behind
+  its icon); the other entries are gray
+
 ### Fixed
+- Phones: the bottom navigation bar is centered; it was shifted to the left, so
+  "Dashboard" could run into a rounded screen corner
 - Detail pages on narrow phones: long titles with long words ("The Terminal List - Die
   Abschussliste") wrap instead of making the page wider than the screen
 

@@ -36,16 +36,28 @@
   color: var(--pico-color);
 }
 
+/* Inactive entries are muted; the current page is colored and sits on a tinted pill
+   (on phones only the icon does, like Android's own navigation bar) */
+.app-nav {
+  --app-nav-active-background: color-mix(in srgb, var(--pico-primary) 15%, transparent);
+}
+
 .app-nav ul a {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   text-decoration: none;
+  color: var(--pico-muted-color);
+}
+
+.app-nav ul a:hover {
+  color: var(--pico-primary-hover);
 }
 
 .app-nav ul a[aria-current="page"] {
   color: var(--pico-primary);
   font-weight: 600;
+  background: var(--app-nav-active-background);
 }
 
 .app-nav svg {
@@ -76,12 +88,15 @@
     border-top: 1px solid var(--pico-muted-border-color);
   }
 
-  .app-nav ul {
+  /* Pico pulls the first and last list of a nav outwards (negative margins), which
+     shifted the whole bar to the left: "Dashboard" ran into the rounded screen corner.
+     The selector has to be as specific as Pico's "nav ul:first-of-type". */
+  .app-nav ul:first-of-type {
     display: flex;
     justify-content: space-around;
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0 max(0.5rem, env(safe-area-inset-left)) 0 max(0.5rem, env(safe-area-inset-right));
   }
 
   .app-nav ul li {
@@ -93,13 +108,25 @@
     flex-direction: column;
     gap: 0.15rem;
     margin: 0;
-    padding: 0.5rem 0;
+    padding: 0.375rem 0;
     font-size: 0.7rem;
   }
 
+  .app-nav ul a[aria-current="page"] {
+    background: none;
+  }
+
+  /* The icon sits in a pill-shaped box; the current page's pill is tinted */
   .app-nav svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    box-sizing: border-box;
+    width: 3.5rem;
+    height: 2rem;
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .app-nav ul a[aria-current="page"] svg {
+    background: var(--app-nav-active-background);
   }
 
   /* Keep content clear of the fixed bottom bar */

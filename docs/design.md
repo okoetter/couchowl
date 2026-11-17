@@ -315,7 +315,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 ### Look and feel
 
 - Pages: dashboard, lists, upcoming, search, detail pages, profile, About, Django admin.
-  Navigation as a top bar on desktop and a bottom tab bar on phones.
+  Navigation as a top bar on desktop and a bottom tab bar on phones. The current page is
+  colored on a tinted pill (on phones behind the icon, like Android's navigation bar), the
+  other entries are gray. Rejected: bold text alone (barely visible at the tab bar's
+  small font size).
 - Pico CSS (classless, no build step), color scheme follows the system and can be set in
   the profile. Installable as a PWA (manifest, icons, standalone mode).
 - **Update only what changes:** htmx responses replace the smallest element (a button,
