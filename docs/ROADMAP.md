@@ -33,7 +33,7 @@ The reasons behind finished work are in [design.md](design.md).
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   real-world deployment
   - [x] `1.0.0-rc.1` published
-  - [ ] Docs: installing as an app needs HTTPS (reverse proxy); over plain http browsers
+  - [x] Docs: installing as an app needs HTTPS (reverse proxy); over plain http browsers
     only offer a shortcut
   - [x] Import and search: compare titles without punctuation ("Der Hobbit - Eine
     unerwartete Reise" = "Der Hobbit: Eine unerwartete Reise")

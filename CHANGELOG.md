@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Deployment guide and README: installing Couch Owl as an app on phones needs HTTPS;
+  over plain http browsers only offer a home screen shortcut
 - Search and batch import ignore punctuation when comparing titles: "Der Hobbit - Eine
   unerwartete Reise" is recognized as "Der Hobbit: Eine unerwartete Reise", "Spiderman"
   as "Spider-Man", so far fewer imported lines need a choice

@@ -24,8 +24,9 @@ A self-hosted watchlist for movies and TV shows, for you and the people you invi
 - Invite-only accounts; interface in English and German, picked from your country
 - Privacy-friendly: no CDNs, no tracking, your browser never talks to third parties
   (Couch Owl fetches data and posters from TMDB itself)
-- Installable on your phone (PWA); runs as a single small Docker container with SQLite
-  (PostgreSQL optional), daily data refresh and nightly database copies built in
+- Installable on your phone as an app (PWA, needs HTTPS); runs as a single small Docker
+  container with SQLite (PostgreSQL optional), daily data refresh and nightly database
+  copies built in
 
 ## Installation
 

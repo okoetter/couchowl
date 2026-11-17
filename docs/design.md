@@ -320,7 +320,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   other entries are gray. Rejected: bold text alone (barely visible at the tab bar's
   small font size).
 - Pico CSS (classless, no build step), color scheme follows the system and can be set in
-  the profile. Installable as a PWA (manifest, icons, standalone mode).
+  the profile. Installable as a PWA (manifest, icons, standalone mode; browsers install
+  it only over HTTPS).
 - **Update only what changes:** htmx responses replace the smallest element (a button,
   one card's text) or remove one entry; re-rendering a whole list rebuilds every poster
   and makes them flicker. Where a region is refreshed but most entries stay (live search,

@@ -105,6 +105,10 @@ TRUSTED_PROXY_COUNT=0
 Without HTTPS, passwords travel unencrypted. Don't make port 8000 reachable from the
 internet this way.
 
+Phones can't install Couch Owl as an app this way either: browsers only install web apps
+served over HTTPS. Over plain http they offer just a shortcut on the home screen, which
+opens Couch Owl in a normal browser tab with the address bar.
+
 ## Behind a reverse proxy (HTTPS)
 
 The reverse proxy accepts HTTPS connections, holds the certificate and forwards requests to
