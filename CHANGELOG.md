@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   buttons replace the watched buttons. The "×" next to every entry of the compact list is
   gone, so each entry has a single button; the poster grid can now remove titles too.
   Removing shows "“Heat” removed" with "Undo", which puts the title back at its place
+- Detail pages: a thin line separates subscription, free, rent and buy offers, and each
+  label sits next to the first row of logos, so many wrapped logos stay clearly grouped
 - Logins last until 90 days without a visit (`SESSION_DAYS`) instead of 14 days after
   logging in, so people using Couch Owl regularly, e.g. as an app on their phone, stay
   logged in

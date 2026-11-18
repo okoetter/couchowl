@@ -146,6 +146,38 @@ def show_movie(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_movie_many_offers(page, url):
+    """Many providers (like "Dunkirk"): the logos wrap, groups must stay apart.
+    No free offers: a group without providers is left out."""
+    from catalog.models import Title
+
+    logos = sorted(
+        {
+            p["logo_path"]
+            for name in ("movie_155", "tv_70523")
+            for offers in load_tmdb_fixture(name)["watch/providers"]["results"].values()
+            for kind, providers in offers.items()
+            if kind != "link"
+            for p in providers
+        }
+    )
+
+    def providers(count, start):
+        return [
+            {"id": start + i, "name": f"Provider {start + i}", "logo": logos[i % len(logos)]}
+            for i in range(count)
+        ]
+
+    title = Title.objects.get(tmdb_id=155, media_type="movie")
+    title.watch_providers["DE"] = {
+        "flatrate": providers(5, 100),
+        "rent": providers(8, 200),
+        "buy": providers(9, 300),
+    }
+    title.save(update_fields=["watch_providers"])
+    show_movie(page, url)
+
+
 def show_show(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/tv/70523/")
@@ -369,6 +401,7 @@ PAGES = {
     "list-grid-complete": show_list_grid,
     "list-compact-complete": show_list_compact,
     "movie": show_movie,
+    "movie-many-offers": show_movie_many_offers,
     "show": show_show,
     "show-long-title": show_show_long_title,
     "show-details": show_show_details,

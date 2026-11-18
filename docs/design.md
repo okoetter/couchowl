@@ -208,6 +208,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   stored, as a JSON field `Title.watch_providers` (always read with the title, never
   queried across titles, so no separate table). If the user's region is missing (e.g.
   after changing it), the detail page reloads the title.
+  The groups (only those with providers) are split by a thin line, with the label at the
+  first row of logos: with many providers (e.g. "Dunkirk") the wrapped logos otherwise
+  looked like the next group. Rejected: the label as a heading above the logos (just as
+  clear, but noticeably taller, since the label column hardly costs logos per row).
 - TMDB statuses are translated ("Ended" → "Beendet").
 
 ### Batch import

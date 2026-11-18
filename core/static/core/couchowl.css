@@ -1449,23 +1449,38 @@ details.episode-watched > summary::after {
   font-size: 1.1rem;
 }
 
+/* Subscription, free, rent, buy: a line between the groups (only those with providers),
+   since wrapped logos otherwise look like the next group. The label sits at the first row
+   of logos (40px high). Spacing is padding, so the line runs under label and logos. */
 .offers dl {
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0.5rem var(--pico-spacing);
+  align-items: start;
   margin: 0 0 0.5rem;
 }
 
-.offers dt {
+.offers dt,
+.offers dd {
   margin: 0;
+  padding: 0.6rem 0;
+}
+
+.offers dt:first-of-type,
+.offers dt:first-of-type + dd {
+  padding-top: 0;
+}
+
+.offers dd + dt,
+.offers dd + dt + dd {
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.offers dt {
+  padding-right: var(--pico-spacing);
   color: var(--pico-muted-color);
   font-size: 0.9rem;
   font-weight: normal;
-}
-
-.offers dd {
-  margin: 0;
+  line-height: 40px;
 }
 
 .offer-logos {
