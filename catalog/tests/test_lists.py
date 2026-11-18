@@ -172,7 +172,8 @@ def test_remove_item_from_compact_list(auth_client, user, movie, show):
     )
 
     assert list(user_list.items.values_list("title", flat=True)) == [show.pk]
-    assert "The Dark Knight" not in response.content.decode()
+    # Only the message, no entry
+    assert "<li" not in response.content.decode()
 
 
 @pytest.mark.parametrize("layout", ["grid", "compact"])
@@ -243,6 +244,7 @@ def test_delete_list_asks_first_and_keeps_watched_state(auth_client, user, movie
         ("catalog:list_delete", "post", []),
         ("catalog:list_layout", "post", []),
         ("catalog:list_item_remove", "post", ["item"]),
+        ("catalog:list_item_restore", "post", []),
     ],
 )
 def test_other_users_lists_are_invisible(
@@ -669,7 +671,8 @@ def test_removing_an_entry_removes_only_that_entry(auth_client, user, mixed_list
         reverse("catalog:list_item_remove", args=[mixed_list.pk, item.pk]), headers=HTMX
     )
 
-    assert response.content == b""
+    # Nothing replaces the entry, only the message goes to the #toast region
+    assert response.content.decode().lstrip().startswith('<div hx-swap-oob="innerHTML:#toast">')
     assert response["HX-Retarget"] == "closest li"
 
 
@@ -685,6 +688,60 @@ def test_removing_the_last_entry_shows_the_empty_list(auth_client, user, movie):
     assert response["HX-Retarget"] == "#list-content"
     assert response["HX-Reswap"] == "innerHTML"
     assert "Diese Liste ist leer" in response.content.decode()
+
+
+def test_removing_offers_undo(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+
+    response = auth_client.post(
+        reverse("catalog:list_item_remove", args=[mixed_list.pk, item.pk]) + "?type=movie",
+        headers=HTMX,
+    )
+
+    content = response.content.decode()
+    assert "„Heat“ entfernt" in content
+    restore = reverse("catalog:list_item_restore", args=[mixed_list.pk]) + "?type=movie"
+    assert f'hx-post="{restore}"' in content
+    assert f'name="title" value="{item.title_id}"' in content
+    assert f'name="added_at" value="{item.added_at.isoformat()}"' in content
+
+
+def test_undo_puts_the_entry_back_at_its_place(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+    before = shown_names(auth_client.get(mixed_list.get_absolute_url()).content.decode())
+    auth_client.post(reverse("catalog:list_item_remove", args=[mixed_list.pk, item.pk]))
+
+    response = auth_client.post(
+        reverse("catalog:list_item_restore", args=[mixed_list.pk]),
+        {"title": item.title_id, "added_at": item.added_at.isoformat()},
+        headers=HTMX,
+    )
+
+    content = response.content.decode()
+    assert shown_names(content) == before
+    assert mixed_list.items.get(title=item.title).added_at == item.added_at
+    # The message disappears
+    assert '<div hx-swap-oob="innerHTML:#toast">' in content
+    assert "„Heat“ entfernt" not in content
+
+
+def test_undo_does_nothing_when_the_title_is_back_already(auth_client, user, mixed_list):
+    item = mixed_list.items.get(title__original_title="Heat")
+
+    response = auth_client.post(
+        reverse("catalog:list_item_restore", args=[mixed_list.pk]),
+        {"title": item.title_id, "added_at": "2001-01-01T00:00:00+00:00"},
+    )
+
+    assert response.status_code == 302
+    assert mixed_list.items.get(title=item.title).added_at == item.added_at
+
+
+def test_undo_with_invalid_data_is_rejected(auth_client, user, mixed_list):
+    url = reverse("catalog:list_item_restore", args=[mixed_list.pk])
+
+    assert auth_client.post(url, {"title": "x", "added_at": "today"}).status_code == 400
+    assert mixed_list.items.count() == 3
 
 
 def test_last_entry_leaving_the_filter_shows_the_filter_message(auth_client, user, movie):
@@ -770,6 +827,8 @@ def test_followed_shows_cannot_be_edited(auth_client, user, show):
 
     remove = reverse("catalog:list_item_remove", args=["followed", series.pk])
     assert auth_client.post(remove).status_code == 404
+    restore = reverse("catalog:list_item_restore", args=["followed"])
+    assert auth_client.post(restore, {"title": show.pk}).status_code == 404
     assert auth_client.get("/lists/followed/rename/").status_code == 404
     assert auth_client.get("/lists/followed/delete/").status_code == 404
     assert shows.is_following(user, show)

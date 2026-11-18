@@ -46,6 +46,7 @@ urlpatterns = [
         views.list_item_remove,
         name="list_item_remove",
     ),
+    path("lists/<listkey:pk>/restore/", views.list_item_restore, name="list_item_restore"),
     path(
         "lists/<listkey:pk>/items/<int:item_pk>/watched/",
         views.list_item_watched,

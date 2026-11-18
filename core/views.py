@@ -93,8 +93,9 @@ def watch_next(request, tmdb_id):
 def _toast(request, show: Title, episode: Episode | None) -> str:
     """The "S2 E5 watched · Undo" message (htmx puts it in place by its id)."""
     context = {
-        "episode": episode,
+        "message": _("%(code)s watched") % {"code": episode.code} if episode else "",
         "undo_url": reverse("core:watch_next", args=[show.tmdb_id]),
+        "undo_fields": {"undo": episode.pk} if episode else {},
         "undo_target": "#watching",
     }
     return render_to_string("catalog/_toast.html", context, request=request)

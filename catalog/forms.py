@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import UserList
+from .models import Title, UserList
 
 
 class ListForm(forms.ModelForm):
@@ -56,3 +56,10 @@ class WatchedDateForm(forms.Form):
         elif data["watched_at"] > timezone.localdate():
             self.add_error("watched_at", _("The date can't be in the future."))
         return data
+
+
+class RestoreItemForm(forms.Form):
+    """Hidden fields of "Undo" after removing a title from a list."""
+
+    title = forms.ModelChoiceField(queryset=Title.objects.all())
+    added_at = forms.DateTimeField()

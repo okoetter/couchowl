@@ -106,6 +106,11 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   took room from the text and it wasn't clear which one did what; the grid had no way to
   remove at all. Without JavaScript nothing can be removed from a list (like the toasts).
   Not in "Followed shows" (unfollow on the show page).
+  A tap removes right away; the toast "“Heat” removed · Undo" brings the entry back with
+  its old date, so at its old place (the form carries title and date as hidden fields).
+  Rejected: collecting removals and saving them with "Done": leaving the page without
+  "Done" would lose them, and filters reload the content from the server, so the marks
+  would have to be kept and reapplied in JavaScript.
 - **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
   soon as the user follows a show; same view as other lists without rename, delete,
   remove and type filter; most recently followed first; can be hidden in the profile

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 20:34+0100\n"
+"POT-Creation-Date: 2026-11-18 21:03+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -912,7 +912,7 @@ msgid "No"
 msgstr "Nein"
 
 #: catalog/templates/catalog/_earlier.html:48
-#: catalog/templates/catalog/_toast.html:17
+#: catalog/templates/catalog/_toast.html:21
 msgid "Undo"
 msgstr "Rückgängig"
 
@@ -1101,11 +1101,6 @@ msgstr "%(minutes)s Min."
 msgid "Change date"
 msgstr "Datum ändern"
 
-#: catalog/templates/catalog/_toast.html:12
-#, python-format
-msgid "%(code)s watched"
-msgstr "%(code)s gesehen"
-
 #: catalog/templates/catalog/_watched_badge.html:14
 #: catalog/templates/catalog/_watched_badge.html:22
 #: catalog/templates/catalog/title_detail.html:67
@@ -1168,8 +1163,12 @@ msgid "Done"
 msgstr "Fertig"
 
 #: catalog/templates/catalog/list_detail.html:77
-msgid "Removes titles from this list only – watched status, progress and followed shows stay."
-msgstr "Entfernt Titel nur aus dieser Liste – Gesehen-Status, Fortschritt und gefolgte Serien bleiben."
+msgid ""
+"Removes titles from this list only – watched status, progress and followed "
+"shows stay."
+msgstr ""
+"Entfernt Titel nur aus dieser Liste – Gesehen-Status, Fortschritt und "
+"gefolgte Serien bleiben."
 
 #: catalog/templates/catalog/list_detail.html:143
 msgid "No titles match this filter."
@@ -1370,8 +1369,8 @@ msgstr ""
 "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
 "eingerichtet."
 
-#: catalog/views.py:55 catalog/views.py:389 catalog/views.py:436
-#: core/views.py:134 imports/views.py:39
+#: catalog/views.py:55 catalog/views.py:425 catalog/views.py:472
+#: core/views.py:135 imports/views.py:39
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
 "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
@@ -1402,34 +1401,44 @@ msgstr "Serien"
 msgid "%(episode)s watched."
 msgstr "%(episode)s gesehen."
 
-#: catalog/views.py:289
+#: catalog/views.py:275 core/views.py:96
+#, python-format
+msgid "%(code)s watched"
+msgstr "%(code)s gesehen"
+
+#: catalog/views.py:290
 msgid "List renamed."
 msgstr "Liste umbenannt."
 
-#: catalog/views.py:301
+#: catalog/views.py:302
 #, python-format
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:386 catalog/views.py:433 core/views.py:131
+#: catalog/views.py:333
+#, python-format
+msgid "“%(name)s” removed"
+msgstr "„%(name)s“ entfernt"
+
+#: catalog/views.py:422 catalog/views.py:469 core/views.py:132
 #: imports/views.py:38
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
-#: catalog/views.py:426
+#: catalog/views.py:462
 msgid "Too many refreshes in a short time. Please wait a moment."
 msgstr "Zu viele Aktualisierungen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:438
+#: catalog/views.py:474
 msgid "Refreshed from TMDB."
 msgstr "Von TMDB aktualisiert."
 
-#: catalog/views.py:491
+#: catalog/views.py:527
 #, python-format
 msgid "Please enter a name (at most %(max)s characters)."
 msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."
 
-#: catalog/views.py:830
+#: catalog/views.py:866
 #, python-format
 msgid "%(count)s episode marked as watched."
 msgid_plural "%(count)s episodes marked as watched."
@@ -1587,11 +1596,11 @@ msgstr ""
 "Noch keine Termine bekannt. Neue Staffeln und Folgen erscheinen hier, sobald "
 "TMDB ein Datum für sie hat."
 
-#: core/views.py:126
+#: core/views.py:127
 msgid "Everything was just refreshed. Please wait a few minutes."
 msgstr "Gerade erst aktualisiert. Bitte warte ein paar Minuten."
 
-#: core/views.py:140
+#: core/views.py:141
 #, python-format
 msgid ""
 "%(updated)s of %(total)s show refreshed. The others could not be loaded."
@@ -1604,14 +1613,14 @@ msgstr[1] ""
 "%(updated)s von %(total)s Serien aktualisiert. Die übrigen konnten nicht "
 "geladen werden."
 
-#: core/views.py:149
+#: core/views.py:150
 #, python-format
 msgid "%(count)s show refreshed."
 msgid_plural "%(count)s shows refreshed."
 msgstr[0] "%(count)s Serie aktualisiert."
 msgstr[1] "%(count)s Serien aktualisiert."
 
-#: core/views.py:192
+#: core/views.py:193
 msgid "Your watchlist for movies and TV shows"
 msgstr "Deine Watchlist für Filme und Serien"
 

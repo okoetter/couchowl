@@ -75,6 +75,15 @@ def remove_from_list(user_list: UserList, title: Title) -> None:
     ListItem.objects.filter(user_list=user_list, title=title).delete()
 
 
+def restore_item(user_list: UserList, title: Title, added_at) -> None:
+    """Undo for removing: the entry comes back with its old date, so at its old place
+    (newest first). Already back in the list (added again meanwhile): nothing changes."""
+    item, created = ListItem.objects.get_or_create(user_list=user_list, title=title)
+    if created:
+        # `auto_now_add` ignores a given value when creating; set it afterwards
+        ListItem.objects.filter(pk=item.pk).update(added_at=added_at)
+
+
 # --- Watched movies ------------------------------------------------------------------------
 
 

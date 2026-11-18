@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count
 from django.db.models.functions import Lower
-from django.http import FileResponse, Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -20,7 +20,7 @@ from accounts.throttle import hit
 
 from . import lists as list_rules
 from . import posters, providers, services, shows, tmdb
-from .forms import ListForm, WatchedDateForm
+from .forms import ListForm, RestoreItemForm, WatchedDateForm
 from .models import Episode, MediaType, Season, Title, TitleTranslation, UserList, WatchedMovie
 
 logger = logging.getLogger(__name__)
@@ -272,9 +272,10 @@ def _item_response(request, user_list: UserList, item_pk: int, *, toast: Episode
 def _toast(request, user_list, item_pk, episode: Episode | None) -> str:
     """The "S2 E5 watched · Undo" message (htmx puts it in place by its id)."""
     context = {
-        "episode": episode,
+        "message": _("%(code)s watched") % {"code": episode.code} if episode else "",
         "undo_url": reverse("catalog:list_item_watched", args=[user_list.pk, item_pk])
         + _filter_query(_list_filters(request)),
+        "undo_fields": {"undo": episode.pk} if episode else {},
     }
     return render_to_string("catalog/_toast.html", context, request=request)
 
@@ -320,9 +321,44 @@ def list_layout(request, pk):
 
 @require_POST
 def list_item_remove(request, pk, item_pk):
+    """Trash button (edit mode); the message "“Heat” removed" offers "Undo"."""
     user_list = _editable_list(request, pk)
-    get_object_or_404(user_list.items, pk=item_pk).delete()
-    return _item_response(request, user_list, item_pk)
+    item = get_object_or_404(user_list.items.select_related("title"), pk=item_pk)
+    added_at = item.added_at
+    item.delete()
+    translation = services.best_translations(
+        [item.title], request.user.effective_tmdb_language
+    ).get(item.title_id)
+    name = translation.name if translation else item.title.original_title
+    message = _("“%(name)s” removed") % {"name": name}
+    if not _is_htmx_fragment_request(request):
+        messages.success(request, message)
+    response = _item_response(request, user_list, item_pk)
+    if _is_htmx_fragment_request(request):
+        context = {
+            "message": message,
+            "undo_url": reverse("catalog:list_item_restore", args=[user_list.pk])
+            + _filter_query(_list_filters(request)),
+            "undo_fields": {"title": item.title_id, "added_at": added_at.isoformat()},
+        }
+        response.content += render_to_string(
+            "catalog/_toast.html", context, request=request
+        ).encode()
+    return response
+
+
+@require_POST
+def list_item_restore(request, pk):
+    """ "Undo" after removing: the entry comes back at its old place in the list."""
+    user_list = _editable_list(request, pk)
+    form = RestoreItemForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+    list_rules.restore_item(user_list, form.cleaned_data["title"], form.cleaned_data["added_at"])
+    response = _list_response(request, user_list)
+    if _is_htmx_fragment_request(request):
+        response.content += render_to_string("catalog/_toast.html", request=request).encode()
+    return response
 
 
 @require_POST

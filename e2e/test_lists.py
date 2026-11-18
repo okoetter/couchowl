@@ -84,8 +84,8 @@ def test_search_add_to_list_mark_watched_and_remove(live_server, member, page, f
 
 
 def test_edit_mode(live_server, member, page, fake_tmdb):
-    """ "Edit" swaps the watched buttons for trash buttons; filters and the layout toggle
-    keep the mode, "Done" ends it."""
+    """ "Edit" swaps the watched buttons for trash buttons; removing offers "Undo"; filters
+    and the layout toggle keep the mode, "Done" ends it."""
     from e2e.test_screenshots import sample_lists, show_list_grid
 
     sample_lists(fake_tmdb, member)
@@ -100,6 +100,16 @@ def test_edit_mode(live_server, member, page, fake_tmdb):
     page.get_by_role("button", name="Bearbeiten").click()
     expect(watched).to_be_hidden()
     expect(hint).to_be_visible()
+    names = page.locator(".poster-grid strong")
+    before = names.all_text_contents()
+    remove_heat.click()
+    expect(page.locator(".poster-grid strong", has_text="Heat")).to_have_count(0)
+    # "Undo" puts it back at its old place; edit mode stays
+    toast = page.locator(".toast")
+    expect(toast).to_contain_text("„Heat“ entfernt")
+    toast.get_by_role("button", name="Rückgängig").click()
+    expect(names).to_have_text(before)
+    expect(toast).to_have_count(0)
     remove_heat.click()
     expect(page.locator(".poster-grid strong", has_text="Heat")).to_have_count(0)
     # A filter and the other layout keep edit mode

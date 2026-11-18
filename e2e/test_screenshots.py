@@ -126,6 +126,12 @@ def show_list_compact_edit(page, url):
     page.get_by_role("button", name="Bearbeiten").click()
 
 
+def show_list_remove_toast(page, url):
+    show_list_grid_edit(page, url)
+    page.get_by_role("button", name="„Heat“ von der Liste entfernen").click()
+    page.locator(".toast").wait_for()
+
+
 def show_list_filtered(page, url):
     show_list_compact(page, url)
     page.get_by_role("button", name="Ungesehen").click()
@@ -357,6 +363,7 @@ PAGES = {
     "list-compact": show_list_compact,
     "list-grid-edit": show_list_grid_edit,
     "list-compact-edit": show_list_compact_edit,
+    "list-remove-toast": show_list_remove_toast,
     "list-filtered": show_list_filtered,
     # "Dark" completely watched (see watch_dark): the check mark undoes the whole show
     "list-grid-complete": show_list_grid,
