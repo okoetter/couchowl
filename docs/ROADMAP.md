@@ -40,6 +40,13 @@ The reasons behind finished work are in [design.md](design.md).
   - [x] Detail page on narrow phones: long titles wrap instead of widening the page
   - [x] Navigation: current page on a tinted background, others gray; bottom bar centered
   - [x] `1.0.0-rc.2` with the changes above
+  - [x] Image tag `next` for every release including release candidates
+  - [x] Logins last until 90 days without a visit
+  - [x] Lists: one round check per row (shows too), progress and next episode in the text
+    or on the poster, bell for followed shows; removing in edit mode with "Undo"
+  - [x] Detail pages: a line between the streaming provider groups
+  - [x] Back button: pages from the browser's cache update themselves after changes
+  - [x] `1.0.0-rc.3` with the changes above
 
 ## Backlog (after 1.0)
 
