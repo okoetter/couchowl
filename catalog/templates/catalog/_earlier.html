@@ -7,7 +7,7 @@
 
 {# The #toast region (base.html), replaced "out of band"; empty without a question #}
 {% partialdef region %}
-  <div id="toast" hx-swap-oob="innerHTML">{% if earlier %}{% partial prompt %}{% endif %}</div>
+  <div hx-swap-oob="innerHTML:#toast">{% if earlier %}{% partial prompt %}{% endif %}</div>
 {% endpartialdef %}
 
 {% partialdef prompt %}

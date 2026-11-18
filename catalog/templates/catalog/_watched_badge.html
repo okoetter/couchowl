@@ -1,21 +1,32 @@
 {% load i18n %}
 {% comment %}
-  Compact view, below the title: "✓ Watched", or for shows the next episode ("Next: S1 E3",
-  which the round check button marks) and, once started, the progress bar like on the
-  dashboard. Only the code stays together, so narrow screens can break after "Next:".
-  `oob`: htmx updates it by its id after a click on the check button.
+  Text below the title on the list page; `oob`: htmx updates it by its id after a click
+  on the check button.
+  Compact view: "✓ Watched", or for shows the next episode ("Next: S1 E3", which the round
+  check button marks) and, once started, the progress bar like on the dashboard. Only the
+  code stays together, so narrow screens can break after "Next:".
+  Grid (`corner`): only "▶ S1 E3" (screen readers say "Next:"), never broken; the check on
+  the poster shows "watched", the bar on the poster the progress (_poster_progress.html).
 {% endcomment %}
-<div id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>
-  {% if item.watched %}
-    <small><span class="watched-badge">✓ {% translate "Watched" %}</span></small>
-  {% elif item.progress.next_episode %}
-    <small>{% translate "Next:" %} <span class="nowrap">{{ item.progress.next_episode.code }}</span></small>
-    {% if item.progress.started %}
-      {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
-      <span class="watching-progress" title="{{ progress_label }}">
-        <progress value="{{ item.progress.watched }}" max="{{ item.progress.aired }}" aria-label="{{ progress_label }}"></progress>
-        <small aria-hidden="true">{{ item.progress.watched }}/{{ item.progress.aired }}</small>
-      </span>
+{% if corner %}
+  <small id="watched-badge-{{ item.pk }}" class="next-episode"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% if not item.watched and item.progress.next_episode %}
+      <span class="nowrap"><svg viewBox="0 0 24 24" class="icon play-icon" role="img" aria-label="{% translate 'Next:' %}"><title>{% translate "Next:" %}</title><path d="M7 4l13 8-13 8z"/></svg>{{ item.progress.next_episode.code }}</span>
     {% endif %}
-  {% endif %}
-</div>
+  </small>
+{% else %}
+  <div id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% if item.watched %}
+      <small><span class="watched-badge">✓ {% translate "Watched" %}</span></small>
+    {% elif item.progress.next_episode %}
+      <small>{% translate "Next:" %} <span class="nowrap">{{ item.progress.next_episode.code }}</span></small>
+      {% if item.progress.started %}
+        {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
+        <span class="watching-progress" title="{{ progress_label }}">
+          <progress value="{{ item.progress.watched }}" max="{{ item.progress.aired }}" aria-label="{{ progress_label }}"></progress>
+          <small aria-hidden="true">{{ item.progress.watched }}/{{ item.progress.aired }}</small>
+        </span>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endif %}

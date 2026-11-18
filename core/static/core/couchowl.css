@@ -616,6 +616,15 @@ details.dropdown.list-dropdown-compact > summary + ul {
   text-decoration: none;
 }
 
+/* Poster with what lies on it: bell (top left), progress bar (bottom); the watched
+   button (top right) sits outside the link, see .watched-toggle-corner */
+.poster-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--pico-border-radius);
+}
+
 .poster-grid img,
 .poster-grid .poster-missing {
   display: block;
@@ -623,8 +632,54 @@ details.dropdown.list-dropdown-compact > summary + ul {
   height: auto;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  border-radius: var(--pico-border-radius);
   background: var(--pico-muted-border-color);
+}
+
+.followed-badge {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+}
+
+.followed-badge svg.followed-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: #fff;
+}
+
+/* Thin bar along the bottom edge; dark track so it shows on light and dark posters */
+.poster-progress progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.3rem;
+  margin: 0;
+  border-radius: 0;
+  /* Fixed colors: the bar lies on the poster, not on the page background */
+  --pico-progress-background-color: rgb(0 0 0 / 45%);
+  --pico-progress-color: #5ab4ea;
+}
+
+/* "▶ S2 E3" below the title: text color, not muted (inherit: inside the link Pico's
+   --pico-color is the link color) */
+.poster-grid small.next-episode {
+  color: inherit;
+}
+
+svg.play-icon {
+  width: 0.7em;
+  height: 0.7em;
+  margin-right: 0.3em;
+  vertical-align: -0.02em;
+  fill: currentColor;
+  stroke: none;
 }
 
 .poster-grid strong {
@@ -713,7 +768,7 @@ details.dropdown.list-dropdown-compact > summary + ul {
   --pico-background-color: color-mix(in srgb, var(--pico-ins-color) 75%, #fff);
 }
 
-/* With a mouse, the empty circle only appears on hover (calmer grid); watched movies
+/* With a mouse, the empty circle only appears on hover (calmer grid); watched titles
    always show their check mark. Touch devices have no hover, so they always show it.
    Keyboard users see it when the entry has focus. */
 @media (hover: hover) {
@@ -1074,106 +1129,6 @@ details.episode-watched > summary::after {
   max-width: 20rem;
   margin: 0.5rem 0;
   font-size: 1rem;
-}
-
-/* ---- Shows in lists: progress button ("12/26") ------------------------------------ */
-
-.progress-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.85rem;
-  line-height: 1;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  border-radius: 1rem;
-  --pico-background-color: transparent;
-  --pico-border-color: var(--pico-secondary-border);
-  --pico-color: var(--pico-secondary);
-}
-
-.progress-button .icon {
-  width: 0.95rem;
-  height: 0.95rem;
-}
-
-/* Explicit colors (not Pico's button variables) so it looks like the movie buttons */
-.watched-toggle .progress-button {
-  border: 1px solid var(--pico-border-color);
-  background-color: var(--pico-background-color);
-  color: var(--pico-color);
-  box-shadow: none;
-}
-
-/* "12/26" and "S1 E3" in the same grid cell: the button is as wide as the longer one
-   and doesn't jump when the label changes on hover */
-.progress-labels {
-  display: inline-grid;
-}
-
-.progress-labels > span {
-  grid-area: 1 / 1;
-  text-align: center;
-}
-
-.progress-next {
-  visibility: hidden;
-}
-
-button.progress-button:focus-visible .progress-count {
-  visibility: hidden;
-}
-
-button.progress-button:focus-visible .progress-next {
-  visibility: visible;
-}
-
-/* Only with a mouse: touch devices keep :hover after a tap, which would stick */
-@media (hover: hover) {
-  button.progress-button:hover .progress-count {
-    visibility: hidden;
-  }
-
-  button.progress-button:hover .progress-next {
-    visibility: visible;
-  }
-}
-
-/* Grid: a pill on the poster instead of the round movie button
-   (repeats the selectors of the round button so these rules win) */
-.watched-toggle-corner button.progress-button {
-  display: inline-flex;
-  width: auto;
-  margin: 0;
-  border-radius: 1rem;
-  height: 2rem;
-  padding: 0 0.6rem;
-  border: none;
-  box-shadow: none;
-  --pico-background-color: rgb(0 0 0 / 65%);
-  --pico-color: #fff;
-  transition: background-color 0.15s, opacity 0.15s;
-}
-
-.poster-grid .watched-toggle-corner button.progress-button:is(:hover, :focus-visible) {
-  width: auto;
-  margin: 0;
-  --pico-background-color: rgb(95 95 95 / 90%);
-  box-shadow: none;
-}
-
-/* Like the movie button: not started yet = only visible on hover (with a mouse) */
-@media (hover: hover) {
-  .watched-toggle-corner .progress-button:not(.is-started) {
-    opacity: 0;
-  }
-
-  .poster-grid li:hover .watched-toggle-corner .progress-button,
-  .poster-grid li:focus-within .watched-toggle-corner .progress-button {
-    opacity: 1;
-  }
 }
 
 /* ---- Toast: short message with "Undo" --------------------------------------------- */

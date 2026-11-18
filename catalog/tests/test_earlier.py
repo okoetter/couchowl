@@ -89,7 +89,7 @@ def test_other_shows_are_left_out(user, show):
 def test_question_after_marking_an_episode_with_gaps(auth_client, show):
     content = mark(auth_client, show, 2, 3, **HTMX).content.decode()
 
-    assert '<div id="toast" hx-swap-oob="innerHTML">' in content
+    assert '<div hx-swap-oob="innerHTML:#toast">' in content
     assert "S2 E3 gesehen. Davor sind noch 12 Folgen offen." in content
     assert "Nur Staffel 2 (2)" in content
     assert "Alle (12)" in content
@@ -116,7 +116,7 @@ def test_one_button_when_only_older_seasons_have_gaps(auth_client, show):
 def test_no_question_without_gaps_clears_an_old_one(auth_client, show):
     content = mark(auth_client, show, 1, 1, **HTMX).content.decode()
 
-    assert '<div id="toast" hx-swap-oob="innerHTML"></div>' in content
+    assert '<div hx-swap-oob="innerHTML:#toast"></div>' in content
     assert "offen" not in content
 
 
@@ -126,7 +126,7 @@ def test_unmarking_clears_the_question(auth_client, user, show):
 
     content = auth_client.post(url, {"action": "unmark"}, headers=HTMX).content.decode()
 
-    assert '<div id="toast" hx-swap-oob="innerHTML"></div>' in content
+    assert '<div hx-swap-oob="innerHTML:#toast"></div>' in content
 
 
 def test_question_after_marking_a_season(auth_client, show):
@@ -194,7 +194,7 @@ def test_undo_unmarks_only_the_added_episodes(auth_client, user, show):
     content = auth_client.post(url, {"undo": undo}, headers=HTMX).content.decode()
 
     assert set(watched(user, show)) == {(2, 3)}
-    assert '<div id="toast" hx-swap-oob="innerHTML"></div>' in content
+    assert '<div hx-swap-oob="innerHTML:#toast"></div>' in content
 
 
 def test_undo_ignores_episodes_of_other_shows(auth_client, user, show):

@@ -113,7 +113,7 @@ def test_check_button_marks_next_episode_and_updates_only_the_entry(auth_client,
     assert "<img" not in content  # the poster stays as it is
     assert "S1 E3</span>" in content
     # Message with "undo"
-    assert 'id="toast" hx-swap-oob="innerHTML"' in content
+    assert 'hx-swap-oob="innerHTML:#toast"' in content
     assert "S1 E2 gesehen" in content
     assert f'name="undo" value="{episode(show, 1, 2).pk}"' in content
     assert 'hx-target="#watching"' in content
@@ -201,7 +201,7 @@ def test_undo_takes_the_episode_back_and_reloads_the_section(auth_client, user, 
     assert f'id="watching-{show.pk}"' in content
     assert "S1 E2</span>" in content
     # The empty toast hides the message
-    assert 'id="toast" hx-swap-oob="innerHTML"' in content
+    assert 'hx-swap-oob="innerHTML:#toast"' in content
     assert "gesehen</span>" not in content
 
 

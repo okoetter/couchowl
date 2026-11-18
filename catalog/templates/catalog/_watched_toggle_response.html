@@ -1,7 +1,8 @@
 {% comment %}
   Answer to the watched button on the list page: the new button replaces the old one.
-  In the compact view the "✓ Watched" text is updated too ("out of band": htmx puts
-  it in place by its id).
+  The text below the title (both views) and the progress bar on the poster (grid) are
+  updated too ("out of band": htmx puts them in place by their id).
 {% endcomment %}
 {% include "catalog/_watched_button.html" %}
-{% if not corner %}{% include "catalog/_watched_badge.html" with oob=True %}{% endif %}
+{% include "catalog/_watched_badge.html" with oob=True %}
+{% if corner %}{% include "catalog/_poster_progress.html" with oob=True %}{% endif %}

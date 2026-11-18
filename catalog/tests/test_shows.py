@@ -521,7 +521,7 @@ def test_mark_whole_show_as_not_watched(auth_client, user, show):
     assert 'id="show-progress" class="show-progress" hx-swap-oob="true"' in content
     assert "0 von 26 Folgen gesehen" in content
     assert url not in content  # nothing left to unmark
-    assert 'id="toast" hx-swap-oob="innerHTML"' in content  # an open prompt disappears
+    assert 'hx-swap-oob="innerHTML:#toast"' in content  # an open prompt disappears
 
 
 def test_mark_whole_show_as_not_watched_without_javascript(auth_client, user, show):

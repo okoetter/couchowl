@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 19:07+0100\n"
+"POT-Creation-Date: 2026-11-18 19:30+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -953,32 +953,41 @@ msgstr "Name der neuen Liste"
 msgid "Create list"
 msgstr "Liste anlegen"
 
+#: catalog/templates/catalog/_poster_progress.html:9
+#: catalog/templates/catalog/_watched_badge.html:24
+#: catalog/templates/catalog/_watched_button.html:24
+#: catalog/templates/catalog/title_detail.html:63
+#: core/templates/core/dashboard.html:38
+#, python-format
+msgid "%(watched)s of %(aired)s episodes watched"
+msgstr "%(watched)s von %(aired)s Folgen gesehen"
+
 #: catalog/templates/catalog/_seasons.html:11
 msgid "Seasons"
 msgstr "Staffeln"
 
 #: catalog/templates/catalog/_seasons.html:20
-#: catalog/templates/catalog/_watched_button.html:25
+#: catalog/templates/catalog/_watched_button.html:22
 #, python-format
 msgid "Mark all episodes of “%(name)s” as not watched?"
 msgstr "Alle Folgen von „%(name)s“ als nicht gesehen markieren?"
 
 #: catalog/templates/catalog/_seasons.html:26
-#: catalog/templates/catalog/_watched_button.html:30
-#: catalog/templates/catalog/_watched_button.html:62
+#: catalog/templates/catalog/_watched_button.html:27
+#: catalog/templates/catalog/_watched_button.html:48
 #, python-format
 msgid "Mark “%(name)s” as not watched"
 msgstr "„%(name)s“ als nicht gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:27
 #: catalog/templates/catalog/_seasons.html:112
-#: catalog/templates/catalog/_watched_button.html:31
-#: catalog/templates/catalog/_watched_button.html:63
+#: catalog/templates/catalog/_watched_button.html:28
+#: catalog/templates/catalog/_watched_button.html:49
 msgid "Watched – click to undo"
 msgstr "Gesehen – zum Rückgängigmachen klicken"
 
 #: catalog/templates/catalog/_seasons.html:33
-#: catalog/templates/catalog/_watched_button.html:66
+#: catalog/templates/catalog/_watched_button.html:52
 #, python-format
 msgid "Mark “%(name)s” as watched"
 msgstr "„%(name)s“ als gesehen markieren"
@@ -1000,7 +1009,7 @@ msgstr[0] "%(counter)s Folge"
 msgstr[1] "%(counter)s Folgen"
 
 #: catalog/templates/catalog/_seasons.html:50
-#: catalog/templates/catalog/_watched_badge.html:10
+#: catalog/templates/catalog/_watched_badge.html:20
 #: catalog/templates/catalog/search.html:45
 #: catalog/templates/catalog/title_detail.html:95 catalog/views.py:209
 #: imports/templates/imports/import.html:157
@@ -1053,15 +1062,14 @@ msgid "Mark %(code)s as not watched"
 msgstr "%(code)s als nicht gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:116
-#: catalog/templates/catalog/_watched_button.html:38
-#: catalog/templates/catalog/_watched_button.html:48
+#: catalog/templates/catalog/_watched_button.html:34
 #: core/templates/core/dashboard.html:56
 #, python-format
 msgid "Mark %(code)s as watched"
 msgstr "%(code)s als gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:117
-#: catalog/templates/catalog/_watched_button.html:67
+#: catalog/templates/catalog/_watched_button.html:53
 #: catalog/templates/catalog/title_detail.html:132
 msgid "Mark as watched"
 msgstr "Als gesehen markieren"
@@ -1089,21 +1097,13 @@ msgstr "Datum ändern"
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
 
-#: catalog/templates/catalog/_watched_badge.html:12
+#: catalog/templates/catalog/_watched_badge.html:14
+#: catalog/templates/catalog/_watched_badge.html:22
 #: catalog/templates/catalog/title_detail.html:67
 msgid "Next:"
 msgstr "Als Nächstes:"
 
-#: catalog/templates/catalog/_watched_badge.html:14
-#: catalog/templates/catalog/_watched_button.html:27
-#: catalog/templates/catalog/title_detail.html:63
-#: core/templates/core/dashboard.html:38
-#, python-format
-msgid "%(watched)s of %(aired)s episodes watched"
-msgstr "%(watched)s von %(aired)s Folgen gesehen"
-
-#: catalog/templates/catalog/_watched_button.html:37
-#: catalog/templates/catalog/_watched_button.html:47
+#: catalog/templates/catalog/_watched_button.html:33
 #: core/templates/core/dashboard.html:55
 #, python-format
 msgid "Mark %(code)s of “%(name)s” as watched"
@@ -1159,21 +1159,21 @@ msgstr "„%(name)s“ von der Liste entfernen"
 msgid "Remove from list"
 msgstr "Von der Liste entfernen"
 
-#: catalog/templates/catalog/list_detail.html:133
+#: catalog/templates/catalog/list_detail.html:138
 msgid "No titles match this filter."
 msgstr "Keine Titel für diesen Filter."
 
-#: catalog/templates/catalog/list_detail.html:134
+#: catalog/templates/catalog/list_detail.html:139
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:137
+#: catalog/templates/catalog/list_detail.html:142
 msgid "You don't follow any shows. Use the “Follow” button on a show's page."
 msgstr ""
 "Du folgst keiner Serie. Auf der Seite einer Serie gibt es dafür den Button "
 "„Folgen“."
 
-#: catalog/templates/catalog/list_detail.html:141
+#: catalog/templates/catalog/list_detail.html:146
 #, python-format
 msgid ""
 "This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
@@ -1182,7 +1182,7 @@ msgstr ""
 "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du "
 "Filme und Serien hinzu."
 
-#: catalog/templates/catalog/list_detail.html:143
+#: catalog/templates/catalog/list_detail.html:148
 #, python-format
 msgid ""
 "Or <a href=\"%(import_url)s?list=%(list_pk)s\">import a list of titles</a>."

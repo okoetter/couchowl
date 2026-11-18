@@ -103,7 +103,7 @@ def show_list_grid_hover_watched(page, url):
 
 
 def show_list_grid_hover_show(page, url):
-    """The show's progress button names the next episode on hover."""
+    """Hovering a started show's check (the next episode is named below the title)."""
     show_list_grid(page, url)
     page.get_by_role("button", name="S2 E3 von „Dark“ als gesehen markieren").hover()
     page.wait_for_timeout(300)

@@ -81,21 +81,22 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   at "All". Actions keep the filter, so a title marked under "Unwatched" disappears.
 - **Watched button in lists:** a round button on the poster (grid) or next to "×"
   (compact). For movies it toggles watched with today's date (an existing date is kept).
-  For shows it marks the next episode, followed by a toast "S2 E5 watched · Undo".
-  Grid: the button shows the progress ("12/25"); on hover or focus the pill shows the
-  episode it will mark ("S1 E3"). Compact: the same round check as for movies (and as on
-  the dashboard and the show page); the text says "Next: S1 E3" and, once started, shows
-  the dashboard's progress bar ("12/25"). Earlier the compact view also had the wider
-  progress pill: on narrow phones it left little room for the text, and two different
-  buttons per row (check and pill) were confusing.
+  For shows it is the same round check and marks the next episode, followed by a toast
+  "S2 E5 watched · Undo". The text names that episode and, once started, a bar shows the
+  progress: compact "Next: S1 E3" and the dashboard's progress bar ("12/25"); grid
+  "▶ S1 E3" below the title (never broken; screen readers say "Next:") and a thin bar
+  along the bottom of the poster. Earlier shows had a wider pill ("12/25", on hover
+  "S1 E3"): on narrow phones it left little room for the text (compact) and covered the
+  poster (grid), and two different buttons (check and pill) were confusing.
   A completely watched show shows a check mark like a watched movie; clicking it marks
   the whole show as not watched after asking (a misclick would delete all dates).
   Earlier this check couldn't be clicked, so undoing a show marked by mistake (e.g. by an
   import) took one click and one question per season on the show page.
-  Unwatched buttons in the grid only appear on hover, focus or touch devices, to keep the
-  grid calm.
-- **Followed shows are marked in lists** with a bell after the name (the icon of the
-  Follow button on the show page), only for display; following and unfollowing stay on
+  Unwatched buttons in the grid (movies and shows) only appear on hover, focus or touch
+  devices, to keep the grid calm; the bar and "▶ S1 E3" show a show's progress anyway.
+- **Followed shows are marked in lists** with a bell (the icon of the Follow button on the
+  show page): after the name (compact) or in the top left corner of the poster (grid),
+  only for display; following and unfollowing stay on
   the show page. Not in the system list "Followed shows", where every show has it.
 - **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
   soon as the user follows a show; same view as other lists without rename, delete,

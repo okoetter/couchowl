@@ -510,7 +510,7 @@ def test_shows_show_their_progress(auth_client, user, show):
     content = auth_client.get(user_list.get_absolute_url()).content.decode()
 
     assert url in content
-    assert "1/26" in content
+    assert "1 von 26 Folgen gesehen" in content
     assert "S1 E2 von „Dark“ als gesehen markieren" in content
 
 
@@ -524,17 +524,17 @@ def test_show_button_marks_the_next_episode_with_undo(auth_client, user, show):
 
     watched = user.watched_episodes.get()
     assert watched.episode.code == "S1 E1"
-    assert "1/26" in content
+    assert "1 von 26 Folgen gesehen" in content
     assert "<img" not in content
     # Message with "undo" in the toast region
-    assert 'id="toast" hx-swap-oob="innerHTML"' in content
+    assert 'hx-swap-oob="innerHTML:#toast"' in content
     assert "S1 E1 gesehen" in content
     assert f'name="undo" value="{watched.episode.pk}"' in content
 
     content = auth_client.post(url, {"undo": watched.episode.pk}, headers=HTMX).content.decode()
 
     assert not user.watched_episodes.exists()
-    assert "0/26" in content  # the whole list content, with the button as before
+    assert "S1 E1 von „Dark“ als gesehen markieren" in content  # whole content, button as before
     assert "S1 E1 gesehen" not in content
 
 
@@ -590,9 +590,9 @@ def test_completely_watched_show_can_be_marked_as_not_watched(auth_client, user,
     content = auth_client.post(url, {"unwatched": "1"}, headers=HTMX).content.decode()
 
     assert not user.watched_episodes.exists()
-    assert "0/26" in content
+    assert "0 von 26 Folgen gesehen" in content
     assert "<img" not in content
-    assert 'id="toast" hx-swap-oob="innerHTML"' in content  # an old "Undo" disappears
+    assert 'hx-swap-oob="innerHTML:#toast"' in content  # an old "Undo" disappears
 
 
 def test_watched_button_on_other_users_list_is_404(auth_client, user, other_user, movie):
@@ -621,7 +621,9 @@ def test_watched_button_answer_is_only_the_button(auth_client, user, mixed_list)
     assert content.count("<form") == 1
     assert "watched-toggle-corner" in content
     assert "„Heat“ als nicht gesehen markieren" in content
-    assert "hx-swap-oob" not in content
+    # Plus the (empty for movies) text below the title and progress bar, by their ids
+    assert f'id="watched-badge-{item.pk}" class="next-episode" hx-swap-oob="true"' in content
+    assert f'id="poster-progress-{item.pk}" class="poster-progress" hx-swap-oob="true"' in content
 
 
 def test_compact_view_also_updates_the_watched_text(auth_client, user, mixed_list):
@@ -711,7 +713,7 @@ def test_followed_shows_list(auth_client, user, other_user, show):
 
     assert "<h1>Gefolgte Serien</h1>" in content
     assert shown_names(content) == ["Dark"]
-    assert "0/26" in content  # progress button as in other lists
+    assert "S1 E1 von „Dark“ als gesehen markieren" in content  # as in other lists
     # Computed list: nothing to rename, delete or remove; only shows, so no type filter
     assert "Umbenennen" not in content
     assert "aus der Liste entfernen" not in content
@@ -759,15 +761,42 @@ def test_followed_shows_of_other_users_are_not_reachable(auth_client, other_user
     assert auth_client.post(url, {"next": "1"}).status_code == 404
 
 
-def test_show_button_names_the_next_episode_for_hover(auth_client, user, show):
+def test_grid_shows_the_next_episode_and_the_progress_on_the_poster(auth_client, user, show):
     user_list = user.lists.create(name="Watchlist")
     list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
 
     content = auth_client.get(user_list.get_absolute_url()).content.decode()
 
-    # Both labels are rendered; CSS shows "S1 E1" instead of "0/26" on hover
-    assert '<span class="progress-count">0/26</span>' in content
-    assert '<span class="progress-next">S1 E1</span>' in content
+    # A round check like movies, "▶ S1 E1" below the title, no bar before the first episode
+    assert 'class="icon-button" aria-pressed="false"' in content
+    assert 'aria-label="Als Nächstes:"><title>Als Nächstes:</title>' in content
+    assert "</svg>S1 E1</span>" in content
+    assert "<progress" not in content
+
+    # After a click: text and bar are updated "out of band"
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+    content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
+    oob = 'hx-swap-oob="true"'
+    badge = content.split(f'id="watched-badge-{item.pk}" class="next-episode" {oob}')[1]
+    assert "</svg>S1 E2</span>" in badge
+    bar = content.split(f'id="poster-progress-{item.pk}" class="poster-progress" {oob}')[1]
+    assert '<progress value="1" max="26" title="1 von 26 Folgen gesehen" aria-hidden="true">' in bar
+
+
+def test_grid_marks_followed_shows(auth_client, user, show):
+    from catalog import shows
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    badge = '<span class="followed-badge">'
+
+    assert badge not in auth_client.get(user_list.get_absolute_url()).content.decode()
+
+    shows.set_following(user, show, True)
+    assert badge in auth_client.get(user_list.get_absolute_url()).content.decode()
+    content = auth_client.get(reverse("catalog:list_detail", args=["followed"])).content.decode()
+    assert badge not in content
 
 
 def test_compact_view_shows_the_next_episode(auth_client, user, show):

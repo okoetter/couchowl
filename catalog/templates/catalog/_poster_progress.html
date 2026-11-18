@@ -1,0 +1,12 @@
+{% load i18n %}
+{% comment %}
+  Grid: thin progress bar at the bottom of a show's poster, once started and until all
+  aired episodes are watched. Hidden from screen readers: the check button's label already
+  says "12 of 25 episodes watched". The empty element stays as the target for `oob`.
+{% endcomment %}
+<span id="poster-progress-{{ item.pk }}" class="poster-progress"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if item.progress.started and not item.progress.complete %}
+    {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
+    <progress value="{{ item.progress.watched }}" max="{{ item.progress.aired }}" title="{{ progress_label }}" aria-hidden="true"></progress>
+  {% endif %}
+</span>

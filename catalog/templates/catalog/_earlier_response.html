@@ -9,4 +9,4 @@
   {% include "catalog/_seasons.html#season-episodes" with oob=True %}
 {% endfor %}
 {% include "catalog/title_detail.html#show-progress" with oob=True %}
-<div id="toast" hx-swap-oob="innerHTML">{% if toast %}{% include "catalog/_earlier.html#done" %}{% endif %}</div>
+<div hx-swap-oob="innerHTML:#toast">{% if toast %}{% include "catalog/_earlier.html#done" %}{% endif %}</div>

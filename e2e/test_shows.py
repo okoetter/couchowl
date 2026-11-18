@@ -1,4 +1,4 @@
-"""Shows in a real browser: follow, mark episodes and seasons, progress button in lists."""
+"""Shows in a real browser: follow, mark episodes and seasons, progress in lists."""
 
 import pytest
 from playwright.sync_api import expect
@@ -49,11 +49,12 @@ def test_follow_mark_episodes_and_watch_next_from_the_list(live_server, member, 
     page.get_by_role("link", name="Gefolgte Serien").click()
     page.get_by_role("button", name="S1 E2 von „Dark“ als gesehen markieren").click()
     expect(page.get_by_text("S1 E2 gesehen")).to_be_visible()
-    # Away from the button: on hover it shows the next episode ("S1 E3") instead
-    page.mouse.move(0, 0)
-    expect(page.get_by_text("2/26")).to_be_visible()
+    # "▶ S1 E3" below the title and the bar on the poster follow
+    expect(page.locator(".next-episode")).to_contain_text("S1 E3")
+    expect(page.locator(".poster-progress progress")).to_have_attribute("value", "2")
     page.get_by_role("button", name="Rückgängig").click()
-    expect(page.get_by_text("1/26")).to_be_visible()
+    expect(page.locator(".next-episode")).to_contain_text("S1 E2")
+    expect(page.locator(".poster-progress progress")).to_have_attribute("value", "1")
     expect(page.get_by_text("S1 E2 gesehen")).to_be_hidden()
     assert WatchedEpisode.objects.count() == 1
 
@@ -195,8 +196,10 @@ def test_mark_the_whole_show_as_not_watched(live_server, member, page, fake_tmdb
 
     answer["accept"] = True
     button.click()
-    page.mouse.move(0, 0)  # on hover the button shows the next episode instead
-    expect(page.get_by_text("0/26")).to_be_visible()
+    expect(page.locator(".next-episode")).to_contain_text("S1 E1")
+    expect(page.get_by_role("button", name="S1 E1 von „Dark“ als gesehen markieren")).to_have_count(
+        1
+    )
     assert not WatchedEpisode.objects.exists()
 
     # Show page: seasons and progress line follow without a reload

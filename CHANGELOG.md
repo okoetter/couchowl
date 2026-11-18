@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   names the next episode and, once started, shows the progress bar like the dashboard
   ("12/25"), leaving more room for the text. Followed shows have a bell after the name;
   the Follow button on the show page shows the same bell
+- Poster grid: shows get the same round check as movies instead of the "12/25" pill;
+  "▶ S2 E3" below the title names the next episode, a thin bar at the bottom of the poster
+  shows the progress, and followed shows have a bell in the top left corner
 - Logins last until 90 days without a visit (`SESSION_DAYS`) instead of 14 days after
   logging in, so people using Couch Owl regularly, e.g. as an app on their phone, stay
   logged in

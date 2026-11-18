@@ -109,16 +109,21 @@
               {% with name=item.translation.name|default:item.title.original_title %}
                 <li id="item-{{ item.pk }}">
                   <a href="{{ item.title.get_absolute_url }}">
-                    {% poster item.translation.poster_path "w185" as thumb %}
-                    {% if thumb %}
-                      {% poster item.translation.poster_path "w342" as thumb_2x %}
-                      <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
-                           alt="" width="185" height="278" loading="lazy">
-                    {% else %}
-                      <span class="poster-missing" aria-hidden="true"></span>
-                    {% endif %}
+                    <span class="poster-frame">
+                      {% poster item.translation.poster_path "w185" as thumb %}
+                      {% if thumb %}
+                        {% poster item.translation.poster_path "w342" as thumb_2x %}
+                        <img src="{{ thumb }}" srcset="{{ thumb }} 1x, {{ thumb_2x }} 2x"
+                             alt="" width="185" height="278" loading="lazy">
+                      {% else %}
+                        <span class="poster-missing" aria-hidden="true"></span>
+                      {% endif %}
+                      {% if item.following and not list.is_system %}<span class="followed-badge">{% include "catalog/_followed_icon.html" %}</span>{% endif %}
+                      {% include "catalog/_poster_progress.html" %}
+                    </span>
                     <strong>{{ name }}</strong>
                     <small>{{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}{% rating item.title as stars %}{% if stars %} · {{ stars }}{% endif %}</small>
+                    {% include "catalog/_watched_badge.html" with corner=True %}
                   </a>
                   {# Outside the link (a button inside a link is invalid), placed on the poster #}
                   {% include "catalog/_watched_button.html" with corner=True %}
