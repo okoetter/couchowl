@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Poster grid: shows get the same round check as movies instead of the "12/25" pill;
   "▶ S2 E3" below the title names the next episode, a thin bar at the bottom of the poster
   shows the progress, and followed shows have a bell in the top left corner
+- Lists: titles are removed in edit mode ("Edit" / "Done", both views), where trash
+  buttons replace the watched buttons. The "×" next to every entry of the compact list is
+  gone, so each entry has a single button; the poster grid can now remove titles too
 - Logins last until 90 days without a visit (`SESSION_DAYS`) instead of 14 days after
   logging in, so people using Couch Owl regularly, e.g. as an app on their phone, stay
   logged in

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% comment %}
+  Edit mode on the list page: removes the entry from the list (watched data stays).
+  Only visible while editing (CSS: #list-content.is-editing), in place of the watched button.
+  `corner`: on the poster (grid view).
+{% endcomment %}
+<form method="post" class="remove-form{% if corner %} remove-form-corner{% endif %}"
+      action="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
+      hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
+      hx-target="closest li" hx-swap="outerHTML">
+  {% csrf_token %}
+  <button type="submit" class="remove-button"
+          aria-label="{% blocktranslate %}Remove “{{ name }}” from the list{% endblocktranslate %}"
+          title="{% translate 'Remove from list' %}">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg>
+  </button>
+</form>

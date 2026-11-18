@@ -589,6 +589,111 @@ details.dropdown.list-dropdown-compact > summary + ul {
   line-height: 1;
 }
 
+/* ---- Edit mode: trash buttons instead of the watched buttons ------------------- */
+
+/* Both labels share one grid cell: the button is as wide as "Edit" in both modes, so
+   it doesn't jump (or wrap to another line) when the label changes */
+.edit-toggle {
+  display: inline-grid;
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9em;
+}
+
+.edit-toggle > span {
+  grid-area: 1 / 1;
+  justify-self: center;
+}
+
+.edit-toggle .edit-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.edit-toggle .edit-done,
+#list-content.is-editing .edit-toggle .edit-start {
+  visibility: hidden;
+}
+
+#list-content.is-editing .edit-toggle .edit-done {
+  visibility: visible;
+}
+
+.edit-toggle .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.list-edit-hint,
+.remove-form {
+  display: none;
+}
+
+#list-content.is-editing .watched-toggle {
+  display: none;
+}
+
+#list-content.is-editing .list-edit-hint,
+#list-content.is-editing .remove-form {
+  display: block;
+}
+
+/* "Done" stands out: the page is in a different mode */
+#list-content.is-editing button.edit-toggle {
+  --pico-background-color: var(--pico-primary-background);
+  --pico-border-color: var(--pico-primary-border);
+  --pico-color: var(--pico-primary-inverse);
+  font-weight: 600;
+}
+
+.list-edit-hint {
+  margin-top: calc(var(--pico-spacing) * -0.5);
+  color: var(--pico-muted-color);
+  font-size: 0.9em;
+}
+
+.remove-form {
+  margin: 0;
+}
+
+/* Round like the watched buttons, in the color of destructive actions */
+button.remove-button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  --pico-background-color: transparent;
+  --pico-border-color: var(--app-error-color);
+  --pico-color: var(--app-error-color);
+}
+
+button.remove-button:is(:hover, :focus-visible) {
+  --pico-background-color: color-mix(in srgb, var(--app-error-color) 15%, transparent);
+}
+
+/* Grid: on the poster where the watched button was; filled so it shows on any poster */
+.remove-form-corner {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+}
+
+.remove-form-corner button.remove-button {
+  border: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  --pico-background-color: var(--app-error-color);
+  --pico-color: #fff;
+}
+
+.remove-form-corner button.remove-button:is(:hover, :focus-visible) {
+  --pico-background-color: color-mix(in srgb, var(--app-error-color) 80%, #000);
+}
+
 
 /* Poster grid: as many columns as fit (3 on a phone) */
 .poster-grid {

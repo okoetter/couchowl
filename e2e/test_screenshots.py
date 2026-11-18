@@ -116,6 +116,16 @@ def show_list_compact(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_list_grid_edit(page, url):
+    show_list_grid(page, url)
+    page.get_by_role("button", name="Bearbeiten").click()
+
+
+def show_list_compact_edit(page, url):
+    show_list_compact(page, url)
+    page.get_by_role("button", name="Bearbeiten").click()
+
+
 def show_list_filtered(page, url):
     show_list_compact(page, url)
     page.get_by_role("button", name="Ungesehen").click()
@@ -345,6 +355,8 @@ PAGES = {
     "list-grid-hover-watched": show_list_grid_hover_watched,
     "list-grid-hover-show": show_list_grid_hover_show,
     "list-compact": show_list_compact,
+    "list-grid-edit": show_list_grid_edit,
+    "list-compact-edit": show_list_compact_edit,
     "list-filtered": show_list_filtered,
     # "Dark" completely watched (see watch_dark): the check mark undoes the whole show
     "list-grid-complete": show_list_grid,

@@ -16,7 +16,12 @@
     {% endif %}
   </div>
 
-  <div id="list-content">
+  {% comment %}
+    Edit mode ("Edit" / "Done"): trash buttons instead of the watched buttons. Only a class
+    on this element (Alpine); htmx replaces just its content, so filters, the layout toggle
+    and removing entries keep the mode.
+  {% endcomment %}
+  <div id="list-content" x-data="{ editing: false }" :class="{ 'is-editing': editing }">
     {% partialdef list-content inline %}
       {% if has_items %}
         <div class="list-toolbar">
@@ -59,7 +64,16 @@
               <span class="visually-hidden">{{ layouts.COMPACT.label }}</span>
             </button>
           </form>
+          {% if not list.is_system %}{# Nothing to remove from "Followed shows" (unfollow on the show page) #}
+            <button type="button" class="outline secondary edit-toggle" @click="editing = !editing">
+              <span class="edit-start"><svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{% translate "Edit" %}</span>
+              <span class="edit-done">{% translate "Done" %}</span>
+            </button>
+          {% endif %}
         </div>
+        {% if not list.is_system %}
+          <p class="list-edit-hint">{% translate "Removes titles from this list only – watched status, progress and followed shows stay." %}</p>
+        {% endif %}
       {% endif %}
 
       {% if items %}
@@ -87,18 +101,7 @@
                     </div>
                   </a>
                   {% include "catalog/_watched_button.html" %}
-                  {% if not list.is_system %}
-                  <form method="post" action="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
-                        hx-post="{% url 'catalog:list_item_remove' list.pk item.pk %}{{ filter_query }}"
-                        hx-target="closest li" hx-swap="outerHTML">
-                    {% csrf_token %}
-                    <button type="submit" class="outline secondary icon-button"
-                            aria-label="{% blocktranslate %}Remove “{{ name }}” from the list{% endblocktranslate %}"
-                            title="{% translate 'Remove from list' %}">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 6l12 12M18 6L6 18"/></svg>
-                    </button>
-                  </form>
-                  {% endif %}
+                  {% if not list.is_system %}{% include "catalog/_remove_button.html" %}{% endif %}
                 </li>
               {% endwith %}
             {% endfor %}
@@ -127,6 +130,7 @@
                   </a>
                   {# Outside the link (a button inside a link is invalid), placed on the poster #}
                   {% include "catalog/_watched_button.html" with corner=True %}
+                  {% if not list.is_system %}{% include "catalog/_remove_button.html" with corner=True %}{% endif %}
                 </li>
               {% endwith %}
             {% endfor %}

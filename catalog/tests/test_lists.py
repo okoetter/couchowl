@@ -175,6 +175,29 @@ def test_remove_item_from_compact_list(auth_client, user, movie, show):
     assert "The Dark Knight" not in response.content.decode()
 
 
+@pytest.mark.parametrize("layout", ["grid", "compact"])
+def test_edit_mode_offers_remove_buttons(auth_client, user, movie, layout):
+    """The trash buttons are always rendered; CSS shows them instead of the watched
+    buttons once "Edit" is clicked (a class on #list-content, see list_detail.html)."""
+    user.list_layout = layout
+    user.save()
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, movie)
+    item = user_list.items.get()
+
+    content = auth_client.get(user_list.get_absolute_url()).content.decode()
+
+    assert '<div id="list-content" x-data="{ editing: false }"' in content
+    assert '@click="editing = !editing"' in content
+    assert "Entfernt Titel nur aus dieser Liste – Gesehen-Status, Fortschritt" in content
+    form = content.split(
+        f'action="{reverse("catalog:list_item_remove", args=[user_list.pk, item.pk])}"'
+    )
+    assert len(form) == 2
+    assert ("remove-form-corner" in form[0].rsplit("<form", 1)[1]) == (layout == "grid")
+    assert "„The Dark Knight“ von der Liste entfernen" in content
+
+
 def test_rename_list(auth_client, user):
     user_list = user.lists.create(name="Watchlist")
     user.lists.create(name="Favoriten")
@@ -717,6 +740,7 @@ def test_followed_shows_list(auth_client, user, other_user, show):
     # Computed list: nothing to rename, delete or remove; only shows, so no type filter
     assert "Umbenennen" not in content
     assert "aus der Liste entfernen" not in content
+    assert "editing = !editing" not in content  # no "Edit" button
     assert "?type=movie" not in content
     # Every user sees their own followed shows
     auth_client.force_login(other_user)

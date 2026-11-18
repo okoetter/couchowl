@@ -79,8 +79,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   (`User.list_layout`). **Filters** "All / Unwatched / Watched" and "All / Movies / Shows"
   live in the URL (bookmarkable, back button works) and aren't saved; every list starts
   at "All". Actions keep the filter, so a title marked under "Unwatched" disappears.
-- **Watched button in lists:** a round button on the poster (grid) or next to "×"
-  (compact). For movies it toggles watched with today's date (an existing date is kept).
+- **Watched button in lists:** one round button per entry, on the poster (grid) or at
+  the end of the row (compact). For movies it toggles watched with today's date (an existing date is kept).
   For shows it is the same round check and marks the next episode, followed by a toast
   "S2 E5 watched · Undo". The text names that episode and, once started, a bar shows the
   progress: compact "Next: S1 E3" and the dashboard's progress bar ("12/25"); grid
@@ -98,6 +98,14 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   show page): after the name (compact) or in the top left corner of the poster (grid),
   only for display; following and unfollowing stay on
   the show page. Not in the system list "Followed shows", where every show has it.
+- **Removing titles: edit mode.** "Edit" next to the layout toggle swaps every watched
+  button for a red trash button (same place, both views) and shows a hint that watched
+  data stays; "Done" ends it. Filters and the layout toggle keep the mode. It is only a
+  class on `#list-content` (Alpine), whose content htmx replaces; no request, no URL
+  parameter. Earlier each compact row had a "×" next to the check: two buttons per row
+  took room from the text and it wasn't clear which one did what; the grid had no way to
+  remove at all. Without JavaScript nothing can be removed from a list (like the toasts).
+  Not in "Followed shows" (unfollow on the show page).
 - **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
   soon as the user follows a show; same view as other lists without rename, delete,
   remove and type filter; most recently followed first; can be hidden in the profile

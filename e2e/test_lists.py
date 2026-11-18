@@ -74,10 +74,45 @@ def test_search_add_to_list_mark_watched_and_remove(live_server, member, page, f
     # Only the button was replaced: the poster is still the same element (no flicker)
     assert poster.evaluate("img => img.isConnected")
 
-    # Compact view, then remove the movie from the list
+    # Compact view, then remove the movie from the list in edit mode
     page.get_by_role("button", name="Kompakte Liste").click()
-    page.get_by_role("button", name="„The Dark Knight“ von der Liste entfernen").click()
+    remove = page.get_by_role("button", name="„The Dark Knight“ von der Liste entfernen")
+    expect(remove).to_be_hidden()
+    page.get_by_role("button", name="Bearbeiten").click()
+    remove.click()
     expect(page.get_by_text("Diese Liste ist leer.")).to_be_visible()
+
+
+def test_edit_mode(live_server, member, page, fake_tmdb):
+    """ "Edit" swaps the watched buttons for trash buttons; filters and the layout toggle
+    keep the mode, "Done" ends it."""
+    from e2e.test_screenshots import sample_lists, show_list_grid
+
+    sample_lists(fake_tmdb, member)
+    show_list_grid(page, live_server.url)
+    watched = page.get_by_role("button", name="„Arrival“ als nicht gesehen markieren")
+    remove_heat = page.get_by_role("button", name="„Heat“ von der Liste entfernen")
+    hint = page.get_by_text("Gesehen-Status, Fortschritt und gefolgte Serien bleiben.")
+    expect(watched).to_be_visible()
+    expect(remove_heat).to_be_hidden()
+    expect(hint).to_be_hidden()
+
+    page.get_by_role("button", name="Bearbeiten").click()
+    expect(watched).to_be_hidden()
+    expect(hint).to_be_visible()
+    remove_heat.click()
+    expect(page.locator(".poster-grid strong", has_text="Heat")).to_have_count(0)
+    # A filter and the other layout keep edit mode
+    page.get_by_role("button", name="Filme").click()
+    expect(page).to_have_url(re.compile(r"\?type=movie$"))
+    page.get_by_role("button", name="Kompakte Liste").click()
+    expect(page.get_by_role("button", name="„Arrival“ von der Liste entfernen")).to_be_visible()
+    expect(watched).to_be_hidden()
+
+    page.get_by_role("button", name="Fertig").click()
+    expect(watched).to_be_visible()
+    expect(page.get_by_role("button", name="„Arrival“ von der Liste entfernen")).to_be_hidden()
+    expect(page.get_by_role("button", name="Bearbeiten")).to_be_visible()
 
 
 @pytest.mark.parametrize(

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 19:30+0100\n"
+"POT-Creation-Date: 2026-11-18 20:34+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -912,7 +912,7 @@ msgid "No"
 msgstr "Nein"
 
 #: catalog/templates/catalog/_earlier.html:48
-#: catalog/templates/catalog/_toast.html:16
+#: catalog/templates/catalog/_toast.html:17
 msgid "Undo"
 msgstr "Rückgängig"
 
@@ -961,6 +961,15 @@ msgstr "Liste anlegen"
 #, python-format
 msgid "%(watched)s of %(aired)s episodes watched"
 msgstr "%(watched)s von %(aired)s Folgen gesehen"
+
+#: catalog/templates/catalog/_remove_button.html:13
+#, python-format
+msgid "Remove “%(name)s” from the list"
+msgstr "„%(name)s“ von der Liste entfernen"
+
+#: catalog/templates/catalog/_remove_button.html:14
+msgid "Remove from list"
+msgstr "Von der Liste entfernen"
 
 #: catalog/templates/catalog/_seasons.html:11
 msgid "Seasons"
@@ -1092,7 +1101,7 @@ msgstr "%(minutes)s Min."
 msgid "Change date"
 msgstr "Datum ändern"
 
-#: catalog/templates/catalog/_toast.html:11
+#: catalog/templates/catalog/_toast.html:12
 #, python-format
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
@@ -1138,42 +1147,45 @@ msgstr "Umbenennen"
 msgid "Delete"
 msgstr "Löschen"
 
-#: catalog/templates/catalog/list_detail.html:28
+#: catalog/templates/catalog/list_detail.html:34
 msgid "Show"
 msgstr "Anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:36
+#: catalog/templates/catalog/list_detail.html:42
 msgid "Type"
 msgstr "Art"
 
-#: catalog/templates/catalog/list_detail.html:48
+#: catalog/templates/catalog/list_detail.html:54
 msgid "View"
 msgstr "Ansicht"
 
-#: catalog/templates/catalog/list_detail.html:97
-#, python-format
-msgid "Remove “%(name)s” from the list"
-msgstr "„%(name)s“ von der Liste entfernen"
+#: catalog/templates/catalog/list_detail.html:71
+msgid "Edit"
+msgstr "Bearbeiten"
 
-#: catalog/templates/catalog/list_detail.html:98
-msgid "Remove from list"
-msgstr "Von der Liste entfernen"
+#: catalog/templates/catalog/list_detail.html:72 imports/models.py:18
+msgid "Done"
+msgstr "Fertig"
 
-#: catalog/templates/catalog/list_detail.html:138
+#: catalog/templates/catalog/list_detail.html:77
+msgid "Removes titles from this list only – watched status, progress and followed shows stay."
+msgstr "Entfernt Titel nur aus dieser Liste – Gesehen-Status, Fortschritt und gefolgte Serien bleiben."
+
+#: catalog/templates/catalog/list_detail.html:143
 msgid "No titles match this filter."
 msgstr "Keine Titel für diesen Filter."
 
-#: catalog/templates/catalog/list_detail.html:139
+#: catalog/templates/catalog/list_detail.html:144
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:142
+#: catalog/templates/catalog/list_detail.html:147
 msgid "You don't follow any shows. Use the “Follow” button on a show's page."
 msgstr ""
 "Du folgst keiner Serie. Auf der Seite einer Serie gibt es dafür den Button "
 "„Folgen“."
 
-#: catalog/templates/catalog/list_detail.html:146
+#: catalog/templates/catalog/list_detail.html:151
 #, python-format
 msgid ""
 "This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
@@ -1182,7 +1194,7 @@ msgstr ""
 "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du "
 "Filme und Serien hinzu."
 
-#: catalog/templates/catalog/list_detail.html:148
+#: catalog/templates/catalog/list_detail.html:153
 #, python-format
 msgid ""
 "Or <a href=\"%(import_url)s?list=%(list_pk)s\">import a list of titles</a>."
@@ -1692,10 +1704,6 @@ msgstr "Vorschau"
 #: imports/models.py:17
 msgid "Importing"
 msgstr "Wird importiert"
-
-#: imports/models.py:18
-msgid "Done"
-msgstr "Fertig"
 
 #: imports/models.py:27
 msgid "state"
