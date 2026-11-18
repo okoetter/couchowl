@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Compact list on narrow phones or with large text: the line below the title ("Show ·
   2017 · ★ 8.4 · Next: S2 E3") ran under the progress button of shows; it wraps now.
   The links above the list ("Import", "Rename", "Delete") wrap instead of widening the page
+- The back button showed the previous page as it was: after following a show, the list
+  still lacked the bell. Pages coming back from the browser's cache now update themselves
+  when something changed in the meantime
 
 ## [1.0.0-rc.2] - 2026-11-17
 

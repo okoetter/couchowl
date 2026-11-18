@@ -202,7 +202,8 @@ aren't logged in.
 
 For a privacy policy: Couch Owl stores the account data (user name, optional e-mail
 address, settings), the lists and what was watched when, in its own database. It sets only
-the cookies it needs (login session, form protection, short status messages). Browsers never contact
+the cookies it needs (login session, form protection, short status messages, the time of
+the last change so pages restored by the back button stay current). Browsers never contact
 TMDB or other third parties; Couch Owl itself talks to TMDB (without any user data) and
 serves the posters itself.
 

@@ -9,6 +9,8 @@ def app(request):
         "APP_NAME": settings.APP_NAME,
         "APP_VERSION": settings.VERSION,
         "theme": theme,
+        # See core.middleware.DataVersionMiddleware
+        "data_version": getattr(request, "data_version", ""),
         "email_enabled": settings.EMAIL_ENABLED,
         "imprint_url": settings.IMPRINT_URL,
         "privacy_url": settings.PRIVACY_URL,

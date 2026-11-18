@@ -360,6 +360,21 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   one card's text) or remove one entry; re-rendering a whole list rebuilds every poster
   and makes them flicker. Where a region is refreshed but most entries stay (live search,
   list filters, "Undo"), Idiomorph merges old and new HTML instead of replacing it.
+- **The back button shows the current state.** Browsers restore the previous page from
+  their caches without asking the server: the bfcache keeps the whole page in memory, the
+  HTTP cache keeps its HTML. After following a show and going back, the list would still
+  lack the bell, which breaks the app feeling, especially in the PWA. Every successful
+  change (POST) sets the cookie `couchowl_version` to a new timestamp
+  (`core/middleware.py`); pages carry the version they were made with
+  (`<main data-version>`). When a page comes back (`pageshow` from the bfcache, a
+  back/forward load, an htmx history restore), `couchowl.js` compares both and, only if
+  they differ, loads the page again and morphs `<main>` into place (no flicker, scroll
+  position stays); a changed interface language or theme reloads the whole page. Because
+  Django answers with `Vary: Cookie`, the new cookie also makes Chromium skip its outdated
+  HTTP cache copy. Limit: changes made on another device are not noticed (that would need
+  a version in the database and a request on every back navigation). Rejected:
+  `Cache-Control: no-store` (turns off the bfcache, every back navigation becomes a full
+  page load) and always reloading on `pageshow` (same, plus a second load).
 - **Toasts** ("S2 E5 watched · Undo") at the bottom disappear after 6 seconds. Without
   JavaScript, actions fall back to full page loads with a message.
 - Episode codes are always "S1 E3", not "S01E03".

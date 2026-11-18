@@ -28,7 +28,8 @@
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-ext="morph">
   {% include "core/_nav.html" %}
 
-  <main class="container">
+  {# data-version: the back button may restore an outdated page (core/middleware.py) #}
+  <main class="container" data-version="{{ data_version }}">
     {% if messages %}
       {% for message in messages %}
         <article class="message message-{{ message.tags }}" role="status">{{ message }}</article>

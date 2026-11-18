@@ -247,3 +247,65 @@ def test_long_title_does_not_widen_the_page_on_phones(
     )
     assert overflow == 0
     context.close()
+
+
+@pytest.fixture
+def watchlist_with_dark(member, fake_tmdb):
+    from catalog import lists, services
+
+    fake_tmdb.add_show()
+    for size in ("w92", "w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    watchlist = lists.find_or_create_list(member, "Watchlist")
+    lists.add_to_list(watchlist, services.get_title("tv", 70523, "de-DE").title)
+    return watchlist
+
+
+def test_back_button_shows_the_new_follow_state(live_server, page, watchlist_with_dark):
+    """Going back must show the bell. Chromium would take the list from its HTTP cache; the
+    new version cookie makes it ask the server (Django answers with "Vary: Cookie")."""
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/lists/{watchlist_with_dark.pk}/")
+    bell = page.locator(".followed-icon")
+    expect(bell).to_have_count(0)
+
+    page.get_by_role("link", name="Dark").first.click()
+    page.get_by_role("button", name="Folgen", exact=True).click()
+    expect(page.get_by_role("button", name="Gefolgt")).to_be_visible()
+    page.go_back()
+    expect(bell.first).to_be_visible()
+
+    page.get_by_role("link", name="Dark").first.click()
+    page.get_by_role("button", name="Gefolgt").click()
+    expect(page.get_by_role("button", name="Folgen", exact=True)).to_be_visible()
+    page.go_back()
+    expect(bell).to_have_count(0)
+
+
+def test_page_from_the_bfcache_updates_in_place(live_server, page, watchlist_with_dark):
+    """Real browsers keep the previous page in memory (bfcache) and show it again as it was.
+
+    Headless Chromium has no bfcache, so this does what it would: the list stays as it is,
+    the show is followed elsewhere, then the page gets the "pageshow" event.
+    """
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/lists/{watchlist_with_dark.pk}/")
+    bell = page.locator(".followed-icon")
+    poster = page.locator(".list-content img, #list-content img").first.element_handle()
+    restored = "() => dispatchEvent(new PageTransitionEvent('pageshow', {persisted: true}))"
+
+    # Nothing changed: no request
+    requests = []
+    page.on("request", lambda request: requests.append(request.url))
+    page.evaluate(restored)
+    page.wait_for_timeout(500)
+    assert requests == []
+
+    other = page.context.new_page()
+    other.goto(f"{live_server.url}/tv/70523/")
+    other.get_by_role("button", name="Folgen", exact=True).click()
+    expect(other.get_by_role("button", name="Gefolgt")).to_be_visible()
+    page.evaluate(restored)
+    expect(bell.first).to_be_visible()
+    # Morphed into place: the poster stays (no flicker)
+    assert poster.evaluate("img => img.isConnected")

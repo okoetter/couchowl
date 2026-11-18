@@ -103,6 +103,8 @@ MIDDLEWARE = [
     "accounts.middleware.UserLanguageMiddleware",
     # Must come after AuthenticationMiddleware: moves the login's expiry once a day
     "accounts.middleware.SessionRenewalMiddleware",
+    # Cookie with the time of the last change, for pages restored by the back button
+    "core.middleware.DataVersionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Should be last: turns axes lockouts into a proper "locked out" response
