@@ -178,8 +178,10 @@ def _list_context(request, user_list: UserList) -> dict:
         )
     )
     progress = shows.progress(request.user, [t for t in titles if not t.is_movie])
+    following = shows.followed_ids(request.user, titles)
     for item in all_items:
         item.translation = translations.get(item.title_id)
+        item.following = item.title_id in following
         if item.title.is_movie:
             item.watched = item.title_id in watched
         else:

@@ -780,8 +780,32 @@ def test_compact_view_shows_the_next_episode(auth_client, user, show):
     content = auth_client.get(user_list.get_absolute_url()).content.decode()
     assert 'Als Nächstes: <span class="nowrap">S1 E1</span>' in content
 
-    # After a click the text is updated too ("out of band")
+    # A round check like movies (not the grid's "0/26" button); no progress bar yet
+    assert 'class="check-button" aria-pressed="false"' in content
+    assert "progress-count" not in content
+    assert "<progress" not in content
+
+    # After a click the text is updated too ("out of band"), now with the progress bar
     url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
     content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
     badge = content.split(f'id="watched-badge-{item.pk}" hx-swap-oob="true"')[1]
-    assert badge.startswith('> · Als Nächstes: <span class="nowrap">S1 E2')
+    assert 'Als Nächstes: <span class="nowrap">S1 E2</span>' in badge
+    assert '<progress value="1" max="26" aria-label="1 von 26 Folgen gesehen">' in badge
+
+
+def test_compact_view_marks_followed_shows(auth_client, user, show, mixed_list):
+    from catalog import shows
+
+    user.list_layout = "compact"
+    user.save()
+    bell = 'class="icon followed-icon" role="img" aria-label="Gefolgt"'
+
+    assert bell not in auth_client.get(mixed_list.get_absolute_url()).content.decode()
+
+    shows.set_following(user, show, True)
+    content = auth_client.get(mixed_list.get_absolute_url()).content.decode()
+    assert content.count(bell) == 1
+
+    # Not in "Followed shows": every show there is followed
+    content = auth_client.get(reverse("catalog:list_detail", args=["followed"])).content.decode()
+    assert bell not in content

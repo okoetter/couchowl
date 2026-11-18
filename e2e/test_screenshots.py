@@ -581,5 +581,8 @@ def test_screenshot(live_server, member, browser, fake_tmdb, name, device, schem
     PAGES[name](page, live_server.url)
 
     OUTPUT.mkdir(exist_ok=True)
-    page.screenshot(path=OUTPUT / f"{name}-{device}-{scheme}.png", full_page=True)
+    # Finish running CSS transitions (e.g. a button morphed from the grid to the list)
+    page.screenshot(
+        path=OUTPUT / f"{name}-{device}-{scheme}.png", full_page=True, animations="disabled"
+    )
     context.close()

@@ -87,9 +87,9 @@ def test_search_add_to_list_mark_watched_and_remove(live_server, member, page, f
 def test_compact_list_text_stays_left_of_the_buttons_on_phones(
     live_server, member, browser, fake_tmdb, width, text_size
 ):
-    """The show's progress button ("12/25") is wider than the movie buttons: the line
-    below the title ("Show · 2017 · ★ 8,4 · Next: S2 E3") wraps instead of running under
-    it, and the links above the list wrap instead of widening the page.
+    """The text (title with the bell, "Show · 2017 · ★ 8,4", "Next: S2 E3" and the
+    progress bar) wraps instead of running under the round button, and the links above
+    the list wrap instead of widening the page.
     (Larger text like Android's font size setting, see test_shows.py.)
     """
     from e2e.test_screenshots import sample_lists, show_list_compact
@@ -104,7 +104,7 @@ def test_compact_list_text_stays_left_of_the_buttons_on_phones(
 
     rows = page.evaluate(
         """() => [...document.querySelectorAll('.compact-list li')].map(li => ({
-          name: li.querySelector('strong').textContent,
+          name: li.querySelector('strong').firstChild.textContent.trim(),
           textEnd: li.querySelector('.result-link > div').getBoundingClientRect().right,
           buttonStart: li.querySelector('.watched-toggle').getBoundingClientRect().left,
         }))"""

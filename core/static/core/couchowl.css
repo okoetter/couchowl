@@ -461,6 +461,20 @@ button.danger.outline,
   padding: 0;
 }
 
+/* Below the title: "✓ Watched", or a show's next episode and progress (like the dashboard) */
+.compact-list .watching-progress {
+  max-width: 16rem;
+  margin-top: 0.15rem;
+}
+
+/* Bell after the name of a followed show (lists) */
+svg.followed-icon {
+  width: 0.95em;
+  height: 0.95em;
+  vertical-align: -0.1em;
+  color: var(--pico-primary);
+}
+
 .compact-list form {
   margin: 0;
 }

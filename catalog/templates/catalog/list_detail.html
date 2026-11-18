@@ -78,11 +78,12 @@
                       <span class="poster poster-missing" aria-hidden="true"></span>
                     {% endif %}
                     <div>
-                      <strong>{{ name }}</strong>
+                      {# The bell marks followed shows; pointless in "Followed shows" itself #}
+                      <strong>{{ name }}{% if item.following and not list.is_system %} {% include "catalog/_followed_icon.html" %}{% endif %}</strong>
                       <small>
                         {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}{% rating item.title as stars %}{% if stars %} · {{ stars }}{% endif %}
-                        {% include "catalog/_watched_badge.html" %}
                       </small>
+                      {% include "catalog/_watched_badge.html" %}
                     </div>
                   </a>
                   {% include "catalog/_watched_button.html" %}

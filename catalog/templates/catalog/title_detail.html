@@ -34,16 +34,17 @@
         {% include "catalog/_list_dropdown.html" with name=translation.name %}
         {% if not title.is_movie %}
           {% partialdef follow inline %}
-            {# Follow / Following: followed shows appear in the system list "Followed shows" #}
+            {# Follow / Following: followed shows appear in the system list "Followed shows". #}
+            {# The bell also marks followed shows in lists (_followed_icon.html). #}
             <form id="follow" method="post" action="{% url 'catalog:show_follow' title.tmdb_id %}"
                   hx-post="{% url 'catalog:show_follow' title.tmdb_id %}" hx-target="this" hx-swap="outerHTML">
               {% csrf_token %}
               {% if following %}
                 <button type="submit" class="secondary" aria-pressed="true"
-                        title="{% translate 'Click to unfollow' %}">✓ {% translate "Following" %}</button>
+                        title="{% translate 'Click to unfollow' %}"><svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> {% translate "Following" %}</button>
               {% else %}
                 <input type="hidden" name="following" value="1">
-                <button type="submit" class="secondary outline" aria-pressed="false">{% translate "Follow" %}</button>
+                <button type="submit" class="secondary outline" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> {% translate "Follow" %}</button>
               {% endif %}
             </form>
           {% endpartialdef %}

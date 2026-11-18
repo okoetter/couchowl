@@ -1,2 +1,21 @@
-{% load i18n %}{# Compact view: "✓ Watched", or the next episode of a show ("Next: S1 E3"), which phones can't show on hover. Only the code stays together, so narrow screens can break after "Next:". `oob`: htmx updates it by its id #}
-<span id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>{% if item.watched %} · <span class="watched-badge">✓ {% translate "Watched" %}</span>{% elif item.progress.next_episode %} · {% translate "Next:" %} <span class="nowrap">{{ item.progress.next_episode.code }}</span>{% endif %}</span>
+{% load i18n %}
+{% comment %}
+  Compact view, below the title: "✓ Watched", or for shows the next episode ("Next: S1 E3",
+  which the round check button marks) and, once started, the progress bar like on the
+  dashboard. Only the code stays together, so narrow screens can break after "Next:".
+  `oob`: htmx updates it by its id after a click on the check button.
+{% endcomment %}
+<div id="watched-badge-{{ item.pk }}"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if item.watched %}
+    <small><span class="watched-badge">✓ {% translate "Watched" %}</span></small>
+  {% elif item.progress.next_episode %}
+    <small>{% translate "Next:" %} <span class="nowrap">{{ item.progress.next_episode.code }}</span></small>
+    {% if item.progress.started %}
+      {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
+      <span class="watching-progress" title="{{ progress_label }}">
+        <progress value="{{ item.progress.watched }}" max="{{ item.progress.aired }}" aria-label="{{ progress_label }}"></progress>
+        <small aria-hidden="true">{{ item.progress.watched }}/{{ item.progress.aired }}</small>
+      </span>
+    {% endif %}
+  {% endif %}
+</div>

@@ -81,15 +81,22 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   at "All". Actions keep the filter, so a title marked under "Unwatched" disappears.
 - **Watched button in lists:** a round button on the poster (grid) or next to "×"
   (compact). For movies it toggles watched with today's date (an existing date is kept).
-  For shows it shows the progress ("12/25") and marks the next episode, followed by a
-  toast "S2 E5 watched · Undo". On hover or focus the progress pill shows the episode it
-  will mark ("S1 E3"); phones have no hover, so the compact view says "Next: S1 E3".
+  For shows it marks the next episode, followed by a toast "S2 E5 watched · Undo".
+  Grid: the button shows the progress ("12/25"); on hover or focus the pill shows the
+  episode it will mark ("S1 E3"). Compact: the same round check as for movies (and as on
+  the dashboard and the show page); the text says "Next: S1 E3" and, once started, shows
+  the dashboard's progress bar ("12/25"). Earlier the compact view also had the wider
+  progress pill: on narrow phones it left little room for the text, and two different
+  buttons per row (check and pill) were confusing.
   A completely watched show shows a check mark like a watched movie; clicking it marks
   the whole show as not watched after asking (a misclick would delete all dates).
   Earlier this check couldn't be clicked, so undoing a show marked by mistake (e.g. by an
   import) took one click and one question per season on the show page.
   Unwatched buttons in the grid only appear on hover, focus or touch devices, to keep the
   grid calm.
+- **Followed shows are marked in lists** with a bell after the name (the icon of the
+  Follow button on the show page), only for display; following and unfollowing stay on
+  the show page. Not in the system list "Followed shows", where every show has it.
 - **System list "Followed shows"** (`/lists/followed/`): computed, not stored; appears as
   soon as the user follows a show; same view as other lists without rename, delete,
   remove and type filter; most recently followed first; can be hidden in the profile

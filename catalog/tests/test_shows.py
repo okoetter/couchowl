@@ -558,7 +558,7 @@ def test_follow_button(auth_client, user, show):
     assert "Folgen</button>" in auth_client.get(show.get_absolute_url()).content.decode()
 
     content = auth_client.post(url, {"following": "1"}, headers=HTMX).content.decode()
-    assert "✓ Gefolgt" in content
+    assert "Gefolgt</button>" in content
     assert shows.is_following(user, show)
 
     auth_client.post(url, {}, headers=HTMX)

@@ -26,7 +26,7 @@ def test_follow_mark_episodes_and_watch_next_from_the_list(live_server, member, 
 
     # Follow: the system list appears
     page.get_by_role("button", name="Folgen", exact=True).click()
-    expect(page.get_by_role("button", name="✓ Gefolgt")).to_be_visible()
+    expect(page.get_by_role("button", name="Gefolgt")).to_be_visible()
 
     # Season 1 is open (next episode); mark episode 1, the progress line follows
     page.get_by_role("button", name="S1 E1 als gesehen markieren").click()

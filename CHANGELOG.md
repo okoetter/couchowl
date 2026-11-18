@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `COUCHOWL_VERSION=next` to test each release candidate without changing the version
 
 ### Changed
+- Compact list: shows get the same round check button as movies; the text below the title
+  names the next episode and, once started, shows the progress bar like the dashboard
+  ("12/25"), leaving more room for the text. Followed shows have a bell after the name;
+  the Follow button on the show page shows the same bell
 - Logins last until 90 days without a visit (`SESSION_DAYS`) instead of 14 days after
   logging in, so people using Couch Owl regularly, e.g. as an app on their phone, stay
   logged in

@@ -64,6 +64,15 @@ def set_following(user, show: Title, following: bool) -> None:
         series.save(update_fields=["following", "followed_at"])
 
 
+def followed_ids(user, titles) -> set[int]:
+    """Ids of the titles among `titles` that the user follows (for lists)."""
+    return set(
+        UserSeries.objects.filter(user=user, following=True, title__in=titles).values_list(
+            "title_id", flat=True
+        )
+    )
+
+
 def followed_shows(user):
     """UserSeries rows of the followed shows, most recently followed first."""
     return (

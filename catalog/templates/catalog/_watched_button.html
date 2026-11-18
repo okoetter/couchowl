@@ -3,12 +3,17 @@
   "Watched" button on the list page. `corner`: on the poster (grid view).
   The server answers with just this button (see catalog.views._item_response).
   - Movies: a toggle. Sends `watched=1` to mark (today), nothing to undo.
-  - Shows: shows the progress ("12/26"); a click marks the next episode as watched.
-    On hover or keyboard focus the button shows that episode instead ("S1 E3"); both
-    labels share one grid cell, so the button keeps its width.
+  - Shows: a click marks the next episode as watched.
+    Compact view: a round check like movies (the line below the title names the episode
+    and shows the progress, see _watched_badge.html).
+    Grid: shows the progress ("12/26"); on hover or keyboard focus the button shows the
+    next episode instead ("S1 E3"); both labels share one grid cell, so the button keeps
+    its width.
     All aired episodes watched: a check like a watched movie; a click marks all episodes
     as not watched, after asking (a misclick would delete all dates).
     Nothing to click when nothing has aired yet.
+  Compact view: the round check of the dashboard and the show page (`check-button`).
+  Grid: round buttons on the poster (`icon-button`, styled by .watched-toggle-corner).
 {% endcomment %}
 {% if not item.title.is_movie %}
   {% if item.progress.aired %}
@@ -21,12 +26,12 @@
       {% csrf_token %}
       {% blocktranslate asvar progress_label with watched=item.progress.watched aired=item.progress.aired %}{{ watched }} of {{ aired }} episodes watched{% endblocktranslate %}
       {% if item.progress.complete %}
-        <button type="submit" name="unwatched" value="1" class="icon-button" aria-pressed="true"
+        <button type="submit" name="unwatched" value="1" class="{% if corner %}icon-button{% else %}check-button{% endif %}" aria-pressed="true"
                 aria-label="{% blocktranslate %}Mark “{{ name }}” as not watched{% endblocktranslate %} ({{ progress_label }})"
                 title="{% translate 'Watched – click to undo' %}">
           <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
         </button>
-      {% else %}
+      {% elif corner %}
         <button type="submit" name="next" value="1"
                 class="progress-button{% if item.progress.started %} is-started{% endif %}"
                 aria-label="{% blocktranslate with code=item.progress.next_episode.code %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %} ({{ progress_label }})"
@@ -36,6 +41,12 @@
             <span class="progress-count">{{ item.progress.watched }}/{{ item.progress.aired }}</span>
             <span class="progress-next">{{ item.progress.next_episode.code }}</span>
           </span>
+        </button>
+      {% else %}
+        <button type="submit" name="next" value="1" class="check-button" aria-pressed="false"
+                aria-label="{% blocktranslate with code=item.progress.next_episode.code %}Mark {{ code }} of “{{ name }}” as watched{% endblocktranslate %} ({{ progress_label }})"
+                title="{% blocktranslate with code=item.progress.next_episode.code %}Mark {{ code }} as watched{% endblocktranslate %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
         </button>
       {% endif %}
     </form>
@@ -47,11 +58,11 @@
       hx-target="this" hx-swap="outerHTML">
   {% csrf_token %}
   {% if item.watched %}
-    <button type="submit" class="icon-button" aria-pressed="true"
+    <button type="submit" class="{% if corner %}icon-button{% else %}check-button{% endif %}" aria-pressed="true"
             aria-label="{% blocktranslate %}Mark “{{ name }}” as not watched{% endblocktranslate %}"
             title="{% translate 'Watched – click to undo' %}">
   {% else %}
-    <button type="submit" name="watched" value="1" class="icon-button" aria-pressed="false"
+    <button type="submit" name="watched" value="1" class="{% if corner %}icon-button{% else %}check-button{% endif %}" aria-pressed="false"
             aria-label="{% blocktranslate %}Mark “{{ name }}” as watched{% endblocktranslate %}"
             title="{% translate 'Mark as watched' %}">
   {% endif %}
