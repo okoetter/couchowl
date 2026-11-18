@@ -101,6 +101,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     # Must come after AuthenticationMiddleware: applies the user's profile language
     "accounts.middleware.UserLanguageMiddleware",
+    # Must come after AuthenticationMiddleware: moves the login's expiry once a day
+    "accounts.middleware.SessionRenewalMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Should be last: turns axes lockouts into a proper "locked out" response
@@ -144,6 +146,9 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "accounts:login"
+# Users stay logged in until they haven't visited for SESSION_DAYS days
+# (renewed at most once a day by accounts.middleware.SessionRenewalMiddleware)
+SESSION_COOKIE_AGE = env.int("SESSION_DAYS", default=90) * 24 * 3600
 
 AUTHENTICATION_BACKENDS = [
     # Must be first: rejects logins while a username/IP combination is locked out

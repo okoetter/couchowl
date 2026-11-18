@@ -46,6 +46,16 @@ never reveals whether an address exists and is limited to 5 requests per hour an
 Open the user in the admin and uncheck **Active**. The user can no longer log in; their data
 is kept. Deleting the user removes their data.
 
+## How long logins last
+
+Users stay logged in until they haven't visited Couch Owl for `SESSION_DAYS` days
+(default 90); every visit starts the period again. To end logins early:
+
+- Logging out ends the login on that device.
+- Changing the password ends the user's logins on all other devices, e.g. after losing a
+  phone.
+- Deactivating a user (see above) ends all their logins.
+
 ## Locked logins (brute-force protection)
 
 After `AXES_FAILURE_LIMIT` failed logins (default 5), the combination of username and IP address

@@ -36,6 +36,15 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **E-mail configuration lives in environment variables**, not in the admin: secrets stay
   out of the database, it works before the first login, and it's the Docker convention.
   `EMAIL_URL` is converted to Django 6.1's `MAILERS` setting (`config/mail.py`).
+- **Logins last until `SESSION_DAYS` (default 90) without a visit.** Django moves a
+  session's expiry only when its data changes, so its default (14 days, not renewed) logged
+  daily users out every two weeks, annoying in the phone app. `SessionRenewalMiddleware`
+  (`accounts/middleware.py`) changes the session at most once a day, which saves it with a
+  new expiry and cookie. `SESSION_SAVE_EVERY_REQUEST` would do the same with a database
+  write per request. 90 days because a watchlist is low-risk; logging out ends a session,
+  changing the password ends all other sessions of that user (Django), deactivating a user
+  ends all of theirs. Rejected: a "Stay logged in" checkbox (in the app one always wants
+  that; on shared devices, log out) and a per-user setting (effort for an edge case).
 - **Brute-force protection** with django-axes: the combination of user name **and** client
   address is locked after 5 failures for 60 minutes. Locking by address alone would lock
   everyone out behind a reverse proxy without a correct client address.
