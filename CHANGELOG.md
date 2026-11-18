@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   logging in, so people using Couch Owl regularly, e.g. as an app on their phone, stay
   logged in
 
+### Fixed
+- Compact list on narrow phones or with large text: the line below the title ("Show ·
+  2017 · ★ 8.4 · Next: S2 E3") ran under the progress button of shows; it wraps now.
+  The links above the list ("Import", "Rename", "Delete") wrap instead of widening the page
+
 ## [1.0.0-rc.2] - 2026-11-17
 
 ### Changed

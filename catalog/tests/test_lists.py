@@ -778,10 +778,10 @@ def test_compact_view_shows_the_next_episode(auth_client, user, show):
     item = user_list.items.get()
 
     content = auth_client.get(user_list.get_absolute_url()).content.decode()
-    assert "Als Nächstes: S1 E1" in content
+    assert 'Als Nächstes: <span class="nowrap">S1 E1</span>' in content
 
     # After a click the text is updated too ("out of band")
     url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
     content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
     badge = content.split(f'id="watched-badge-{item.pk}" hx-swap-oob="true"')[1]
-    assert badge.startswith('> · <span class="nowrap">Als Nächstes: S1 E2')
+    assert badge.startswith('> · Als Nächstes: <span class="nowrap">S1 E2')

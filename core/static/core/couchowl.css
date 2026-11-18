@@ -440,6 +440,13 @@ button.danger.outline,
   text-decoration: none;
 }
 
+/* The text may shrink (flex items don't by default) and wraps instead of running under
+   the button on the right */
+.result-link > div {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
 .result-link:hover strong {
   text-decoration: underline;
 }
@@ -555,7 +562,8 @@ details.dropdown.list-dropdown-compact > summary + ul {
 
 .list-header-links {
   display: flex;
-  gap: var(--pico-spacing);
+  flex-wrap: wrap;
+  gap: 0 var(--pico-spacing);
 }
 
 .list-toolbar > .layout-toggle {

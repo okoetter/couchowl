@@ -6,7 +6,7 @@ import pytest
 from playwright.sync_api import expect
 
 from conftest import load_tmdb_fixture
-from e2e.conftest import login
+from e2e.conftest import LOCALE, login
 
 pytestmark = pytest.mark.e2e
 
@@ -78,3 +78,42 @@ def test_search_add_to_list_mark_watched_and_remove(live_server, member, page, f
     page.get_by_role("button", name="Kompakte Liste").click()
     page.get_by_role("button", name="„The Dark Knight“ von der Liste entfernen").click()
     expect(page.get_by_text("Diese Liste ist leer.")).to_be_visible()
+
+
+@pytest.mark.parametrize(
+    ("width", "text_size"),
+    [(320, "100%"), (360, "100%"), (390, "100%"), (360, "125%"), (412, "125%")],
+)
+def test_compact_list_text_stays_left_of_the_buttons_on_phones(
+    live_server, member, browser, fake_tmdb, width, text_size
+):
+    """The show's progress button ("12/25") is wider than the movie buttons: the line
+    below the title ("Show · 2017 · ★ 8,4 · Next: S2 E3") wraps instead of running under
+    it, and the links above the list wrap instead of widening the page.
+    (Larger text like Android's font size setting, see test_shows.py.)
+    """
+    from e2e.test_screenshots import sample_lists, show_list_compact
+
+    sample_lists(fake_tmdb, member)
+    context = browser.new_context(
+        locale=LOCALE, viewport={"width": width, "height": 800}, is_mobile=True, has_touch=True
+    )
+    page = context.new_page()
+    show_list_compact(page, live_server.url)
+    page.add_style_tag(content=f"html {{ font-size: {text_size} !important; }}")
+
+    rows = page.evaluate(
+        """() => [...document.querySelectorAll('.compact-list li')].map(li => ({
+          name: li.querySelector('strong').textContent,
+          textEnd: li.querySelector('.result-link > div').getBoundingClientRect().right,
+          buttonStart: li.querySelector('.watched-toggle').getBoundingClientRect().left,
+        }))"""
+    )
+    assert any(row["name"] == "Dark" for row in rows)
+    for row in rows:
+        assert row["textEnd"] <= row["buttonStart"], row["name"]
+    overflow = page.evaluate(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+    )
+    assert overflow == 0
+    context.close()
