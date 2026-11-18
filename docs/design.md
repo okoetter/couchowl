@@ -465,8 +465,12 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Tags:** the Git tag `v1.2.3` produces the image tags `1.2.3`, `1.2`, `1` and `latest`,
   so users can pin as tightly as they like (`COUCHOWL_VERSION` in `.env`, default
   `latest`). Pre-releases (`v1.0.0-rc.1`) get only their own tag and a GitHub
-  "Pre-release", so nobody runs a release candidate by accident. No image per push to main
-  (`edge`): every published image went through a release.
+  "Pre-release", so nobody runs a release candidate by accident. Every release, pre-release
+  or not, also moves `next`: whoever tests release candidates sets `COUCHOWL_VERSION=next`
+  once instead of entering each version. `next` follows the order of publication; ordering
+  by version number (no `next` move for a bug fix of an older line) was left out because
+  releases are linear so far. No image per push to main (`edge`): every published image
+  went through a release.
 - **Installation without git:** `docker-compose.yml` pulls the image; the release attaches
   it and `env.example` (GitHub removes leading dots from file names), so
   `releases/latest/download/…` always fetches matching files. Building from source is an

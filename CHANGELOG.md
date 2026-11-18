@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Image tag `next`: every release including release candidates; set
+  `COUCHOWL_VERSION=next` to test each release candidate without changing the version
+
 ## [1.0.0-rc.2] - 2026-11-17
 
 ### Changed

@@ -113,8 +113,8 @@ Release with the changelog section, `docker-compose.yml` and `env.example`.
 
 | Git tag | Image tags |
 |---|---|
-| `v1.2.0` | `1.2.0`, `1.2`, `1`, `latest` |
-| `v1.3.0-rc.1` (pre-release) | `1.3.0-rc.1` only; the GitHub Release is marked "Pre-release" |
+| `v1.2.0` | `1.2.0`, `1.2`, `1`, `latest`, `next` |
+| `v1.3.0-rc.1` (pre-release) | `1.3.0-rc.1`, `next`; the GitHub Release is marked "Pre-release" |
 
 ## Translations
 

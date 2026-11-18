@@ -1,8 +1,9 @@
 # Publishes a release when a version tag is pushed, e.g. `git push origin v1.2.3`:
 # multi-arch image (amd64, arm64) on ghcr.io/okoetter/couchowl and a GitHub Release.
 #
-# Image tags: v1.2.3 -> 1.2.3, 1.2, 1, latest. Pre-releases (v1.0.0-rc.1) get only their own
-# tag, so nobody gets a release candidate by accident.
+# Image tags: v1.2.3 -> 1.2.3, 1.2, 1, latest, next. Pre-releases (v1.0.0-rc.1) get only their
+# own tag and next, so nobody gets a release candidate by accident. "next" follows every
+# release, for testing release candidates without changing COUCHOWL_VERSION each time.
 name: Release
 
 on:
@@ -79,6 +80,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+            type=raw,value=next
       - name: Build and push (reuses the layers the smoke tests built)
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:

@@ -66,11 +66,14 @@ By default, Couch Owl runs the newest release (`latest`). To control updates, se
 | `1` | the newest 1.x release; no major upgrade with possibly breaking changes |
 | `1.2` | the newest 1.2.x release (bug fixes only) |
 | `1.2.3` | exactly this version |
+| `next` | the most recently published release, release candidates included |
 
-Release candidates (e.g. `1.0.0-rc.1`) are only installed when you set them explicitly.
-They are marked "Pre-release" on the [releases page](https://github.com/okoetter/couchowl/releases)
-and aren't found by the `releases/latest` links above: download the two files from the
-release candidate's page instead.
+Release candidates (e.g. `1.0.0-rc.1`) are only installed when you set them explicitly
+(their version, or `next` to test every one). They are marked "Pre-release" on the
+[releases page](https://github.com/okoetter/couchowl/releases) and aren't found by the
+`releases/latest` links above: download the two files from the release candidate's page
+instead. `next` follows the order of publication, not the version number: a bug fix for an
+older version published after a release candidate replaces it.
 
 To build the image from the source code instead (e.g. with your own changes), clone the
 repository and use `docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`.
