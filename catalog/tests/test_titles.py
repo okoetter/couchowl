@@ -31,6 +31,10 @@ def test_movie_detail_page(auth_client, fake_tmdb):
     assert "Film · 2008 · Veröffentlicht" in content
     assert "Gemeinsam mit Bezirksstaatsanwalt" in content
     assert "/posters/w342/54WAzARB0rTp5L7gvCcfZ49AgkX.jpg" in content
+    # Clicking the poster shows it large in a dialog
+    assert 'href="/posters/w780/54WAzARB0rTp5L7gvCcfZ49AgkX.jpg"' in content
+    assert 'data-zoom="poster-dialog"' in content
+    assert '<dialog id="poster-dialog"' in content
     assert "Als gesehen markieren" in content
     assert "Zu Liste hinzufügen" in content
     assert fake_tmdb.requests[0].url.params["language"] == "de-DE"

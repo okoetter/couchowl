@@ -162,3 +162,39 @@ def test_compact_list_text_stays_left_of_the_buttons_on_phones(
     )
     assert overflow == 0
     context.close()
+
+
+def test_poster_opens_large_on_the_detail_page(live_server, member, page, fake_tmdb):
+    fake_tmdb.add("/3/movie/155", json=load_tmdb_fixture("movie_155"))
+    for size in ("w342", "w500", "w780"):
+        fake_tmdb.add_image(size, "54WAzARB0rTp5L7gvCcfZ49AgkX.jpg")
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/movie/155/")
+    enlarge = page.get_by_role("link", name="Poster vergrößern")
+    dialog = page.get_by_role("dialog", name="Poster")
+
+    enlarge.click()
+    expect(dialog).to_be_visible()
+    # The small image first, then the large one once it has loaded
+    expect(dialog.locator("img")).to_have_attribute("src", re.compile(r"/posters/w780/"))
+    page.keyboard.press("Escape")
+    expect(dialog).to_be_hidden()
+    # Closing also left the dialog's history entry: none piles up
+    page.wait_for_function("history.state === null")  # history.back() is asynchronous
+
+    # The back button closes it (and stays on the page), forward opens it again
+    enlarge.click()
+    expect(dialog).to_be_visible()
+    page.go_back()
+    expect(dialog).to_be_hidden()
+    assert page.url.endswith("/movie/155/")
+    page.go_forward()
+    expect(dialog).to_be_visible()
+    # Still open after a reload (the entry is current), so "back" doesn't seem to do nothing
+    page.reload()
+    expect(dialog).to_be_visible()
+
+    # A click on the image closes it too
+    dialog.locator("img").click()
+    expect(dialog).to_be_hidden()
+    page.wait_for_function("history.state === null")  # history.back() is asynchronous

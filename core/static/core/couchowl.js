@@ -87,6 +87,7 @@ async function refreshIfOutdated() {
 
 window.addEventListener("pageshow", (event) => {
   const navigation = performance.getEntriesByType("navigation")[0];
+  syncZoom(); // reloaded or came back (forward) to an open zoom dialog
   if (event.persisted) {
     // Restored from the bfcache with the spinner still running: reset it
     for (const form of document.querySelectorAll("form[data-busy]")) {
@@ -101,3 +102,72 @@ window.addEventListener("pageshow", (event) => {
 
 // htmx restores pages it changed the address of (hx-push-url) from its own snapshots
 document.addEventListener("htmx:historyRestore", refreshIfOutdated);
+
+// Links marked with data-zoom="<dialog id>" show their image (the link's target) in that
+// dialog instead of opening it: first the small image (already loaded), then the large
+// one as soon as it has loaded. Ctrl/Cmd/middle click still opens the image in a new tab.
+// Opening adds a history entry, so the back button (Android) closes the dialog instead of
+// leaving the page: the dialog is open exactly while that entry is the current one.
+function showZoom(link) {
+  const dialog = document.getElementById(link.dataset.zoom);
+  const image = dialog?.querySelector("img");
+  if (!image) {
+    return;
+  }
+  if (image.src !== link.href) {
+    image.src = link.querySelector("img")?.currentSrc || image.src;
+    const large = new Image();
+    large.src = link.href;
+    large.decode().then(
+      () => {
+        image.src = large.src;
+      },
+      () => {}, // not available (e.g. TMDB down): keep the small image
+    );
+  }
+  if (!dialog.open) {
+    dialog.showModal();
+  }
+}
+
+// Open or close the dialogs to match the current history entry
+function syncZoom() {
+  const zoom = history.state?.zoom;
+  for (const dialog of document.querySelectorAll("dialog.zoom-dialog[open]")) {
+    if (dialog.id !== zoom) {
+      dialog.close();
+    }
+  }
+  const link = zoom && document.querySelector(`a[data-zoom="${CSS.escape(zoom)}"]`);
+  if (link) {
+    showZoom(link);
+  }
+}
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[data-zoom]");
+  if (!link || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return;
+  }
+  event.preventDefault();
+  history.pushState({ zoom: link.dataset.zoom }, "");
+  showZoom(link);
+});
+
+// A click anywhere in the zoom dialog (image, backdrop, close button) closes it
+document.addEventListener("click", (event) => {
+  event.target.closest("dialog.zoom-dialog")?.close();
+});
+
+// Closed by click or Esc: leave the dialog's history entry (back closes it on its own)
+document.addEventListener(
+  "close",
+  (event) => {
+    if (event.target.matches?.("dialog.zoom-dialog") && history.state?.zoom === event.target.id) {
+      history.back();
+    }
+  },
+  true, // "close" doesn't bubble
+);
+
+window.addEventListener("popstate", syncZoom);

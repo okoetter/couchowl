@@ -146,6 +146,15 @@ def show_movie(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_movie_poster(page, url):
+    """The poster enlarged (click on it)."""
+    login(page, url, "anna")
+    page.goto(f"{url}/movie/155/")
+    page.get_by_role("link", name="Poster vergrößern").click()
+    page.locator("dialog img[src*='/w780/']").wait_for()
+    page.wait_for_load_state("networkidle")
+
+
 def show_movie_many_offers(page, url):
     """Many providers (like "Dunkirk"): the logos wrap, groups must stay apart.
     No free offers: a group without providers is left out."""
@@ -401,6 +410,7 @@ PAGES = {
     "list-grid-complete": show_list_grid,
     "list-compact-complete": show_list_compact,
     "movie": show_movie,
+    "movie-poster": show_movie_poster,
     "movie-many-offers": show_movie_many_offers,
     "show": show_show,
     "show-long-title": show_show_long_title,
@@ -514,7 +524,7 @@ def sample_lists(fake_tmdb, user):
     list_rules.mark_watched(user, titles[0], date(2024, 3, 15))
     list_rules.mark_watched(user, titles[2])
     for index, color in zip([0, 1, 2, 9], colors, strict=False):
-        for size in ("w92", "w185", "w342", "w500"):
+        for size in ("w92", "w185", "w342", "w500", "w780"):
             fake_tmdb.add(
                 f"/t/p/{size}/sample{index}.jpg",
                 content=tiny_png(color),

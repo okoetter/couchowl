@@ -425,10 +425,20 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   too slow. They show the stored texts, in the nearest stored language if needed.
 - **When TMDB is unreachable**, stale data from the database is shown instead of an error.
   Without a token, search shows a notice.
-- **Poster proxy** (`/posters/<size>/<file>`): only sizes `w92`, `w185`, `w342`, `w500`
-  and valid TMDB file names, only for logged-in users. Files are stored in
+- **Poster proxy** (`/posters/<size>/<file>`): only sizes `w92`, `w185`, `w342`, `w500`,
+  `w780` and valid TMDB file names, only for logged-in users. Files are stored in
   `DATA_DIR/posters` once and never change (a new image has a new name), so browsers may
   cache them for a year. Provider logos use the same proxy.
+- **Large poster on detail pages:** clicking the poster opens it in a native `<dialog>`
+  (Pico's blurred overlay; a few lines in `couchowl.js`, no lightbox library). It shows
+  the already loaded small image at once and swaps in `w780` once that has loaded, so the
+  page itself loads nothing extra and only enlarged posters end up in the cache. `original`
+  was rejected (often several MB). A click anywhere or Esc closes it; without JavaScript the
+  link opens the image itself. Opening adds a history entry (`history.pushState`), so the
+  back button (Android, browser) closes the dialog instead of leaving the page; closing by
+  click or Esc goes back that entry, so no dead entries pile up. The dialog is open exactly
+  while that entry is current (also after a reload or "forward"). htmx ignores the entry
+  (it only restores its own entries, marked `htmx: true`).
 - Titles are read-only in the Django admin (the data belongs to TMDB).
 - JustWatch was rejected as a data source: no official API, and its terms forbid
   unofficial use. Its provider data reaches us through TMDB, with attribution.

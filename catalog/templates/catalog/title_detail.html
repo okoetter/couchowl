@@ -14,8 +14,19 @@
       {% poster translation.poster_path "w342" as poster_url %}
       {% if poster_url %}
         {% poster translation.poster_path "w500" as poster_2x %}
-        <img src="{{ poster_url }}" srcset="{{ poster_url }} 1x, {{ poster_2x }} 2x"
-             alt="" width="342" height="513">
+        {% poster translation.poster_path "w780" as poster_large %}
+        {# Opens the large poster in the dialog below (couchowl.js); without JavaScript the image itself #}
+        <a href="{{ poster_large }}" class="poster-zoom" data-zoom="poster-dialog"
+           aria-label="{% translate 'Enlarge poster' %}">
+          <img src="{{ poster_url }}" srcset="{{ poster_url }} 1x, {{ poster_2x }} 2x"
+               alt="" width="342" height="513">
+        </a>
+        <dialog id="poster-dialog" class="zoom-dialog" aria-label="{% translate 'Poster' %}">
+          <img src="{{ poster_url }}" alt="{{ translation.name }}" width="780" height="1170">
+          <button type="button" class="zoom-dialog-close" aria-label="{% translate 'Close' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </dialog>
       {% else %}
         <span class="poster-missing" aria-hidden="true"></span>
       {% endif %}

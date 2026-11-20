@@ -15,8 +15,9 @@ from django.urls import reverse
 from . import tmdb
 
 # Sizes offered by TMDB that Couch Owl uses (width in pixels). Other sizes are refused,
-# so the cache can't be filled with arbitrary variants.
-POSTER_SIZES = ("w92", "w185", "w342", "w500")
+# so the cache can't be filled with arbitrary variants. w780 is only loaded when someone
+# enlarges a poster on a detail page.
+POSTER_SIZES = ("w92", "w185", "w342", "w500", "w780")
 # TMDB file names: letters, digits, and an image extension. Nothing else is accepted.
 FILENAME_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,64}\.(jpg|jpeg|png|webp)$")
 CONTENT_TYPES = {

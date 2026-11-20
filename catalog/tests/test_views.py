@@ -188,6 +188,7 @@ def test_posters_require_login(client, db):
     ("path", "size", "expected"),
     [
         ("/abc.jpg", "w92", "/posters/w92/abc.jpg"),
+        ("/abc.jpg", "w780", "/posters/w780/abc.jpg"),  # enlarged poster on detail pages
         ("", "w92", ""),
         ("/abc.jpg", "original", ""),
         ("/../x.jpg", "w92", ""),

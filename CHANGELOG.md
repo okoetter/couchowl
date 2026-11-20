@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Detail pages link to the title's page on TMDB ("View movie on TMDB" or "View show on
   TMDB", in the language for movie/show information)
+- Detail pages: clicking the poster shows it large (click anywhere or Esc to close)
 
 ### Changed
 - Detail pages: JustWatch is credited in the line "Data from TMDB and JustWatch as of …";
