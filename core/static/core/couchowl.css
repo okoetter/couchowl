@@ -937,14 +937,24 @@ svg.play-icon {
 /* Long titles wrap, even within long words ("Abschussliste"), instead of widening the
    page on phones. Only long words get hyphens ("Abschuss-liste", not "Ter-minal"); where
    the browser can't hyphenate, a word that doesn't fit is broken anywhere. */
-.title-detail-info > hgroup {
+.title-detail-head {
   min-width: 0;
+  margin-bottom: var(--pico-typography-spacing-vertical);
   overflow-wrap: anywhere;
 }
 
-.title-detail-info > hgroup h1 {
+.title-detail-head h1 {
   hyphens: auto;
   hyphenate-limit-chars: 10 4 4;
+}
+
+/* Title and subtitle, then "View show on TMDB" */
+.title-detail-head hgroup {
+  margin-bottom: 0.5rem;
+}
+
+.title-tmdb-link {
+  margin: 0;
 }
 
 .title-detail-actions {
@@ -986,12 +996,12 @@ svg.play-icon {
     display: contents;
   }
 
-  .title-detail-info > hgroup {
+  .title-detail-head {
     grid-column: 2;
     grid-row: 1;
   }
 
-  .title-detail-info > :not(hgroup) {
+  .title-detail-info > :not(.title-detail-head) {
     grid-column: 1 / -1;
   }
 }
@@ -1510,10 +1520,6 @@ details.episode-watched > summary::after {
   border: 1px solid var(--pico-muted-border-color);
   border-radius: 0.5rem;
   font-size: 0.85rem;
-}
-
-.offers-source {
-  margin-bottom: 0;
 }
 
 /* "Data from TMDB as of …" with a small button next to it (Pico makes form buttons

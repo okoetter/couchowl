@@ -43,11 +43,6 @@ def offers(title: Title, region: str) -> list[ProviderGroup]:
     return groups
 
 
-def link(title: Title, region: str) -> str:
-    """TMDB's page with all offers in `region` ('' if unknown)."""
-    return (title.watch_providers.get(region) or {}).get("link", "")
-
-
 def sources(title: Title, region: str) -> list[str]:
     """Where a show airs, for one-line display: its networks, then streaming providers.
 

@@ -201,13 +201,19 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **TMDB ratings** ("★ 8.4") in search, lists and on detail pages (with the number of
   votes). Overviews need at least 10 votes (`MIN_VOTES`; "10.0 from 2 votes" says little).
   Own ratings were dropped (not needed).
-- **Streaming providers** per region on detail pages ("Available in Germany": subscription,
-  free incl. with ads, rent, buy), with "Source: JustWatch" and a link to all offers on
-  TMDB. They come with the detail request (`append_to_response=watch/providers`), which
-  returns all ~130 regions; only the regions of our users plus `DEFAULT_REGION` are
-  stored, as a JSON field `Title.watch_providers` (always read with the title, never
-  queried across titles, so no separate table). If the user's region is missing (e.g.
-  after changing it), the detail page reloads the title.
+- **Streaming providers** per region on detail pages ("Available in Germany":
+  subscription, free incl. with ads, rent, buy). TMDB's terms require crediting
+  JustWatch as the source: the About page does, and detail pages say "Data from TMDB and
+  JustWatch as of …" in the small line above "Refresh now". A separate "Source:
+  JustWatch" line with a link to TMDB's offers page was dropped (two TMDB links next to
+  each other, the offers page added little); detail pages link to the title's TMDB page
+  instead ("View movie/show on TMDB" below the subtitle, next to the poster on phones;
+  in the user's TMDB language). They come with the detail request
+  (`append_to_response=watch/providers`), which returns all ~130 regions; only the
+  regions of our users plus `DEFAULT_REGION` are stored, as a JSON field
+  `Title.watch_providers` (always read with the title, never queried across titles, so
+  no separate table). If the user's region is missing (e.g. after changing it), the
+  detail page reloads the title.
   The groups (only those with providers) are split by a thin line, with the label at the
   first row of logos: with many providers (e.g. "Dunkirk") the wrapped logos otherwise
   looked like the next group. Rejected: the label as a heading above the logos (just as

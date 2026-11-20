@@ -438,7 +438,7 @@ def title_detail(request, media_type, tmdb_id):
         "title": title,
         "translation": translation,
         "offers": providers.offers(title, region),
-        "offers_link": providers.link(title, region),
+        "tmdb_link": title.tmdb_url(request.user.effective_tmdb_language),
         "region_name": country_name(region, get_language()),
         **_menu_context(request, media_type, tmdb_id, title),
     }

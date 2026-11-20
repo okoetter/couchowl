@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Lower
@@ -31,7 +33,7 @@ class Title(models.Model):
     # Shows: names of the networks/platforms that air it, e.g. ["Netflix"] (from TMDB)
     networks = models.JSONField(_("networks"), default=list, blank=True)
     # Streaming providers per region (data from JustWatch via TMDB), only for the regions
-    # of our users: {"DE": {"link": "…", "flatrate": [{"id": 8, "name": "Netflix",
+    # of our users: {"DE": {"flatrate": [{"id": 8, "name": "Netflix",
     # "logo": "/….png"}], "rent": […], …}}. {} for a region = no offers there.
     # See catalog.providers.
     watch_providers = models.JSONField(_("streaming providers"), default=dict, blank=True)
@@ -52,6 +54,11 @@ class Title(models.Model):
 
     def get_absolute_url(self):
         return reverse("catalog:title_detail", args=[self.media_type, self.tmdb_id])
+
+    def tmdb_url(self, language: str = "") -> str:
+        """The title's page on themoviedb.org, in `language` (e.g. "de-DE") if given."""
+        url = f"https://www.themoviedb.org/{self.media_type}/{self.tmdb_id}"
+        return f"{url}?{urlencode({'language': language})}" if language else url
 
     @property
     def year(self) -> int | None:

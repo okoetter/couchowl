@@ -46,6 +46,21 @@ def test_show_detail_page_tracks_episodes_instead_of_the_show(auth_client, show)
     assert "Zu Liste hinzufügen" in content
 
 
+def test_detail_page_links_to_tmdb_in_the_users_language(auth_client, movie, show):
+    content = auth_client.get(movie.get_absolute_url()).content.decode()
+    assert 'href="https://www.themoviedb.org/movie/155?language=de-DE"' in content
+    assert "Film bei TMDB ansehen" in content
+
+    content = auth_client.get(show.get_absolute_url()).content.decode()
+    assert 'href="https://www.themoviedb.org/tv/70523?language=de-DE"' in content
+    assert "Serie bei TMDB ansehen" in content
+
+
+def test_tmdb_url(movie):
+    assert movie.tmdb_url() == "https://www.themoviedb.org/movie/155"
+    assert movie.tmdb_url("pt-BR") == "https://www.themoviedb.org/movie/155?language=pt-BR"
+
+
 def test_detail_page_shows_list_membership(auth_client, user, movie):
     watchlist = user.lists.create(name="Watchlist")
     list_rules.add_to_list(watchlist, movie)

@@ -68,4 +68,3 @@ def test_details_include_streaming_providers(settings):
     # "Dark" is a Netflix original; TMDB sends the providers with the details
     offers = title.watch_providers["DE"]
     assert any(p["name"] == "Netflix" for p in offers.get("flatrate", []))
-    assert offers["link"].startswith("https://www.themoviedb.org/tv/70523")

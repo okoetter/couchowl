@@ -6,7 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Detail pages link to the title's page on TMDB ("View movie on TMDB" or "View show on
+  TMDB", in the language for movie/show information)
+
 ### Changed
+- Detail pages: JustWatch is credited in the line "Data from TMDB and JustWatch as of …";
+  the separate "Source: JustWatch" line and its link to all offers on TMDB are gone
 - Updated gunicorn to 27 (stricter HTTP parsing: requests with a `Transfer-Encoding` other
   than `chunked` are rejected with 400; browsers don't send those)
 

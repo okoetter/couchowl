@@ -310,8 +310,6 @@ def watch_providers(data: dict, regions) -> dict[str, dict]:
             ]
             if providers:
                 entry[kind] = providers
-        if entry and offers.get("link"):
-            entry["link"] = offers["link"]
         stored[region] = entry
     return stored
 

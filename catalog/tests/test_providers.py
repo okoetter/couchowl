@@ -32,7 +32,7 @@ def test_only_regions_of_users_and_the_default_are_stored(db, settings):
     assert set(title.watch_providers) == {"AT", "DE"}
 
 
-def test_providers_are_sorted_by_priority_and_keep_the_link(db):
+def test_providers_are_sorted_by_priority(db):
     title = services.save_title("tv", load_tmdb_fixture("tv_70523"), "de-DE").title
 
     stored = title.watch_providers["DE"]
@@ -42,7 +42,6 @@ def test_providers_are_sorted_by_priority_and_keep_the_link(db):
         "name": "Netflix",
         "logo": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
     }
-    assert stored["link"] == "https://www.themoviedb.org/tv/70523-dark/watch?locale=DE"
 
 
 def test_region_without_offers_is_stored_as_empty(db, settings):
@@ -113,7 +112,6 @@ def test_free_and_ads_are_one_group_without_duplicates(db):
 
 def test_no_offers_for_unknown_region(movie_with_offers):
     assert providers.offers(movie_with_offers, "FR") == []
-    assert providers.link(movie_with_offers, "FR") == ""
 
 
 @pytest.mark.parametrize(
@@ -145,8 +143,8 @@ def test_detail_page_shows_offers_of_the_users_region(auth_client, movie_with_of
     assert "Verfügbar in Deutschland" in content
     assert 'alt="Amazon Prime Video"' in content
     assert "/posters/w92/gMZdpavHmxFNnLpMHwVxfqeux2g.png" in content
-    assert "Quelle: JustWatch" in content
-    assert "https://www.themoviedb.org/movie/155-the-dark-knight/watch?locale=DE" in content
+    assert "Daten von TMDB und JustWatch, Stand" in content
+    assert "/watch?locale=" not in content  # no link to TMDB's offers page
     assert "HBO Max" not in content  # US only
 
 

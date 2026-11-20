@@ -22,13 +22,20 @@
     </div>
 
     <div class="title-detail-info">
-      <hgroup>
-        <h1>{{ translation.name }}</h1>
-        <p>
-          {{ title.get_media_type_display }}{% if title.year %} · {{ title.year }}{% endif %}{% if title.status %} · {{ title.status_label }}{% endif %}{% rating title votes=True as stars %}{% if stars %} · {{ stars }}{% endif %}
-          {% if title.original_title != translation.name %}<br>{{ title.original_title }}{% endif %}
+      {# On phones this sits next to the poster (see .title-detail-head) #}
+      <div class="title-detail-head">
+        <hgroup>
+          <h1>{{ translation.name }}</h1>
+          <p>
+            {{ title.get_media_type_display }}{% if title.year %} · {{ title.year }}{% endif %}{% if title.status %} · {{ title.status_label }}{% endif %}{% rating title votes=True as stars %}{% if stars %} · {{ stars }}{% endif %}
+            {% if title.original_title != translation.name %}<br>{{ title.original_title }}{% endif %}
+          </p>
+        </hgroup>
+        {# More about the title (cast, trailers, …) on TMDB, in the user's TMDB language #}
+        <p class="title-tmdb-link">
+          <a href="{{ tmdb_link }}" target="_blank" rel="noopener noreferrer">{% if title.is_movie %}{% translate "View movie on TMDB" %}{% else %}{% translate "View show on TMDB" %}{% endif %}</a>
         </p>
-      </hgroup>
+      </div>
 
       <div class="title-detail-actions">
         {% include "catalog/_list_dropdown.html" with name=translation.name %}
@@ -166,11 +173,6 @@
               </dd>
             {% endfor %}
           </dl>
-          <p class="offers-source">
-            <small class="muted">
-              {% translate "Source: JustWatch" %}{% if offers_link %} · <a href="{{ offers_link }}" target="_blank" rel="noopener noreferrer">{% translate "All offers on TMDB" %}</a>{% endif %}
-            </small>
-          </p>
         {% else %}
           <p class="muted">{% blocktranslate %}No streaming offers known in {{ region_name }}.{% endblocktranslate %}</p>
         {% endif %}
@@ -180,7 +182,8 @@
       <form method="post" action="{% url 'catalog:title_refresh' title.media_type title.tmdb_id %}" class="title-refresh" data-busy>
         {% csrf_token %}
         <small class="muted">
-          {% blocktranslate with date=translation.fetched_at|date:"SHORT_DATETIME_FORMAT" %}Data from TMDB as of {{ date }}{% endblocktranslate %}
+          {# JustWatch must be credited as the source of the streaming providers (TMDB terms) #}
+          {% blocktranslate with date=translation.fetched_at|date:"SHORT_DATETIME_FORMAT" %}Data from TMDB and JustWatch as of {{ date }}{% endblocktranslate %}
         </small>
         <button type="submit" class="secondary outline">{% translate "Refresh now" %}</button>
       </form>

@@ -312,4 +312,4 @@ def test_detail_page_has_refresh_button(auth_client, movie):
 
     assert reverse("catalog:title_refresh", args=["movie", 155]) in content
     assert "Jetzt aktualisieren" in content
-    assert "Daten von TMDB, Stand" in content
+    assert "Daten von TMDB und JustWatch, Stand" in content
