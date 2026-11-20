@@ -29,7 +29,7 @@ The reasons behind finished work are in [design.md](design.md).
   with year), check the matches (choose among candidates, search again, skip, watched per
   line), import in chunks with a progress bar; result with the lines that weren't
   imported to copy
-- [ ] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
+- [x] **7d – CI and release:** switch the deployment guide to the published image, GitHub Actions (tests on Ubuntu/macOS/Windows, E2E, Docker smoke
   test), multi-arch images on GHCR with version tags, `1.0.0-rc.1`; `1.0.0` after a successful
   real-world deployment
   - [x] `1.0.0-rc.1` published
@@ -47,6 +47,7 @@ The reasons behind finished work are in [design.md](design.md).
   - [x] Detail pages: a line between the streaming provider groups
   - [x] Back button: pages from the browser's cache update themselves after changes
   - [x] `1.0.0-rc.3` with the changes above
+  - [x] `1.0.0`: `1.0.0-rc.3` unchanged, after a successful real-world deployment
 
 ## Backlog (after 1.0)
 

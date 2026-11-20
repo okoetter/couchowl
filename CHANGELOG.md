@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-20
+
+First stable release. For the full list of features see the release candidates below
+(https://github.com/okoetter/couchowl/releases/tag/v1.0.0-rc.1).
+
 ## [1.0.0-rc.3] - 2026-11-18
 
 ### Added
