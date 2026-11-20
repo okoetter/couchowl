@@ -11,7 +11,7 @@ dependencies = [
     "django>=6.1.3",
     "django-axes==9.0.0",
     "django-environ>=0.14.0",
-    "gunicorn>=26.2.0",
+    "gunicorn>=27.0.1",
     "honcho>=2.0.0",
     "httpx>=0.28.1",
     "whitenoise>=6.12.0",
@@ -54,7 +54,7 @@ dev = [
     "pytest>=9.2.0",
     "pytest-django>=4.14.0",
     "pytest-playwright>=0.10.0",
-    "ruff>=0.17.4",
+    "ruff>=0.17.6",
 ]
 # Linters for .github/workflows, installed on demand by the pre-commit hooks
 # (`uv run --group workflows`): actionlint-py downloads its binary when installed

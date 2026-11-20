@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Updated gunicorn to 27 (stricter HTTP parsing: requests with a `Transfer-Encoding` other
+  than `chunked` are rejected with 400; browsers don't send those)
+
 ## [1.0.0] - 2026-11-20
 
 First stable release. For the full list of features see the release candidates below
