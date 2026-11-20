@@ -44,8 +44,14 @@ Design decisions and their reasons: `docs/design.md`. Milestones and backlog: `d
   Fake shows in tests: `fake_tmdb.add_show()` (details and season requests share a path).
   Views/templates use `{% load catalog %}`
   and `{% poster path "w185" %}` for poster URLs, never TMDB URLs.
-- UI changes: add the page to `e2e/test_screenshots.py`, run `uv run pytest -m e2e`, and look at
-  the images in `screenshots/` (light/dark, desktop/phone) before asking for a test.
+- UI changes: add the page to `e2e/test_screenshots.py`, run only its screenshots
+  (`uv run pytest -m e2e e2e/test_screenshots.py -k <page>`, seconds) and look at the images in
+  `screenshots/` (light/dark, desktop/phone) before asking for a test.
+- Test effort scales with the change. Small changes: the affected tests plus `uv run pytest`
+  (~15 s). The full E2E suite (`uv run pytest -m e2e`, ~5 min) only for larger features, changes
+  affecting many pages (`base.html`, shared CSS/JS) and before releases; CI runs it on push.
+  No separate pre-commit run before committing (the hook runs anyway).
+- Before writing new CSS/JS/template code, look for existing helpers (e.g. `.nowrap`).
 - Form fields render via `core/templates/forms/field.html` (label, input, errors, help text).
 - Proxy/HTTPS settings are derived in `config/security.py` from `SITE_URL` and
   `TRUSTED_PROXY_COUNT`. Client IP for rate limits and axes: always `accounts.throttle.client_ip`.
