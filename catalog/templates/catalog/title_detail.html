@@ -178,14 +178,19 @@
         {% endif %}
       </section>
 
-      {# Reloads texts, poster, seasons and providers ("Refresh now", see catalog.views.title_refresh) #}
+      {% comment %}
+        Data line; the ↻ reloads texts, poster, seasons and providers right away (see
+        catalog.views.title_refresh). JustWatch must be credited as the source of the
+        streaming providers (TMDB terms).
+      {% endcomment %}
       <form method="post" action="{% url 'catalog:title_refresh' title.media_type title.tmdb_id %}" class="title-refresh" data-busy>
         {% csrf_token %}
         <small class="muted">
-          {# JustWatch must be credited as the source of the streaming providers (TMDB terms) #}
-          {% blocktranslate with date=translation.fetched_at|date:"SHORT_DATETIME_FORMAT" %}Data from TMDB and JustWatch as of {{ date }}{% endblocktranslate %}
+          {# The date and the ↻ stay together on one line #}
+          {% translate "Data from TMDB and JustWatch as of" context "followed by a date" %}
+          <span class="nowrap">{{ translation.fetched_at|date:"SHORT_DATETIME_FORMAT" }}
+            <button type="submit" class="refresh-button" title="{% translate 'Refresh data now' %}" aria-label="{% translate 'Refresh data now' %}"><svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button></span>
         </small>
-        <button type="submit" class="secondary outline">{% translate "Refresh now" %}</button>
       </form>
     </div>
   </div>

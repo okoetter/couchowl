@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Detail pages: JustWatch is credited in the line "Data from TMDB and JustWatch as of …";
   the separate "Source: JustWatch" line and its link to all offers on TMDB are gone
+- Detail pages: the "Refresh now" button is now a small ↻ after the date ("Refresh data
+  now"); it turns while loading
 - Updated gunicorn to 27 (stricter HTTP parsing: requests with a `Transfer-Encoding` other
   than `chunked` are rejected with 400; browsers don't send those)
 

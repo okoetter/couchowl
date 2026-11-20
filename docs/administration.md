@@ -77,8 +77,8 @@ docker compose exec couchowl python manage.py sync_tmdb             # summary on
 docker compose exec couchowl python manage.py sync_tmdb --force -v 2 # all shows, one line each
 ```
 
-Users can also reload a single title ("Refresh now" on its page) or all shows they follow
-("Refresh all" on the page "Upcoming").
+Users can also reload a single title (the ↻ after the date at the bottom of its page) or all
+shows they follow ("Refresh all" on the page "Upcoming").
 
 ## Backups and restore
 

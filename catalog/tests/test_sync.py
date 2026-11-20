@@ -311,5 +311,5 @@ def test_detail_page_has_refresh_button(auth_client, movie):
     content = auth_client.get(movie.get_absolute_url()).content.decode()
 
     assert reverse("catalog:title_refresh", args=["movie", 155]) in content
-    assert "Jetzt aktualisieren" in content
+    assert 'aria-label="Daten jetzt aktualisieren"' in content
     assert "Daten von TMDB und JustWatch, Stand" in content

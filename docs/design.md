@@ -50,8 +50,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   everyone out behind a reverse proxy without a correct client address.
 - **Rate limits** (Django's cache, a file cache in `DATA_DIR/cache` so all gunicorn
   processes share it): "Forgot password" 5 per hour and address, live search 60 per
-  minute and user, "Refresh now" 10 per minute and user, "Refresh all" once per 5 minutes
-  and user, password attempts for "Reset my data" 5 per hour and user.
+  minute and user, the ↻ on detail pages 10 per minute and user, "Refresh all" once per
+  5 minutes and user, password attempts for "Reset my data" 5 per hour and user.
 - **"Reset my data"** (`/accounts/profile/reset/`, `catalog/reset.py`): deletes all of the
   user's lists, watched movies and episodes, follows, show statuses and a batch import, to
   start over, e.g. after a failed import. Account, password, profile settings and TMDB
@@ -204,7 +204,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Streaming providers** per region on detail pages ("Available in Germany":
   subscription, free incl. with ads, rent, buy). TMDB's terms require crediting
   JustWatch as the source: the About page does, and detail pages say "Data from TMDB and
-  JustWatch as of …" in the small line above "Refresh now". A separate "Source:
+  JustWatch as of …" in the small data line at the bottom. A separate "Source:
   JustWatch" line with a link to TMDB's offers page was dropped (two TMDB links next to
   each other, the offers page added little); detail pages link to the title's TMDB page
   instead ("View movie/show on TMDB" below the subtitle, next to the poster on phones;
@@ -418,7 +418,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
      is watching, in all their users' TMDB languages; shows loaded in the last 6 hours
      are skipped (`--force` reloads all). One failing show doesn't stop the run. Movies
      aren't synced (only with movie announcements, see backlog).
-  3. **Manually:** "Refresh now" on detail pages, "Refresh all" on "Upcoming",
+  3. **Manually:** the ↻ after the date in the data line of detail pages ("Refresh data
+     now"; rarely needed, so an icon instead of a button), "Refresh all" on "Upcoming",
      `sync_tmdb` on the command line.
 - **Lists, dashboard and "Upcoming" never ask TMDB**; loading many titles at once would be
   too slow. They show the stored texts, in the nearest stored language if needed.

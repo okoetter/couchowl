@@ -1452,7 +1452,12 @@ details.episode-watched > summary::after {
   margin: 0;
 }
 
-/* ---- Detail page: streaming providers and "Refresh now" ------------------------------ */
+/* ---- Detail page: streaming providers and data line ↻ -------------------------------- */
+
+/* The data line follows right below */
+.offers {
+  margin-bottom: 0;
+}
 
 .offers h2 {
   margin-bottom: 0.75rem;
@@ -1522,21 +1527,60 @@ details.episode-watched > summary::after {
   font-size: 0.85rem;
 }
 
-/* "Data from TMDB as of …" with a small button next to it (Pico makes form buttons
-   full width) */
+/* "Data from TMDB and JustWatch as of … ↻" */
 .title-refresh {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem var(--pico-spacing);
-  margin: var(--pico-spacing) 0 0;
+  margin: 1.25rem 0 0;
 }
 
-.title-refresh button {
+/* Phones: the grid's gap (see .title-detail) already separates it */
+@media (max-width: 575px) {
+  .title-refresh {
+    margin-top: 0;
+  }
+}
+
+/* The ↻ after the date: just the icon, in the color of the text (Pico makes form buttons
+   full width and filled) */
+.title-refresh .refresh-button {
   width: auto;
   margin: 0;
-  padding: 0.3rem 0.75rem;
-  font-size: 0.875rem;
+  padding: 0.1rem;
+  border: none;
+  background: none;
+  color: inherit;
+  line-height: 1;
+  vertical-align: -0.1em;
+}
+
+.title-refresh .refresh-button:hover {
+  color: var(--pico-primary);
+}
+
+.title-refresh .refresh-button .icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: top;
+}
+
+/* While loading, the icon turns instead of Pico's spinner */
+.title-refresh .refresh-button[aria-busy="true"]::before {
+  display: none;
+}
+
+.title-refresh .refresh-button[aria-busy="true"] .icon {
+  animation: refresh-spin 1s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-refresh .refresh-button[aria-busy="true"] .icon {
+    animation: none;
+  }
 }
 
 /* ---- Batch import ------------------------------------------------------------- */
