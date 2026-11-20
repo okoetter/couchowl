@@ -772,6 +772,10 @@ def test_followed_shows_appear_once_the_user_follows_a_show(auth_client, user, s
     content = auth_client.get(LISTS).content.decode()
     assert f'href="{FOLLOWED}"' in content
     assert "1 Serie" in content
+    # Set apart from the user's own lists: tinted box, bell (decorative), explanation
+    assert '<li class="list-index-system">' in content
+    assert 'class="icon followed-icon" aria-hidden="true"' in content
+    assert "Automatisch: alle Serien, denen du folgst" in content
 
 
 def test_followed_shows_can_be_hidden_in_the_profile(auth_client, user, show):
@@ -791,7 +795,11 @@ def test_followed_shows_list(auth_client, user, other_user, show):
 
     content = auth_client.get(FOLLOWED).content.decode()
 
-    assert "<h1>Gefolgte Serien</h1>" in content
+    bell = '<svg viewBox="0 0 24 24" class="icon followed-icon" aria-hidden="true">'
+    assert f"<h1>Gefolgte Serien {bell}" in content
+    # A note instead of rename/delete: why, where to unfollow, link to the profile setting
+    assert "Enthält alle Serien, denen du folgst. Entfolgen auf der Serienseite" in content
+    assert f'href="{reverse("accounts:profile")}#id_show_followed_list"' in content
     assert shown_names(content) == ["Dark"]
     assert "S1 E1 von „Dark“ als gesehen markieren" in content  # as in other lists
     # Computed list: nothing to rename, delete or remove; only shows, so no type filter

@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Detail pages: clicking the poster shows it large (click anywhere or Esc to close)
 
 ### Changed
+- Lists: the system list "Followed shows" is set apart on a tinted box with a bell and
+  the line "Automatic: all shows you follow"; its page explains that it fills itself, where
+  to unfollow and links to the profile setting that hides it
 - Detail pages: JustWatch is credited in the line "Data from TMDB and JustWatch as of …";
   the separate "Source: JustWatch" line and its link to all offers on TMDB are gone
 - Detail pages: the "Refresh now" button is now a small ↻ after the date ("Refresh data

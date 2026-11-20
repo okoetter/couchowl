@@ -5,9 +5,11 @@
 
 {% block content %}
   <div class="list-header">
-    <h1>{{ list.name }}</h1>
-    {# System lists ("Followed shows") are computed: nothing to rename or delete #}
-    {% if not list.is_system %}
+    {# System lists ("Followed shows") are computed: nothing to rename or delete, a note says why #}
+    {% if list.is_system %}
+      <h1>{{ list.name }} {% include "catalog/_followed_icon.html" with decorative=True %}</h1>
+    {% else %}
+      <h1>{{ list.name }}</h1>
       <div class="list-header-links">
         <a href="{% url 'imports:page' %}?list={{ list.pk }}">{% translate "Import" %}</a>
         <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
@@ -15,6 +17,15 @@
       </div>
     {% endif %}
   </div>
+  {% if list.is_system %}
+    <p class="list-note">
+      {% url 'accounts:profile' as profile_url %}
+      {% blocktranslate trimmed %}
+        Contains every show you follow. Unfollow on the show's page ·
+        <a href="{{ profile_url }}#id_show_followed_list">hide in your profile</a>
+      {% endblocktranslate %}
+    </p>
+  {% endif %}
 
   {% comment %}
     Edit mode ("Edit" / "Done"): trash buttons instead of the watched buttons. Only a class

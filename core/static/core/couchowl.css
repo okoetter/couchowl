@@ -562,6 +562,51 @@ details.dropdown.list-dropdown-compact > summary + ul {
   white-space: nowrap;
 }
 
+/* System list "Followed shows": a tinted box instead of the separator line. It reaches
+   into the page margin, so its text lines up with the other lists. */
+.list-index li.list-index-system {
+  margin: 0 calc(var(--pico-spacing) * -1);
+  padding: 0 var(--pico-spacing);
+  border-bottom: none;
+  border-radius: var(--pico-border-radius);
+  background: color-mix(in srgb, var(--pico-primary) 10%, transparent);
+}
+
+@media (max-width: 767px) {
+  /* Reaches the screen edges: rounded corners would look cut off */
+  .list-index li.list-index-system {
+    border-radius: 0;
+  }
+}
+
+.list-index-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.list-index-name small {
+  font-size: 0.875rem;
+  white-space: normal;
+}
+
+/* Explains a system list below its heading (instead of rename/delete links) */
+.list-note {
+  margin-top: calc(var(--pico-spacing) * -0.5);
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+}
+
+.list-note a {
+  color: inherit;
+}
+
+.list-header h1 svg.followed-icon {
+  width: 0.75em;
+  height: 0.75em;
+  vertical-align: 0;
+}
+
 .new-list {
   margin-top: calc(var(--pico-spacing) * 2);
 }

@@ -115,6 +115,14 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   soon as the user follows a show; same view as other lists without rename, delete,
   remove and type filter; most recently followed first; can be hidden in the profile
   (`User.show_followed_list`, default on).
+  It is set apart so nobody looks for "Delete": on the lists page it sits on a box tinted
+  in the accent color (no separator line) with the bell after the name and the line
+  "Automatic: all shows you follow"; the box reaches into the page margin, so names stay
+  aligned with the other lists. Its page has the bell after the heading and a note instead
+  of the rename/delete links ("Contains every show you follow. Unfollow on the show's page
+  · hide in your profile"). Rejected: a pill "automatic" (too short to be clear; longer
+  texts wrap on phones), a bell before the name (the name no longer lines up), a gray box
+  (looks disabled), headings "Automatic" / "Own lists" (heavy for a single entry).
 - Deleting a list asks for confirmation. **Watched data is independent of lists and
   follows:** removing a title from a list, deleting a list or unfollowing a show keeps what
   was watched and when.
