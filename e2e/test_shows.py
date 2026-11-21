@@ -309,3 +309,53 @@ def test_page_from_the_bfcache_updates_in_place(live_server, page, watchlist_wit
     expect(bell.first).to_be_visible()
     # Morphed into place: the poster stays (no flicker)
     assert poster.evaluate("img => img.isConnected")
+
+
+def test_click_anywhere_in_an_episode_row_opens_its_description(
+    live_server, member, page, fake_tmdb
+):
+    fake_tmdb.add_show()
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/tv/70523/")
+    row = page.locator("#episode-1-1")
+    details = row.locator("details.episode-info")
+
+    # A click on the air date line, not on the name, opens the description
+    row.locator(".episode-meta").click()
+    expect(details).to_have_attribute("open", "")
+    # A click into the open description keeps it open (its text stays selectable)
+    row.locator(".episode-info > p").click()
+    expect(details).to_have_attribute("open", "")
+    row.locator(".episode-meta").click()
+    expect(details).not_to_have_attribute("open", "")
+
+    # The check button only marks the episode
+    page.get_by_role("button", name="S1 E1 als gesehen markieren").click()
+    expect(page.get_by_role("button", name="S1 E1 als nicht gesehen markieren")).to_be_visible()
+    expect(page.locator("#episode-1-1 details.episode-info")).not_to_have_attribute("open", "")
+
+
+def test_continue_watching_card_opens_the_show_from_anywhere(live_server, member, page, fake_tmdb):
+    fake_tmdb.add_show()
+    for size in ("w185", "w342", "w500"):
+        fake_tmdb.add_image(size, "gw8ZlIXEg6SIx3FgMEQqmBkPYKV.jpg")
+    url = live_server.url
+    login(page, url, "anna")
+    page.goto(f"{url}/tv/70523/")
+    page.get_by_role("button", name="Folgen", exact=True).click()
+    expect(page.get_by_role("button", name="Gefolgt")).to_be_visible()
+    page.get_by_role("button", name="S1 E1 als gesehen markieren").click()
+    expect(page.get_by_role("button", name="S1 E1 als nicht gesehen markieren")).to_be_visible()
+
+    # The check button in the card marks the next episode and stays on the dashboard
+    page.goto(f"{url}/")
+    card = page.locator(".watching-list li").first
+    card.get_by_role("button", name="S1 E2 von „Dark“ als gesehen markieren").click()
+    expect(page.get_by_text("S1 E2 gesehen")).to_be_visible()
+    assert page.url == f"{url}/"
+
+    # A click on the progress bar (not the title) opens the show: the title link lies
+    # over the whole card, so the mouse click at the bar's position hits the link
+    # (force: Playwright would otherwise wait for the bar to be clickable itself)
+    card.locator("progress").click(force=True)
+    expect(page).to_have_url(f"{url}/tv/70523/")

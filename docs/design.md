@@ -117,8 +117,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   (`User.show_followed_list`, default on).
   It is set apart so nobody looks for "Delete": on the lists page it sits on a box tinted
   in the accent color (no separator line) with the bell after the name and the line
-  "Automatic: all shows you follow"; the box reaches into the page margin, so names stay
-  aligned with the other lists. Its page has the bell after the heading and a note instead
+  "Automatic: all shows you follow"; the box reaches into the page margin as far as the
+  hover tint of the other lists, so names stay aligned with them. Its page has the bell after the heading and a note instead
   of the rename/delete links ("Contains every show you follow. Unfollow on the show's page
   · hide in your profile"). Rejected: a pill "automatic" (too short to be clear; longer
   texts wrap on phones), a bell before the name (the name no longer lines up), a gray box
@@ -367,6 +367,25 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   colored on a tinted pill (on phones behind the icon, like Android's navigation bar), the
   other entries are gray. Rejected: bold text alone (barely visible at the tab bar's
   small font size).
+- **Hover without underlines.** Entries that link as a whole (lists overview, search
+  results, compact list, announcements, episodes) get a light tint in the accent color
+  (8 %) that reaches 0.75rem beyond the text and up to the separator lines (no gap), and
+  their name turns to the accent color; the dashboard's "Continue watching" cards get the
+  same tint. The tint is lighter than the current navigation entry or filter (15 %), so a
+  hovered entry doesn't look selected. Posters get a 2px frame in the accent color and
+  don't move (rejected for the cards: the frame, less clear next to the tinted
+  announcements).
+  A hover effect only shows where a click does something, so the whole area is
+  clickable: a card's title link covers the card with its `::after` ("stretched link",
+  still one link for screen readers; the check button lies above it), and a click anywhere
+  in an episode row opens or closes its description (`couchowl.js`; not on the check
+  button, the watched date or the open description, whose text stays selectable).
+  Rejected for episodes: the same CSS trick (it would also cover the open description).
+  Text links turn bold; a text shadow fakes it, because real bold is wider and pushes the
+  rest of the line. Only devices with a mouse see hover effects (`@media (hover: hover)`).
+  Rejected: Pico's underline (restless in rows and grids), a neutral gray tint (didn't
+  match the accent-colored navigation), a poster that lifts on hover, a tinted pill or
+  highlighter behind text links.
 - Pico CSS (classless, no build step), color scheme follows the system and can be set in
   the profile. Installable as a PWA (manifest, icons, standalone mode; browsers install
   it only over HTTPS).

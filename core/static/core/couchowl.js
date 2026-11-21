@@ -22,6 +22,23 @@ document.addEventListener("click", (event) => {
   }
 });
 
+// An episode with a description opens and closes it with a click anywhere in its row,
+// not only on the name (the <summary>, which the browser handles itself). The check
+// button and the watched date keep their own clicks; a click into the open description
+// or one that ends a text selection changes nothing (the text stays selectable).
+document.addEventListener("click", (event) => {
+  const row = event.target.closest(".episodes li");
+  const details = row?.querySelector(":scope > .episode-body > details.episode-info");
+  if (
+    !details ||
+    event.target.closest("summary, a, button, form, details.episode-watched, .episode-info > p") ||
+    getSelection().toString()
+  ) {
+    return;
+  }
+  details.open = !details.open;
+});
+
 // Forms marked with data-busy may take a few seconds ("Refresh all" asks TMDB for every
 // followed show): show Pico's spinner on the button and prevent a second click.
 document.addEventListener("submit", (event) => {

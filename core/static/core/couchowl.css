@@ -260,6 +260,95 @@ textarea + .errorlist {
   justify-content: center;
 }
 
+/* ---- Links on hover ----------------------------------------------------------- */
+
+/* No underlines: Pico underlines links on hover, focus and for aria-current. */
+:where(a:not([role="button"])):is(
+    [aria-current]:not([aria-current="false"]),
+    :hover,
+    :active,
+    :focus
+  ) {
+  --pico-text-decoration: none;
+}
+
+/* Entries that link as a whole (lists overview, search results, compact list,
+   announcements, episodes with a description): a tint in the accent color that
+   reaches a bit beyond the text (negative margin + padding, the text doesn't move).
+   Lighter than the tint of the current navigation entry or filter, so a hovered entry
+   doesn't look selected. */
+:root {
+  --app-text-color: var(--pico-color);
+  --app-hover-tint: color-mix(in srgb, var(--pico-primary) 8%, transparent);
+  --app-hover-bleed: 0.75rem;
+}
+
+@media (hover: hover) {
+  /* Text links turn bold. A text shadow fakes it: real bold is wider and would push the
+     rest of the line. */
+  :where(a:not([role="button"])):hover {
+    text-shadow:
+      0 0 0.6px currentColor,
+      0 0 0.6px currentColor;
+  }
+
+  /* Muted links (footer, notes) turn to the text color */
+  .site-footer a:hover,
+  .list-note a:hover {
+    color: var(--app-text-color);
+  }
+
+  .list-index a:hover,
+  .search-results li:has(> .result-link:hover),
+  .compact-list li:has(> .result-link:hover) {
+    background-color: var(--app-hover-tint);
+  }
+
+  /* The name turns to the accent color (on the dashboard cards and posters too) */
+  .list-index a:hover strong,
+  .result-link:hover strong,
+  .watching-text a:hover strong,
+  .poster-grid a:hover strong {
+    color: var(--pico-primary);
+  }
+
+  /* An episode with a description opens and closes it with a click anywhere in its row
+     (couchowl.js), except on the check button, the watched date and the open
+     description */
+  .episodes li:has(> .episode-body > details.episode-info):not(
+      :has(.check-toggle:hover, .episode-watched:hover, .episode-info > p:hover)
+    ):hover {
+    background-color: var(--app-hover-tint);
+    cursor: pointer;
+  }
+
+  .episodes li:has(> .episode-body > details.episode-info):not(
+      :has(.check-toggle:hover, .episode-watched:hover, .episode-info > p:hover)
+    ):hover .episode-info > summary {
+    color: var(--pico-primary);
+  }
+
+  /* Posters get a frame in the accent color, the poster itself stays where it is */
+  .poster-grid a:hover .poster-frame {
+    box-shadow: 0 0 0 2px var(--pico-primary);
+  }
+
+  /* The dashboard's cards are tinted like the announcements below them (the tint lies
+     on the card's own background) */
+  .watching-list li:has(a:hover) {
+    background-image: linear-gradient(var(--app-hover-tint), var(--app-hover-tint));
+  }
+}
+
+/* Links for a whole entry and the navigation have their own hover effect */
+.app-nav a,
+.list-index a,
+.result-link,
+.poster-grid a,
+.watching-text a {
+  text-shadow: none;
+}
+
 /* ---- Footer: version and links, separated by dots ---------------------------- */
 
 .site-footer small {
@@ -271,9 +360,11 @@ textarea + .errorlist {
 
 .site-footer small > * + *::before {
   content: "·";
-  /* Keep the link underline off the dot (Pico lets ::before inherit text-decoration) */
+  /* Keep the link's hover effect off the dot (Pico lets ::before inherit
+     text-decoration, text-shadow is inherited anyway) */
   display: inline-block;
   text-decoration: none;
+  text-shadow: none;
   margin-right: 0.5rem;
   color: var(--pico-muted-color);
 }
@@ -419,14 +510,29 @@ button.danger.outline,
 }
 
 /* A row with poster thumbnail and text that links to the detail page
-   (search results, compact list), with an action button on the right */
+   (search results, compact list), with an action button on the right. The row reaches
+   into the page margin for the hover tint (see "Links on hover"); the separator line is
+   drawn by ::after, so it stays as wide as the text. */
 .search-results li,
 .compact-list li {
+  position: relative;
   list-style: none;
   display: flex;
   align-items: center;
   gap: var(--pico-spacing);
-  padding: 0.5rem 0;
+  /* No margin between the rows (Pico gives every li one): the hover tint reaches the
+     separator lines */
+  margin: 0 calc(var(--app-hover-bleed) * -1);
+  padding: 0.625rem var(--app-hover-bleed);
+  border-radius: var(--pico-border-radius);
+  transition: background-color var(--pico-transition);
+}
+
+.search-results li::after,
+.compact-list li::after {
+  content: "";
+  position: absolute;
+  inset: auto var(--app-hover-bleed) 0;
   border-bottom: 1px solid var(--pico-muted-border-color);
 }
 
@@ -447,9 +553,6 @@ button.danger.outline,
   overflow-wrap: break-word;
 }
 
-.result-link:hover strong {
-  text-decoration: underline;
-}
 
 .search-results small,
 .compact-list small {
@@ -538,45 +641,43 @@ details.dropdown.list-dropdown-compact > summary + ul {
   padding: 0;
 }
 
+/* No margin between the entries (Pico gives every li one): the hover tint reaches the
+   separator lines above and below */
 .list-index li {
   list-style: none;
+  margin: 0;
   border-bottom: 1px solid var(--pico-muted-border-color);
 }
 
+/* Reaches into the page margin for the hover tint (see "Links on hover") */
 .list-index a {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: var(--pico-spacing);
-  padding: 0.75rem 0;
+  margin-inline: calc(var(--app-hover-bleed) * -1);
+  padding: 0.875rem var(--app-hover-bleed);
+  border-radius: var(--pico-border-radius);
   color: inherit;
   text-decoration: none;
+  transition: background-color var(--pico-transition);
 }
 
-.list-index a:hover strong {
-  text-decoration: underline;
-}
 
 .list-index small {
   color: var(--pico-muted-color);
   white-space: nowrap;
 }
 
-/* System list "Followed shows": a tinted box instead of the separator line. It reaches
-   into the page margin, so its text lines up with the other lists. */
+/* System list "Followed shows": a tinted box instead of the separator line, as wide as
+   the hover tint of the other lists. It reaches into the page margin, so its text lines
+   up with the other lists. */
 .list-index li.list-index-system {
-  margin: 0 calc(var(--pico-spacing) * -1);
-  padding: 0 var(--pico-spacing);
+  margin: 0 calc(var(--app-hover-bleed) * -1);
+  padding: 0 var(--app-hover-bleed);
   border-bottom: none;
   border-radius: var(--pico-border-radius);
   background: color-mix(in srgb, var(--pico-primary) 10%, transparent);
-}
-
-@media (max-width: 767px) {
-  /* Reaches the screen edges: rounded corners would look cut off */
-  .list-index li.list-index-system {
-    border-radius: 0;
-  }
 }
 
 .list-index-name {
@@ -773,6 +874,7 @@ button.remove-button:is(:hover, :focus-visible) {
   display: block;
   overflow: hidden;
   border-radius: var(--pico-border-radius);
+  transition: box-shadow var(--pico-transition);
 }
 
 .poster-grid img,
@@ -845,9 +947,6 @@ svg.play-icon {
   font-size: 0.8em;
 }
 
-.poster-grid a:hover strong {
-  text-decoration: underline;
-}
 
 /* ---- Watched toggle on the list page ------------------------------------------ */
 
@@ -1227,22 +1326,26 @@ button.check-button {
   padding: 0;
 }
 
+/* Negative margin + padding: highlights (hover, jump target) reach a bit beyond the
+   text without moving it; the separator line is drawn by ::before, so it stays as wide
+   as the text. */
 .episodes li {
+  position: relative;
   list-style: none;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0 0.75rem;
   align-items: start;
-  padding: 0.4rem 0;
+  /* No margin between the rows (Pico gives every li one): highlights reach the lines */
+  margin: 0 calc(var(--app-hover-bleed) * -1);
+  padding: 0.525rem var(--app-hover-bleed);
+  border-radius: var(--pico-border-radius);
+  transition: background-color var(--pico-transition);
 }
 
 /* The episode a link jumped to ("Next: S1 E3" → #episode-1-3) lights up briefly, so it is
-   easy to find even when the page can't scroll it to the top (end of the page).
-   Negative margin + padding: the highlight reaches a bit beyond the text, without moving it. */
+   easy to find even when the page can't scroll it to the top (end of the page). */
 .episodes li:target {
-  margin-inline: -0.5rem;
-  padding-inline: 0.5rem;
-  border-radius: var(--pico-border-radius);
   animation: target-highlight 2.5s ease-out;
 }
 
@@ -1257,7 +1360,10 @@ button.check-button {
   }
 }
 
-.episodes li + li {
+.episodes li + li::before {
+  content: "";
+  position: absolute;
+  inset: 0 var(--app-hover-bleed) auto;
   border-top: 1px solid var(--pico-muted-border-color);
 }
 
@@ -1274,6 +1380,7 @@ button.check-button {
 .episode-info > summary {
   list-style: none;
   color: var(--pico-color);
+  transition: color var(--pico-transition);
 }
 
 .episode-info > summary::-webkit-details-marker {
@@ -1284,9 +1391,6 @@ details.episode-info > summary::after {
   display: none;
 }
 
-.episode-info > summary:hover {
-  text-decoration: underline;
-}
 
 .episode-info p {
   margin: 0.25rem 0 0.5rem;
@@ -1426,7 +1530,10 @@ details.episode-watched > summary::after {
   }
 }
 
+/* The whole card opens the show: the title link's ::after covers it ("stretched link",
+   still one link for screen readers); the check button lies above it */
 .watching-list li {
+  position: relative;
   list-style: none;
   display: flex;
   align-items: center;
@@ -1457,7 +1564,16 @@ details.episode-watched > summary::after {
 }
 
 .watching-body form {
+  position: relative;
+  z-index: 1;
   margin: 0;
+}
+
+.watching-text > a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--pico-border-radius);
 }
 
 .watching-text {
@@ -1473,9 +1589,6 @@ details.episode-watched > summary::after {
   text-decoration: none;
 }
 
-.watching-text a:hover strong {
-  text-decoration: underline;
-}
 
 /* Long names wrap to two lines at most, the episode line stays on one line */
 .watching-text > a {

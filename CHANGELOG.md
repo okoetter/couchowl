@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the separate "Source: JustWatch" line and its link to all offers on TMDB are gone
 - Detail pages: the "Refresh now" button is now a small ↻ after the date ("Refresh data
   now"); it turns while loading
+- Links are no longer underlined on hover: rows (lists, search, compact list,
+  announcements, episodes, "Continue watching" cards) get a light tint in the accent
+  color, posters a colored frame, text links turn bold
+- Dashboard: a click anywhere on a "Continue watching" card opens the show (not only on
+  the poster or name); detail pages: a click anywhere in an episode row opens its
+  description (not only on the name)
 - Updated gunicorn to 27 (stricter HTTP parsing: requests with a `Transfer-Encoding` other
   than `chunked` are rejected with 400; browsers don't send those)
 

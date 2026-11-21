@@ -241,6 +241,18 @@ def show_followed(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_hover(show, locator):
+    """`show` with the mouse over `locator` (phones have no hover: nothing changes)."""
+
+    def run(page, url):
+        show(page, url)
+        # force: the mouse may rest on an element covered by a link (dashboard cards)
+        locator(page).hover(force=True)
+        page.wait_for_timeout(300)  # let the transition finish
+
+    return run
+
+
 def show_dashboard(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/")
@@ -418,6 +430,20 @@ PAGES = {
     "show-jump": show_show_jump,
     "show-earlier": show_show_earlier,
     "show-complete": show_show,
+    # Hover effects: tinted rows, poster frame, bold text link
+    "lists-hover": show_hover(show_lists, lambda p: p.get_by_role("link", name="Watchlist")),
+    "search-hover": show_hover(show_search, lambda p: p.locator(".result-link").nth(1)),
+    "list-grid-hover-poster": show_hover(
+        show_list_grid, lambda p: p.locator(".poster-grid a").nth(1)
+    ),
+    "show-hover-episode": show_hover(
+        show_show, lambda p: p.locator(".episodes li:has(details) .episode-meta").first
+    ),
+    "dashboard-hover": show_hover(
+        show_dashboard, lambda p: p.locator(".watching-list progress").first
+    ),
+    "upcoming-hover": show_hover(show_upcoming, lambda p: p.locator(".result-link").first),
+    "about-hover": show_hover(show_about, lambda p: p.get_by_role("link", name="JustWatch")),
     "list-toast": show_list_toast,
     "followed": show_followed,
     "dashboard": show_dashboard,
