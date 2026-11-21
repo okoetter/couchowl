@@ -241,6 +241,7 @@ def save_title(
     """
     is_movie = media_type == MediaType.MOVIE
     original = data.get("original_title" if is_movie else "original_name") or ""
+    regions = provider_regions()
     title, _created = Title.objects.update_or_create(
         media_type=media_type,
         tmdb_id=data["id"],
@@ -250,7 +251,8 @@ def save_title(
             "release_date": _parse_date(data.get("release_date" if is_movie else "first_air_date")),
             "status": data.get("status") or "",
             "networks": [n["name"] for n in data.get("networks") or [] if n.get("name")],
-            "watch_providers": watch_providers(data, provider_regions()),
+            "watch_providers": watch_providers(data, regions),
+            "release_dates": release_dates(data, regions) if is_movie else {},
             "vote_average": data.get("vote_average"),
             "vote_count": data.get("vote_count") or 0,
         },
@@ -284,6 +286,38 @@ def provider_regions() -> set[str]:
     """
     regions = User.objects.exclude(region="").values_list("region", flat=True).distinct()
     return {region.upper() for region in regions} | {default_region()}
+
+
+# TMDB release types (https://developer.themoviedb.org/reference/movie-release-dates):
+# 2 = limited theatrical, 3 = theatrical, 4 = digital. Theatrical prefers the wide release.
+RELEASE_TYPES = {"theatrical": (3, 2), "digital": (4,)}
+
+
+def release_dates(data: dict, regions) -> dict[str, dict]:
+    """A movie's theatrical and digital release dates from a TMDB details response
+    (`release_dates`) for `regions`: {"DE": {"theatrical": "2027-03-12", "digital": …}}.
+
+    Every wanted region gets an entry, {} if TMDB knows no dates there. Of several dates
+    of one type (e.g. festival and wide release) the earliest counts.
+    """
+    results = (data.get("release_dates") or {}).get("results") or []
+    by_region = {entry.get("iso_3166_1"): entry.get("release_dates") or [] for entry in results}
+    stored = {}
+    for region in sorted(regions):
+        entry = {}
+        for name, types in RELEASE_TYPES.items():
+            for release_type in types:
+                days = sorted(
+                    day
+                    for item in by_region.get(region, [])
+                    if item.get("type") == release_type
+                    and (day := _parse_date((item.get("release_date") or "")[:10]))
+                )
+                if days:
+                    entry[name] = days[0].isoformat()
+                    break
+        stored[region] = entry
+    return stored
 
 
 def watch_providers(data: dict, regions) -> dict[str, dict]:

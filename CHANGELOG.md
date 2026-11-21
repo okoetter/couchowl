@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Detail pages link to the title's page on TMDB ("View movie on TMDB" or "View show on
   TMDB", in the language for movie/show information)
 - Detail pages: clicking the poster shows it large (click anywhere or Esc to close)
+- Detail pages without streaming offers in the user's region say why: a show that hasn't
+  started names its start date and network ("Starts on … on Prime Video"), a running show
+  its original broadcaster, a movie its theatrical and digital release in the region
 
 ### Changed
 - Lists: the system list "Followed shows" is set apart on a tinted box with a bell and

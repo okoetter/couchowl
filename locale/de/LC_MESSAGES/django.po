@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-20 22:01+0100\n"
+"POT-Creation-Date: 2026-11-21 08:51+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -29,7 +29,7 @@ msgid "Password reset link for %(user)s"
 msgstr "Link zum Zurücksetzen des Passworts für %(user)s"
 
 #: accounts/admin.py:38 accounts/admin.py:64 catalog/models.py:32
-#: catalog/models.py:343 imports/models.py:76
+#: catalog/models.py:347 imports/models.py:76
 msgid "status"
 msgstr "Status"
 
@@ -203,7 +203,7 @@ msgstr "Nur für Admins sichtbar."
 msgid "created by"
 msgstr "erstellt von"
 
-#: accounts/models.py:117 catalog/models.py:137 imports/models.py:35
+#: accounts/models.py:117 catalog/models.py:141 imports/models.py:35
 msgid "created at"
 msgstr "erstellt am"
 
@@ -597,7 +597,7 @@ msgstr "Gefolgte Serien"
 msgid "Movie"
 msgstr "Film"
 
-#: catalog/models.py:15 catalog/models.py:214 catalog/models.py:335
+#: catalog/models.py:15 catalog/models.py:218 catalog/models.py:339
 msgid "TV show"
 msgstr "Serie"
 
@@ -605,7 +605,7 @@ msgstr "Serie"
 msgid "type"
 msgstr "Typ"
 
-#: catalog/models.py:26 catalog/models.py:265
+#: catalog/models.py:26 catalog/models.py:269
 msgid "TMDB ID"
 msgstr "TMDB-ID"
 
@@ -629,230 +629,234 @@ msgstr "Sender"
 msgid "streaming providers"
 msgstr "Streaming-Anbieter"
 
-#: catalog/models.py:41
+#: catalog/models.py:43
+msgid "release dates"
+msgstr "Veröffentlichungstermine"
+
+#: catalog/models.py:45
 msgid "TMDB rating"
 msgstr "TMDB-Bewertung"
 
-#: catalog/models.py:42
+#: catalog/models.py:46
 msgid "TMDB votes"
 msgstr "TMDB-Stimmen"
 
-#: catalog/models.py:43
+#: catalog/models.py:47
 msgid "updated at"
 msgstr "aktualisiert am"
 
-#: catalog/models.py:46 catalog/models.py:84 catalog/models.py:160
+#: catalog/models.py:50 catalog/models.py:88 catalog/models.py:164
 msgid "title"
 msgstr "Titel"
 
-#: catalog/models.py:47
+#: catalog/models.py:51
 msgid "titles"
 msgstr "Titel"
 
-#: catalog/models.py:87 catalog/models.py:244 catalog/models.py:297
+#: catalog/models.py:91 catalog/models.py:248 catalog/models.py:301
 msgid "language"
 msgstr "Sprache"
 
-#: catalog/models.py:88 catalog/models.py:136 catalog/models.py:245
-#: catalog/models.py:298
+#: catalog/models.py:92 catalog/models.py:140 catalog/models.py:249
+#: catalog/models.py:302
 msgid "name"
 msgstr "Name"
 
-#: catalog/models.py:89 catalog/models.py:246 catalog/models.py:299
+#: catalog/models.py:93 catalog/models.py:250 catalog/models.py:303
 msgid "description"
 msgstr "Beschreibung"
 
-#: catalog/models.py:91
+#: catalog/models.py:95
 msgid "poster"
 msgstr "Poster"
 
-#: catalog/models.py:92
+#: catalog/models.py:96
 msgid "loaded from TMDB at"
 msgstr "von TMDB geladen am"
 
-#: catalog/models.py:95
+#: catalog/models.py:99
 msgid "translation"
 msgstr "Übersetzung"
 
-#: catalog/models.py:96
+#: catalog/models.py:100
 msgid "translations"
 msgstr "Übersetzungen"
 
-#: catalog/models.py:107
+#: catalog/models.py:111
 msgid "Released"
 msgstr "Veröffentlicht"
 
-#: catalog/models.py:108
+#: catalog/models.py:112
 msgid "Rumored"
 msgstr "Gerücht"
 
-#: catalog/models.py:109
+#: catalog/models.py:113
 msgid "Planned"
 msgstr "Geplant"
 
-#: catalog/models.py:110
+#: catalog/models.py:114
 msgid "In production"
 msgstr "In Produktion"
 
-#: catalog/models.py:111
+#: catalog/models.py:115
 msgid "Post-production"
 msgstr "Postproduktion"
 
-#: catalog/models.py:112
+#: catalog/models.py:116
 msgid "Canceled"
 msgstr "Abgesetzt"
 
-#: catalog/models.py:113
+#: catalog/models.py:117
 msgid "Returning series"
 msgstr "Wird fortgesetzt"
 
-#: catalog/models.py:114
+#: catalog/models.py:118
 msgid "Ended"
 msgstr "Beendet"
 
-#: catalog/models.py:115
+#: catalog/models.py:119
 msgid "Pilot"
 msgstr "Pilotfolge"
 
-#: catalog/models.py:132 catalog/models.py:181 catalog/models.py:328
-#: catalog/models.py:359 imports/models.py:22
+#: catalog/models.py:136 catalog/models.py:185 catalog/models.py:332
+#: catalog/models.py:363 imports/models.py:22
 msgid "user"
 msgstr "Benutzer"
 
-#: catalog/models.py:140 catalog/models.py:157 imports/models.py:31
+#: catalog/models.py:144 catalog/models.py:161 imports/models.py:31
 msgid "list"
 msgstr "Liste"
 
-#: catalog/models.py:141
+#: catalog/models.py:145
 msgid "lists"
 msgstr "Listen"
 
-#: catalog/models.py:162
+#: catalog/models.py:166
 msgid "added at"
 msgstr "hinzugefügt am"
 
-#: catalog/models.py:165
+#: catalog/models.py:169
 msgid "list entry"
 msgstr "Listeneintrag"
 
-#: catalog/models.py:166
+#: catalog/models.py:170
 msgid "list entries"
 msgstr "Listeneinträge"
 
-#: catalog/models.py:187
+#: catalog/models.py:191
 msgid "movie"
 msgstr "Film"
 
-#: catalog/models.py:193 catalog/models.py:367
+#: catalog/models.py:197 catalog/models.py:371
 msgid "watched on"
 msgstr "gesehen am"
 
-#: catalog/models.py:196
+#: catalog/models.py:200
 msgid "watched movie"
 msgstr "gesehener Film"
 
-#: catalog/models.py:197
+#: catalog/models.py:201
 msgid "watched movies"
 msgstr "gesehene Filme"
 
-#: catalog/models.py:219 catalog/models.py:263
+#: catalog/models.py:223 catalog/models.py:267
 msgid "number"
 msgstr "Nummer"
 
-#: catalog/models.py:220 catalog/models.py:267
+#: catalog/models.py:224 catalog/models.py:271
 msgid "air date"
 msgstr "Ausstrahlung"
 
-#: catalog/models.py:223 catalog/models.py:242 catalog/models.py:261
+#: catalog/models.py:227 catalog/models.py:246 catalog/models.py:265
 msgid "season"
 msgstr "Staffel"
 
-#: catalog/models.py:224
+#: catalog/models.py:228
 msgid "seasons"
 msgstr "Staffeln"
 
-#: catalog/models.py:249
+#: catalog/models.py:253
 msgid "season translation"
 msgstr "Staffel-Übersetzung"
 
-#: catalog/models.py:250
+#: catalog/models.py:254
 msgid "season translations"
 msgstr "Staffel-Übersetzungen"
 
-#: catalog/models.py:268
+#: catalog/models.py:272
 msgid "runtime (minutes)"
 msgstr "Laufzeit (Minuten)"
 
-#: catalog/models.py:271 catalog/models.py:295 catalog/models.py:364
+#: catalog/models.py:275 catalog/models.py:299 catalog/models.py:368
 msgid "episode"
 msgstr "Folge"
 
-#: catalog/models.py:272
+#: catalog/models.py:276
 msgid "episodes"
 msgstr "Folgen"
 
-#: catalog/models.py:284
+#: catalog/models.py:288
 #, python-format
 msgid "S%(season)s E%(episode)s"
 msgstr "S%(season)s E%(episode)s"
 
-#: catalog/models.py:302
+#: catalog/models.py:306
 msgid "episode translation"
 msgstr "Folgen-Übersetzung"
 
-#: catalog/models.py:303
+#: catalog/models.py:307
 msgid "episode translations"
 msgstr "Folgen-Übersetzungen"
 
-#: catalog/models.py:322
+#: catalog/models.py:326
 msgid "Watching"
 msgstr "Schaue gerade"
 
-#: catalog/models.py:323
+#: catalog/models.py:327
 msgid "Paused"
 msgstr "Pausiert"
 
-#: catalog/models.py:324
+#: catalog/models.py:328
 msgid "Finished"
 msgstr "Fertig"
 
-#: catalog/models.py:340
+#: catalog/models.py:344
 msgid "following"
 msgstr "gefolgt"
 
-#: catalog/models.py:341
+#: catalog/models.py:345
 msgid "followed since"
 msgstr "gefolgt seit"
 
-#: catalog/models.py:346
+#: catalog/models.py:350
 msgid "user show"
 msgstr "Serie eines Nutzers"
 
-#: catalog/models.py:347
+#: catalog/models.py:351
 msgid "user shows"
 msgstr "Serien der Nutzer"
 
-#: catalog/models.py:370
+#: catalog/models.py:374
 msgid "watched episode"
 msgstr "gesehene Folge"
 
-#: catalog/models.py:371
+#: catalog/models.py:375
 msgid "watched episodes"
 msgstr "gesehene Folgen"
 
-#: catalog/providers.py:14
+#: catalog/providers.py:15
 msgid "Subscription"
 msgstr "Abo"
 
-#: catalog/providers.py:15
+#: catalog/providers.py:16
 msgid "Free"
 msgstr "Kostenlos"
 
-#: catalog/providers.py:16
+#: catalog/providers.py:17
 msgid "Rent"
 msgstr "Leihen"
 
-#: catalog/providers.py:17
+#: catalog/providers.py:18
 msgid "Buy"
 msgstr "Kaufen"
 
@@ -1020,7 +1024,7 @@ msgstr[1] "%(counter)s Folgen"
 #: catalog/templates/catalog/_seasons.html:50
 #: catalog/templates/catalog/_watched_badge.html:20
 #: catalog/templates/catalog/search.html:45
-#: catalog/templates/catalog/title_detail.html:113 catalog/views.py:209
+#: catalog/templates/catalog/title_detail.html:113 catalog/views.py:210
 #: imports/templates/imports/import.html:157
 msgid "Watched"
 msgstr "Gesehen"
@@ -1347,17 +1351,74 @@ msgstr "Keine Beschreibung vorhanden."
 msgid "Available in %(region_name)s"
 msgstr "Verfügbar in %(region_name)s"
 
-#: catalog/templates/catalog/title_detail.html:188
+#: catalog/templates/catalog/title_detail.html:193
+#, python-format
+msgid "Starts on %(starts)s on %(networks)s."
+msgstr "Startet am %(starts)s bei %(networks)s."
+
+#: catalog/templates/catalog/title_detail.html:195
+#, python-format
+msgid "Starts on %(starts)s."
+msgstr "Startet am %(starts)s."
+
+#: catalog/templates/catalog/title_detail.html:197
+#, python-format
+msgid "Offers in %(region_name)s usually follow at the start."
+msgstr "Angebote für %(region_name)s folgen meist zum Start."
+
+#: catalog/templates/catalog/title_detail.html:199
+msgid "No start date known yet."
+msgstr "Noch kein Starttermin bekannt."
+
+#: catalog/templates/catalog/title_detail.html:202
+#, python-format
+msgid ""
+"In cinemas in %(region_name)s on %(theatrical)s, digital from %(digital)s."
+msgstr "Kinostart in %(region_name)s am %(theatrical)s, digital ab %(digital)s."
+
+#: catalog/templates/catalog/title_detail.html:204
+#, python-format
+msgid "In cinemas in %(region_name)s on %(theatrical)s."
+msgstr "Kinostart in %(region_name)s am %(theatrical)s."
+
+#: catalog/templates/catalog/title_detail.html:206
+msgid "Streaming offers usually follow after the cinema release."
+msgstr "Streaming-Angebote folgen meist nach dem Kinostart."
+
+#: catalog/templates/catalog/title_detail.html:208
+#, python-format
+msgid "Digital from %(digital)s in %(region_name)s."
+msgstr "Digital ab %(digital)s in %(region_name)s."
+
+#: catalog/templates/catalog/title_detail.html:209
+msgid "Streaming offers usually follow at the digital release."
+msgstr "Streaming-Angebote folgen meist zum digitalen Start."
+
+#: catalog/templates/catalog/title_detail.html:211
+#, python-format
+msgid "Comes out on %(starts)s (date for %(region_name)s not known yet)."
+msgstr "Erscheint am %(starts)s (Termin für %(region_name)s noch nicht bekannt)."
+
+#: catalog/templates/catalog/title_detail.html:213
+msgid "No release date known yet."
+msgstr "Noch kein Erscheinungstermin bekannt."
+
+#: catalog/templates/catalog/title_detail.html:215
 #, python-format
 msgid "No streaming offers known in %(region_name)s."
 msgstr "Keine Streaming-Angebote in %(region_name)s bekannt."
 
-#: catalog/templates/catalog/title_detail.html:202
+#: catalog/templates/catalog/title_detail.html:219
+#, python-format
+msgid "Original broadcaster: %(networks)s."
+msgstr "Originalausstrahlung: %(networks)s."
+
+#: catalog/templates/catalog/title_detail.html:236
 msgctxt "followed by a date"
 msgid "Data from TMDB and JustWatch as of"
 msgstr "Daten von TMDB und JustWatch, Stand"
 
-#: catalog/templates/catalog/title_detail.html:204
+#: catalog/templates/catalog/title_detail.html:238
 msgid "Refresh data now"
 msgstr "Daten jetzt aktualisieren"
 
@@ -1384,86 +1445,86 @@ msgid_plural "(%(count)s votes)"
 msgstr[0] "(%(count)s Stimme)"
 msgstr[1] "(%(count)s Stimmen)"
 
-#: catalog/views.py:47
+#: catalog/views.py:48
 msgid "Too many searches in a short time. Please wait a moment."
 msgstr "Zu viele Suchanfragen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:52
+#: catalog/views.py:53
 msgid "Search is not available: the administrator has not set up TMDB yet."
 msgstr ""
 "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
 "eingerichtet."
 
-#: catalog/views.py:55 catalog/views.py:425 catalog/views.py:472
+#: catalog/views.py:56 catalog/views.py:426 catalog/views.py:478
 #: core/views.py:135 imports/views.py:39
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
 "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
 
-#: catalog/views.py:123
+#: catalog/views.py:124
 #, python-format
 msgid "List “%(name)s” created."
 msgstr "Liste „%(name)s“ angelegt."
 
-#: catalog/views.py:207 catalog/views.py:212
+#: catalog/views.py:208 catalog/views.py:213
 msgid "All"
 msgstr "Alle"
 
-#: catalog/views.py:208
+#: catalog/views.py:209
 msgid "Unwatched"
 msgstr "Ungesehen"
 
-#: catalog/views.py:213
+#: catalog/views.py:214
 msgid "Movies"
 msgstr "Filme"
 
-#: catalog/views.py:214
+#: catalog/views.py:215
 msgid "TV shows"
 msgstr "Serien"
 
-#: catalog/views.py:247 core/views.py:72
+#: catalog/views.py:248 core/views.py:72
 #, python-format
 msgid "%(episode)s watched."
 msgstr "%(episode)s gesehen."
 
-#: catalog/views.py:275 core/views.py:96
+#: catalog/views.py:276 core/views.py:96
 #, python-format
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
 
-#: catalog/views.py:290
+#: catalog/views.py:291
 msgid "List renamed."
 msgstr "Liste umbenannt."
 
-#: catalog/views.py:302
+#: catalog/views.py:303
 #, python-format
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:333
+#: catalog/views.py:334
 #, python-format
 msgid "“%(name)s” removed"
 msgstr "„%(name)s“ entfernt"
 
-#: catalog/views.py:422 catalog/views.py:469 core/views.py:132
+#: catalog/views.py:423 catalog/views.py:475 core/views.py:132
 #: imports/views.py:38
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
-#: catalog/views.py:462
+#: catalog/views.py:468
 msgid "Too many refreshes in a short time. Please wait a moment."
 msgstr "Zu viele Aktualisierungen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:474
+#: catalog/views.py:480
 msgid "Refreshed from TMDB."
 msgstr "Von TMDB aktualisiert."
 
-#: catalog/views.py:527
+#: catalog/views.py:533
 #, python-format
 msgid "Please enter a name (at most %(max)s characters)."
 msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."
 
-#: catalog/views.py:866
+#: catalog/views.py:872
 #, python-format
 msgid "%(count)s episode marked as watched."
 msgid_plural "%(count)s episodes marked as watched."

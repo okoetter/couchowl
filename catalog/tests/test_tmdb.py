@@ -36,6 +36,16 @@ def test_details_include_all_translations(fake_tmdb):
     assert fake_tmdb.requests[0].url.params["append_to_response"] == tmdb.DETAILS_APPENDED
 
 
+def test_movie_details_include_release_dates(fake_tmdb):
+    fake_tmdb.add("/3/movie/155", json=load_tmdb_fixture("movie_155"))
+
+    tmdb.get_client().details("movie", 155, "de-DE")
+
+    appended = fake_tmdb.requests[0].url.params["append_to_response"]
+    assert appended == tmdb.MOVIE_DETAILS_APPENDED
+    assert "release_dates" in appended.split(",")
+
+
 def test_missing_token_raises_not_configured(settings):
     settings.TMDB_API_TOKEN = ""
 

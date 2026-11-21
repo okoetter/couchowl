@@ -193,6 +193,42 @@ def show_show(page, url):
     page.wait_for_load_state("networkidle")
 
 
+def show_movie_cinema(page, url):
+    """Not out yet, no offers: cinema and digital release instead (providers.availability)."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from catalog.models import Title
+
+    cinema = timezone.localdate() + timedelta(days=30)
+    Title.objects.filter(tmdb_id=155, media_type="movie").update(
+        status="Post Production",
+        watch_providers={"DE": {}},
+        release_dates={
+            "DE": {"theatrical": str(cinema), "digital": str(cinema + timedelta(days=60))}
+        },
+    )
+    show_movie(page, url)
+
+
+def show_show_starts(page, url):
+    """A show that starts soon, no offers yet: start date and network instead."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from catalog.models import Title
+
+    Title.objects.filter(tmdb_id=70523, media_type="tv").update(
+        status="Planned",
+        release_date=timezone.localdate() + timedelta(days=4),
+        networks=["Prime Video"],
+        watch_providers={"DE": {}},
+    )
+    show_show(page, url)
+
+
 def show_show_long_title(page, url):
     """A long title with a long word must wrap instead of widening the page on phones."""
     from catalog.models import TitleTranslation
@@ -424,7 +460,9 @@ PAGES = {
     "movie": show_movie,
     "movie-poster": show_movie_poster,
     "movie-many-offers": show_movie_many_offers,
+    "movie-cinema": show_movie_cinema,
     "show": show_show,
+    "show-starts": show_show_starts,
     "show-long-title": show_show_long_title,
     "show-details": show_show_details,
     "show-jump": show_show_jump,

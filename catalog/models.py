@@ -37,6 +37,10 @@ class Title(models.Model):
     # "logo": "/….png"}], "rent": […], …}}. {} for a region = no offers there.
     # See catalog.providers.
     watch_providers = models.JSONField(_("streaming providers"), default=dict, blank=True)
+    # Movies: release dates per region (like watch_providers, only our users' regions):
+    # {"DE": {"theatrical": "2027-03-12", "digital": "2027-05-28"}}; {} for a region =
+    # no dates known there. See catalog.providers.availability.
+    release_dates = models.JSONField(_("release dates"), default=dict, blank=True)
     # TMDB user rating: average of 0-10 and number of votes (see catalog.templatetags)
     vote_average = models.FloatField(_("TMDB rating"), null=True, blank=True)
     vote_count = models.PositiveIntegerField(_("TMDB votes"), default=0)

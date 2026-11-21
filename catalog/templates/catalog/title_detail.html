@@ -185,7 +185,41 @@
             {% endfor %}
           </dl>
         {% else %}
-          <p class="muted">{% blocktranslate %}No streaming offers known in {{ region_name }}.{% endblocktranslate %}</p>
+          {# No offers yet: say when the title starts and who airs it (catalog.providers.availability) #}
+          {% with a=availability starts=availability.starts|date:"SHORT_DATE_FORMAT" theatrical=availability.theatrical|date:"SHORT_DATE_FORMAT" digital=availability.digital|date:"SHORT_DATE_FORMAT" networks=availability.networks %}
+            <p class="muted">
+              {% if a.state == a.SHOW_STARTS %}
+                {% if networks %}
+                  {% blocktranslate trimmed %}Starts on {{ starts }} on {{ networks }}.{% endblocktranslate %}
+                {% else %}
+                  {% blocktranslate trimmed %}Starts on {{ starts }}.{% endblocktranslate %}
+                {% endif %}
+                {% blocktranslate trimmed %}Offers in {{ region_name }} usually follow at the start.{% endblocktranslate %}
+              {% elif a.state == a.SHOW_NO_DATE %}
+                {% translate "No start date known yet." %}
+              {% elif a.state == a.CINEMA %}
+                {% if digital %}
+                  {% blocktranslate trimmed %}In cinemas in {{ region_name }} on {{ theatrical }}, digital from {{ digital }}.{% endblocktranslate %}
+                {% else %}
+                  {% blocktranslate trimmed %}In cinemas in {{ region_name }} on {{ theatrical }}.{% endblocktranslate %}
+                {% endif %}
+                {% translate "Streaming offers usually follow after the cinema release." %}
+              {% elif a.state == a.DIGITAL %}
+                {% blocktranslate trimmed %}Digital from {{ digital }} in {{ region_name }}.{% endblocktranslate %}
+                {% translate "Streaming offers usually follow at the digital release." %}
+              {% elif a.state == a.RELEASE %}
+                {% blocktranslate trimmed %}Comes out on {{ starts }} (date for {{ region_name }} not known yet).{% endblocktranslate %}
+              {% elif a.state == a.NO_DATE %}
+                {% translate "No release date known yet." %}
+              {% else %}
+                {% blocktranslate trimmed %}No streaming offers known in {{ region_name }}.{% endblocktranslate %}
+              {% endif %}
+              {% if networks and a.state != a.SHOW_STARTS %}
+                {# The original broadcaster (worldwide), not necessarily an offer in the region #}
+                {% blocktranslate trimmed %}Original broadcaster: {{ networks }}.{% endblocktranslate %}
+              {% endif %}
+            </p>
+          {% endwith %}
         {% endif %}
       </section>
 

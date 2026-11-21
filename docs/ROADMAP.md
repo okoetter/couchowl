@@ -74,7 +74,8 @@ The reasons behind finished work are in [design.md](design.md).
   release falls within the announcement window (no separate "Follow" for movies: being on
   a list already means "I want to see this")
   - release dates per region from TMDB `release_dates` (user's `region`), stored in the DB;
-    the dashboard still never asks TMDB
+    the dashboard still never asks TMDB (done: `Title.release_dates`, shown on detail pages
+    without offers)
   - show the theatrical and, if known, the digital release ("Cinema 12 Feb · digital 28 Mar");
     fall back to the theatrical date (TMDB often adds digital dates late or never)
   - a movie already in cinemas stays announced until its digital release has passed

@@ -23,8 +23,10 @@ MAX_RETRIES = 2
 MAX_RETRY_WAIT_SECONDS = 10
 # TMDB allows up to 20 items in append_to_response
 MAX_APPENDED_SEASONS = 20
-# Extra data in every details request (no additional requests needed)
+# Extra data in every details request (no additional requests needed); movies also get
+# their release dates per country (theatrical, digital, ...)
 DETAILS_APPENDED = "translations,watch/providers"
+MOVIE_DETAILS_APPENDED = f"{DETAILS_APPENDED},release_dates"
 
 
 class TMDBError(Exception):
@@ -71,12 +73,14 @@ class TMDBClient:
         return self.get("/search/multi", query=query, language=language, include_adult="false")
 
     def details(self, media_type: str, tmdb_id: int, language: str) -> dict:
-        """Details of a movie or show, including the texts in all languages and the
-        streaming providers in all regions (`watch/providers`, data from JustWatch)."""
+        """Details of a movie or show, including the texts in all languages, the
+        streaming providers in all regions (`watch/providers`, data from JustWatch) and,
+        for movies, the release dates per country (`release_dates`)."""
+        appended = MOVIE_DETAILS_APPENDED if media_type == "movie" else DETAILS_APPENDED
         return self.get(
             f"/{media_type}/{int(tmdb_id)}",
             language=language,
-            append_to_response=DETAILS_APPENDED,
+            append_to_response=appended,
         )
 
     def seasons(self, tmdb_id: int, numbers: list[int], language: str) -> dict[int, dict]:

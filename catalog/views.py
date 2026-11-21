@@ -9,6 +9,7 @@ from django.http import FileResponse, Http404, HttpResponse, HttpResponseBadRequ
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.cache import patch_cache_control, patch_vary_headers
 from django.utils.translation import get_language, ngettext
 from django.utils.translation import gettext as _
@@ -434,10 +435,15 @@ def title_detail(request, media_type, tmdb_id):
         return render(request, "catalog/title_error.html", {"error": error}, status=503)
     title = translation.title
     region = request.user.effective_region
+    offers = providers.offers(title, region)
     context = {
         "title": title,
         "translation": translation,
-        "offers": providers.offers(title, region),
+        "offers": offers,
+        # Without offers: start dates, networks (see providers.availability)
+        "availability": (
+            None if offers else providers.availability(title, region, timezone.localdate())
+        ),
         "tmdb_link": title.tmdb_url(request.user.effective_tmdb_language),
         "region_name": country_name(region, get_language()),
         **_menu_context(request, media_type, tmdb_id, title),

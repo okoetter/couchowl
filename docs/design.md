@@ -226,6 +226,21 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   first row of logos: with many providers (e.g. "Dunkirk") the wrapped logos otherwise
   looked like the next group. Rejected: the label as a heading above the logos (just as
   clear, but noticeably taller, since the label column hardly costs logos per row).
+- **Without offers in the region** the detail page says why, depending on the state
+  (`catalog.providers.availability`), instead of a bare "No streaming offers known": JustWatch
+  usually lists a title only once it can be watched, so "no offers" was misleading for a
+  show that starts next week on Prime Video.
+  - Shows not started yet: "Starts on 25.11.2026 on Prime Video. Offers in Germany usually
+    follow at the start." (the networks from TMDB); without a date "No start date known yet."
+  - Shows that started and have no offers in the region add "Original broadcaster: HBO."
+    (the networks are worldwide, e.g. an HBO show may run on another service here, so they
+    are not shown as an offer). New seasons of running shows change nothing.
+  - Movies: theatrical and digital release in the region ("In cinemas in Germany on …,
+    digital from …"; TMDB release types 3, else 2, and 4), stored per region like the
+    providers in `Title.release_dates` (`append_to_response=release_dates`, movies only).
+    Without dates for the region but a future release elsewhere: "Comes out on … (date for
+    Germany not known yet)". Titles get the dates on their next reload.
+  Rejected: always showing the networks in the subtitle line (redundant once offers exist).
 - TMDB statuses are translated ("Ended" → "Beendet").
 
 ### Batch import
@@ -497,7 +512,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   `show_followed_list`.
 - `Invitation`: token, optional e-mail, note, `created_by`, `expires_at`, `used_by`.
 - `Title` (`tmdb_id` + `media_type`) with language-neutral data (dates, status, networks,
-  streaming providers, rating); `TitleTranslation` per language (name, description,
+  streaming providers, movie release dates per region, rating); `TitleTranslation` per language (name, description,
   poster). `Season` and `Episode` (numbers, air dates, runtime) with translation tables.
 - `UserList` and `ListItem`.
 - `UserSeries`: user, show, `following`, `followed_at`, `status` ("watching" is set on the
