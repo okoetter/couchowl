@@ -290,9 +290,13 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   (depends on the language), ignoring articles ("The Batman" vs. "Batman") and roman
   numerals ("Rocky II" = "Rocky 2"): each would match different titles silently, while
   an ambiguous line costs one click.
-- **Paste → preview → import**, all on page `/import/` (linked from the lists overview, a
-  list's menu ("Import" preselects the list), the empty states of lists, and the empty
-  "Continue watching" as long as the user has no data at all; not hidden in the profile).
+- **Paste → preview → import**, all on page `/import/` (linked from the search page below
+  the empty field ("Many titles at once? Import a list"), the empty states of lists (an
+  empty list preselects itself), and the empty "Continue watching" as long as the user
+  has no data at all; not hidden in the profile). The search page fits because an import
+  is a search for many titles at once and doesn't always go into a list (watched or
+  followed only). Rejected: links in the headers of the lists overview and of a list
+  (suggest a list is required).
   The dashboard hint disappears once there is anything: "Continue watching" is also empty
   for people who only track movies or are between shows, and a permanent import hint on
   the start page would be noise. Every line shows its state,

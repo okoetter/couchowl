@@ -29,6 +29,12 @@ def test_search_page_without_query(auth_client, fake_tmdb):
     assert fake_tmdb.requests == []
 
 
+def test_results_replace_the_import_hint(auth_client, search_response):
+    response = auth_client.get(SEARCH, {"q": "dark"}, headers=HTMX)
+
+    assert reverse("imports:page") not in response.content.decode()
+
+
 def test_search_uses_the_users_tmdb_language(auth_client, user, search_response):
     user.region = "AT"
     user.save()

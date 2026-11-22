@@ -56,6 +56,11 @@
         <p>{% blocktranslate %}Nothing found for “{{ query }}”.{% endblocktranslate %}</p>
       {% else %}
         <p class="muted">{% translate "Type a title to search movies and TV shows." %}</p>
+        {# Importing is a search for many titles at once (and not always into a list), so it's linked here #}
+        <p class="muted">
+          {% url 'imports:page' as import_url %}
+          {% blocktranslate %}Many titles at once?<br><a href="{{ import_url }}">Import a list</a>{% endblocktranslate %}
+        </p>
       {% endif %}
     {% endpartialdef %}
   </div>

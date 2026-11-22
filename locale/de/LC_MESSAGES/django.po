@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-22 13:46+0100\n"
+"POT-Creation-Date: 2026-11-22 20:13+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -964,7 +964,7 @@ msgid "Watchlist"
 msgstr "Watchlist"
 
 #: catalog/templates/catalog/_list_menu.html:39
-#: catalog/templates/catalog/lists.html:47
+#: catalog/templates/catalog/lists.html:42
 msgid "New list"
 msgstr "Neue Liste"
 
@@ -1160,18 +1160,14 @@ msgid "Movies you marked as watched stay watched."
 msgstr "Als gesehen markierte Filme bleiben gesehen."
 
 #: catalog/templates/catalog/list_detail.html:14
-msgid "Import"
-msgstr "Importieren"
-
-#: catalog/templates/catalog/list_detail.html:15
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: catalog/templates/catalog/list_detail.html:16
+#: catalog/templates/catalog/list_detail.html:15
 msgid "Delete"
 msgstr "Löschen"
 
-#: catalog/templates/catalog/list_detail.html:23
+#: catalog/templates/catalog/list_detail.html:22
 #, python-format
 msgid ""
 "Contains every show you follow. Unfollow with the bell · <a "
@@ -1180,27 +1176,27 @@ msgstr ""
 "Enthält alle Serien, denen du folgst. Entfolgen mit der Glocke · <a "
 "href=\"%(profile_url)s#id_show_followed_list\">im Profil ausblenden</a>"
 
-#: catalog/templates/catalog/list_detail.html:45
+#: catalog/templates/catalog/list_detail.html:44
 msgid "Show"
 msgstr "Anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:53
+#: catalog/templates/catalog/list_detail.html:52
 msgid "Type"
 msgstr "Art"
 
-#: catalog/templates/catalog/list_detail.html:65
+#: catalog/templates/catalog/list_detail.html:64
 msgid "View"
 msgstr "Ansicht"
 
-#: catalog/templates/catalog/list_detail.html:82
+#: catalog/templates/catalog/list_detail.html:81
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: catalog/templates/catalog/list_detail.html:83 imports/models.py:18
+#: catalog/templates/catalog/list_detail.html:82 imports/models.py:18
 msgid "Done"
 msgstr "Fertig"
 
-#: catalog/templates/catalog/list_detail.html:88
+#: catalog/templates/catalog/list_detail.html:87
 msgid ""
 "Removes titles from this list only – watched status, progress and followed "
 "shows stay."
@@ -1208,21 +1204,21 @@ msgstr ""
 "Entfernt Titel nur aus dieser Liste – Gesehen-Status, Fortschritt und "
 "gefolgte Serien bleiben."
 
-#: catalog/templates/catalog/list_detail.html:154
+#: catalog/templates/catalog/list_detail.html:153
 msgid "No titles match this filter."
 msgstr "Keine Titel für diesen Filter."
 
-#: catalog/templates/catalog/list_detail.html:155
+#: catalog/templates/catalog/list_detail.html:154
 msgid "Show all"
 msgstr "Alle anzeigen"
 
-#: catalog/templates/catalog/list_detail.html:158
+#: catalog/templates/catalog/list_detail.html:157
 msgid "You don't follow any shows. Use the “Follow” button on a show's page."
 msgstr ""
 "Du folgst keiner Serie. Auf der Seite einer Serie gibt es dafür den Button "
 "„Folgen“."
 
-#: catalog/templates/catalog/list_detail.html:162
+#: catalog/templates/catalog/list_detail.html:161
 #, python-format
 msgid ""
 "This list is empty. Use the <a href=\"%(search_url)s\">search</a> to add "
@@ -1231,7 +1227,7 @@ msgstr ""
 "Diese Liste ist leer. Über die <a href=\"%(search_url)s\">Suche</a> fügst du "
 "Filme und Serien hinzu."
 
-#: catalog/templates/catalog/list_detail.html:164
+#: catalog/templates/catalog/list_detail.html:163
 #, python-format
 msgid ""
 "Or <a href=\"%(import_url)s?list=%(list_pk)s\">import a list of titles</a>."
@@ -1245,36 +1241,29 @@ msgid "Rename list"
 msgstr "Liste umbenennen"
 
 #: catalog/templates/catalog/lists.html:4
-#: catalog/templates/catalog/lists.html:8 core/templates/core/_nav.html:19
+#: catalog/templates/catalog/lists.html:7 core/templates/core/_nav.html:19
 msgid "Lists"
 msgstr "Listen"
 
-#: catalog/templates/catalog/lists.html:10
-#: imports/templates/imports/import.html:4
-#: imports/templates/imports/import.html:9
-#: imports/templates/imports/import.html:34
-msgid "Import titles"
-msgstr "Titel importieren"
-
-#: catalog/templates/catalog/lists.html:22
+#: catalog/templates/catalog/lists.html:17
 msgid "Automatic: all shows you follow"
 msgstr "Automatisch: alle Serien, denen du folgst"
 
-#: catalog/templates/catalog/lists.html:24
+#: catalog/templates/catalog/lists.html:19
 #, python-format
 msgid "%(counter)s show"
 msgid_plural "%(counter)s shows"
 msgstr[0] "%(counter)s Serie"
 msgstr[1] "%(counter)s Serien"
 
-#: catalog/templates/catalog/lists.html:32
+#: catalog/templates/catalog/lists.html:27
 #, python-format
 msgid "%(counter)s title"
 msgid_plural "%(counter)s titles"
 msgstr[0] "%(counter)s Titel"
 msgstr[1] "%(counter)s Titel"
 
-#: catalog/templates/catalog/lists.html:38
+#: catalog/templates/catalog/lists.html:33
 msgid ""
 "You don't have any lists yet. Create one below, or add a title from the "
 "search: a “Watchlist” is created for you."
@@ -1282,7 +1271,7 @@ msgstr ""
 "Du hast noch keine Listen. Lege unten eine an oder füge einen Titel über die "
 "Suche hinzu: Dann wird automatisch eine „Watchlist“ angelegt."
 
-#: catalog/templates/catalog/lists.html:41
+#: catalog/templates/catalog/lists.html:36
 #: core/templates/core/dashboard.html:73
 #, python-format
 msgid ""
@@ -1292,7 +1281,7 @@ msgstr ""
 "Du kommst von einer anderen App? <a href=\"%(import_url)s\">Importiere eine "
 "Liste von Titeln.</a>"
 
-#: catalog/templates/catalog/lists.html:50
+#: catalog/templates/catalog/lists.html:45
 msgid "Create"
 msgstr "Anlegen"
 
@@ -1317,6 +1306,11 @@ msgstr "Nichts gefunden für „%(query)s“."
 #: catalog/templates/catalog/search.html:58
 msgid "Type a title to search movies and TV shows."
 msgstr "Gib einen Titel ein, um Filme und Serien zu suchen."
+
+#: catalog/templates/catalog/search.html:62
+#, python-format
+msgid "Many titles at once?<br><a href=\"%(import_url)s\">Import a list</a>"
+msgstr "Viele Titel auf einmal?<br><a href=\"%(import_url)s\">Liste importieren</a>"
 
 #: catalog/templates/catalog/title_detail.html:20
 msgid "Enlarge poster"
@@ -1946,6 +1940,12 @@ msgstr "Zeile %(number)s neu suchen"
 msgid "Search again"
 msgstr "Neu suchen"
 
+#: imports/templates/imports/import.html:4
+#: imports/templates/imports/import.html:9
+#: imports/templates/imports/import.html:34
+msgid "Import titles"
+msgstr "Titel importieren"
+
 #: imports/templates/imports/import.html:10
 msgid ""
 "Moving from another app, a spreadsheet or your notes? Paste your movies and "
@@ -2147,6 +2147,9 @@ msgid ""
 msgstr ""
 "Schick diesen Link an die Person, die du einladen möchtest. Er kann nur "
 "einmal benutzt werden."
+
+#~ msgid "Import"
+#~ msgstr "Importieren"
 
 #~ msgid "Source: JustWatch"
 #~ msgstr "Quelle: JustWatch"

@@ -4,12 +4,7 @@
 {% block title %}{% translate "Lists" %}{% endblock %}
 
 {% block content %}
-  <div class="list-header">
-    <h1>{% translate "Lists" %}</h1>
-    <div class="list-header-links">
-      <a href="{% url 'imports:page' %}">{% translate "Import titles" %}</a>
-    </div>
-  </div>
+  <h1>{% translate "Lists" %}</h1>
 
   {% if lists or followed.item_count %}
     <ul class="list-index">

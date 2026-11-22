@@ -67,6 +67,11 @@ def show_search(page, url):
     page.wait_for_load_state("networkidle")  # all poster thumbnails loaded
 
 
+def show_search_empty(page, url):
+    login(page, url, "anna")
+    page.goto(f"{url}/search/")
+
+
 def show_search_error(page, url):
     login(page, url, "anna")
     page.goto(f"{url}/search/?q=fail")
@@ -442,6 +447,7 @@ PAGES = {
     "password-change-error": show_password_change,
     "reset-data-error": show_reset_data,
     "search": show_search,
+    "search-empty": show_search_empty,
     "search-error": show_search_error,
     "search-menu": show_search_menu,
     "lists": show_lists,

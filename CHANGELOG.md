@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their next reload from TMDB
 
 ### Changed
+- The batch import is linked from the search page ("Many titles at once? Import a list"
+  below the empty field) instead of the headers of the lists overview and of a list, since
+  an import doesn't always go into a list
 - Lists: the system list "Followed shows" is set apart on a tinted box with a bell and
   the line "Automatic: all shows you follow"; its page explains that it fills itself, where
   to unfollow and links to the profile setting that hides it

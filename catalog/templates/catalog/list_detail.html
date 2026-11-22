@@ -11,7 +11,6 @@
     {% else %}
       <h1>{{ list.name }}</h1>
       <div class="list-header-links">
-        <a href="{% url 'imports:page' %}?list={{ list.pk }}">{% translate "Import" %}</a>
         <a href="{% url 'catalog:list_rename' list.pk %}">{% translate "Rename" %}</a>
         <a href="{% url 'catalog:list_delete' list.pk %}">{% translate "Delete" %}</a>
       </div>

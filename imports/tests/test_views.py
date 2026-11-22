@@ -1,8 +1,10 @@
 import pytest
 from django.urls import reverse
 
-from catalog import reset
+from catalog import reset, services
+from catalog.lists import add_to_list
 from catalog.models import WatchedMovie
+from conftest import load_tmdb_fixture
 from imports.models import Import, ImportLine
 
 PAGE = reverse("imports:page")
@@ -190,12 +192,18 @@ def test_reset_my_data_deletes_the_import(user):
 
 def test_links_to_the_import(auth_client, user):
     watchlist = user.lists.create(name="Watchlist")
+    family = user.lists.create(name="Family")
+    add_to_list(family, services.save_title("movie", load_tmdb_fixture("movie_155"), "de-DE").title)
 
-    assert PAGE in auth_client.get(reverse("catalog:lists")).content.decode()
+    assert PAGE in auth_client.get(reverse("catalog:search")).content.decode()
+    # An empty list offers the import with the list preselected
     assert (
         f"{PAGE}?list={watchlist.pk}"
         in auth_client.get(watchlist.get_absolute_url()).content.decode()
     )
+    # No links in the lists' headers: an import doesn't always go into a list
+    assert PAGE not in auth_client.get(reverse("catalog:lists")).content.decode()
+    assert PAGE not in auth_client.get(family.get_absolute_url()).content.decode()
 
 
 @pytest.fixture
