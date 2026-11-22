@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0-rc.1] - 2026-11-22
+
 ### Added
 - Detail pages link to the title's page on TMDB ("View movie on TMDB" or "View show on
   TMDB", in the language for movie/show information)

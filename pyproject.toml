@@ -1,6 +1,6 @@
 [project]
 name = "couchowl"
-version = "1.0.0"
+version = "1.1.0-rc.1"
 description = "Self-hosted watchlist for movies and TV shows, powered by TMDB"
 readme = "README.md"
 license = "AGPL-3.0-or-later"
