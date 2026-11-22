@@ -104,6 +104,7 @@ async function refreshIfOutdated() {
 
 window.addEventListener("pageshow", (event) => {
   const navigation = performance.getEntriesByType("navigation")[0];
+  leaving = false; // back from the bfcache: the page was left, but is shown again
   syncZoom(); // reloaded or came back (forward) to an open zoom dialog
   if (event.persisted) {
     // Restored from the bfcache with the spinner still running: reset it
@@ -144,14 +145,27 @@ function showZoom(link) {
   }
   if (!dialog.open) {
     dialog.showModal();
+    addEventListener("beforeunload", markLeaving);
   }
 }
+
+// Leaving the page (e.g. a reload) closes an open dialog too: Chrome fires "close" after
+// "beforeunload". Going back then would cancel the reload or follow it. The listener only
+// exists while a dialog is open (beforeunload listeners can keep pages out of the bfcache).
+let leaving = false;
+function markLeaving() {
+  leaving = true;
+}
+
+// Dialogs closed because the history moved on (back button): their entry is already left
+const closedByHistory = new WeakSet();
 
 // Open or close the dialogs to match the current history entry
 function syncZoom() {
   const zoom = history.state?.zoom;
   for (const dialog of document.querySelectorAll("dialog.zoom-dialog[open]")) {
     if (dialog.id !== zoom) {
+      closedByHistory.add(dialog);
       dialog.close();
     }
   }
@@ -176,11 +190,19 @@ document.addEventListener("click", (event) => {
   event.target.closest("dialog.zoom-dialog")?.close();
 });
 
-// Closed by click or Esc: leave the dialog's history entry (back closes it on its own)
+// Closed by click or Esc: leave the dialog's history entry. "close" arrives asynchronously:
+// after a quick back and forward, the dialog is open again when the back's "close" arrives.
 document.addEventListener(
   "close",
   (event) => {
-    if (event.target.matches?.("dialog.zoom-dialog") && history.state?.zoom === event.target.id) {
+    const dialog = event.target;
+    if (!dialog.matches?.("dialog.zoom-dialog")) {
+      return;
+    }
+    if (!dialog.open) {
+      removeEventListener("beforeunload", markLeaving);
+    }
+    if (!closedByHistory.delete(dialog) && !leaving && history.state?.zoom === dialog.id) {
       history.back();
     }
   },

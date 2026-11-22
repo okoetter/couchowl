@@ -509,7 +509,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   link opens the image itself. Opening adds a history entry (`history.pushState`), so the
   back button (Android, browser) closes the dialog instead of leaving the page; closing by
   click or Esc goes back that entry, so no dead entries pile up. The dialog is open exactly
-  while that entry is current (also after a reload or "forward"). htmx ignores the entry
+  while that entry is current (also after a reload or "forward"). Only closes by the user
+  go back: not those following the history (the asynchronous `close` event can arrive
+  after a quick back and forward) and not those of a page being left (Chrome closes the
+  dialog after `beforeunload`; going back would cancel a reload). htmx ignores the entry
   (it only restores its own entries, marked `htmx: true`).
 - Titles are read-only in the Django admin (the data belongs to TMDB).
 - JustWatch was rejected as a data source: no official API, and its terms forbid
