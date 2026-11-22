@@ -38,7 +38,7 @@
         <hgroup>
           <h1>{{ translation.name }}</h1>
           <p>
-            {{ title.get_media_type_display }}{% if title.year %} · {{ title.year }}{% endif %}{% if title.status %} · {{ title.status_label }}{% endif %}{% rating title votes=True as stars %}{% if stars %} · {{ stars }}{% endif %}
+            {% certification title region as age_rating %}{{ title.get_media_type_display }}{% if title.year %} · {{ title.year }}{% endif %}{% if age_rating %} · {{ age_rating }}{% endif %}{% if title.status %} · {{ title.status_label }}{% endif %}{% rating title votes=True as stars %}{% if stars %} · {{ stars }}{% endif %}
             {% if title.original_title != translation.name %}<br>{{ title.original_title }}{% endif %}
           </p>
         </hgroup>

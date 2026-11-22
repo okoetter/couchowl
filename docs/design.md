@@ -243,6 +243,20 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
     Without dates for the region but a future release elsewhere: "Comes out on … (date for
     Germany not known yet)". Titles get the dates on their next reload.
   Rejected: always showing the networks in the subtitle line (redundant once offers exist).
+- **Age ratings** on detail pages, for the user's region only, in the subtitle after the
+  year: a small framed label ("FSK 16", "PG-13", "TV-MA") with the country as tooltip (and
+  for screen readers). Every country has its own system (FSK in Germany, MPA and TV
+  Parental Guidelines in the US, BBFC in the UK, …) and the values can't be converted, so
+  the user's region decides, like for streaming providers. Germany gets the "FSK" prefix
+  (TMDB sends bare ages, "16", but everyone knows "FSK 16"); other regions show TMDB's value
+  as is. Without a rating for the region nothing is shown. Rejected: falling back to the
+  US rating (looks like a rating for the user's country, but means something else legally);
+  the FSK logos (trademarks; text only). Movies have ratings per release (TMDB's
+  `release_dates`, already loaded): the theatrical release counts, then limited
+  theatrical, digital, physical, TV, premiere, since a cut DVD version may be rated lower.
+  Shows have one rating per country (`append_to_response=content_ratings`). Stored per
+  region in `Title.certifications` like the providers (only regions with a rating);
+  titles get them on their next reload. Not shown in lists and search (for now).
 - TMDB statuses are translated ("Ended" → "Beendet").
 
 ### Batch import
@@ -441,8 +455,8 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Throttling:** at most 20 requests per second and process; on "429 Too Many Requests"
   the client waits (at most 10 s) and retries up to twice.
 - **One request per title:** details come with translations, seasons
-  (`append_to_response=season/1,…`, at most 20 per request), streaming providers and
-  ratings.
+  (`append_to_response=season/1,…`, at most 20 per request), streaming providers,
+  ratings and age ratings.
 - **Language fallback for titles and descriptions** (from the translations list): exact
   language (`de-AT`) → the language's main country (`de-DE`) → same language, other
   country → English → original title / empty description. TMDB returns no German
@@ -514,7 +528,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   `show_followed_list`.
 - `Invitation`: token, optional e-mail, note, `created_by`, `expires_at`, `used_by`.
 - `Title` (`tmdb_id` + `media_type`) with language-neutral data (dates, status, networks,
-  streaming providers, movie release dates per region, rating); `TitleTranslation` per language (name, description,
+  streaming providers, movie release dates and age ratings per region, rating); `TitleTranslation` per language (name, description,
   poster). `Season` and `Episode` (numbers, air dates, runtime) with translation tables.
 - `UserList` and `ListItem`.
 - `UserSeries`: user, show, `following`, `followed_at`, `status` ("watching" is set on the

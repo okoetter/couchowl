@@ -571,9 +571,13 @@ def sample_lists(fake_tmdb, user):
             translation["data"]["title"] = ""  # use the original title as name
         if index == 3:
             data["poster_path"] = None
+        # Age rating on the detail page ("FSK 16"); the release date itself is in the past
+        release = {"type": 3, "release_date": data["release_date"], "certification": "16"}
+        data["release_dates"] = {"results": [{"iso_3166_1": "DE", "release_dates": [release]}]}
         titles.append(services.save_title("movie", data, "de-DE").title)
     show = load_tmdb_fixture("tv_70523")
     show["poster_path"] = "/sample9.jpg"
+    show["content_ratings"] = {"results": [{"iso_3166_1": "DE", "rating": "16"}]}
     dark = services.save_title("tv", show, "de-DE", seasons=dark_seasons("de-DE")).title
     titles.append(dark)
     fake_tmdb.add_show(show)

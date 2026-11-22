@@ -20,7 +20,7 @@ def details_requests(fake, tmdb_id=70523):
         r
         for r in fake.requests
         if r.url.path == f"/3/tv/{tmdb_id}"
-        and r.url.params["append_to_response"] == tmdb.DETAILS_APPENDED
+        and r.url.params["append_to_response"] == tmdb.TV_DETAILS_APPENDED
     ]
 
 

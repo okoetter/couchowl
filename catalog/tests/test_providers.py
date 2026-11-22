@@ -208,6 +208,115 @@ def test_shows_have_no_release_dates(db):
     assert title.release_dates == {}
 
 
+# --- Age ratings -------------------------------------------------------------------------------
+
+
+def rated(release_type, day, certification):
+    return {**release(release_type, day), "certification": certification}
+
+
+def test_movie_age_ratings_per_region(db, settings):
+    settings.DEFAULT_REGION = "DE"
+    User.objects.create_user(username="anna", region="US")
+    User.objects.create_user(username="ben", region="CH")
+    data = load_tmdb_fixture("movie_155")
+    data["release_dates"] = {
+        "results": [
+            # The cinema release counts, not the cut DVD version or the premiere;
+            # releases without a rating are skipped
+            {
+                "iso_3166_1": "DE",
+                "release_dates": [
+                    rated(1, "2008-07-14", "18"),
+                    rated(3, "2008-08-21", ""),
+                    rated(3, "2008-08-20", "16"),
+                    rated(5, "2009-01-15", "12"),
+                ],
+            },
+            # No cinema release: the digital one is next in line
+            {
+                "iso_3166_1": "US",
+                "release_dates": [rated(6, "2009-05-01", "PG"), rated(4, "2008-12-09", "PG-13")],
+            },
+            {"iso_3166_1": "CH", "release_dates": [rated(3, "2008-08-21", "")]},
+            {"iso_3166_1": "GB", "release_dates": [rated(3, "2008-07-24", "12A")]},
+        ]
+    }
+
+    title = services.save_title("movie", data, "de-DE").title
+
+    # CH has no rating, nobody uses GB
+    assert title.certifications == {"DE": "16", "US": "PG-13"}
+
+
+def test_show_age_ratings_per_region(db, settings):
+    settings.DEFAULT_REGION = "DE"
+    User.objects.create_user(username="anna", region="AT")
+    data = load_tmdb_fixture("tv_70523")
+    data["content_ratings"] = {
+        "results": [
+            {"iso_3166_1": "DE", "rating": "16", "descriptors": []},
+            {"iso_3166_1": "AT", "rating": "", "descriptors": []},
+            {"iso_3166_1": "US", "rating": "TV-MA", "descriptors": []},
+        ]
+    }
+
+    title = services.save_title("tv", data, "de-DE").title
+
+    assert title.certifications == {"DE": "16"}
+
+
+def test_titles_without_age_ratings(db):
+    data = load_tmdb_fixture("tv_70523")
+    data.pop("content_ratings", None)
+
+    title = services.save_title("tv", data, "de-DE").title
+
+    assert title.certifications == {}
+
+
+@pytest.mark.parametrize(
+    ("region", "expected"),
+    [("DE", "FSK 16"), ("US", "PG-13"), ("AT", None)],
+)
+def test_detail_page_shows_the_age_rating_of_the_users_region(
+    auth_client, user, fake_tmdb, region, expected
+):
+    user.region = region
+    user.save()
+    data = load_tmdb_fixture("movie_155")
+    data["release_dates"] = {
+        "results": [
+            {"iso_3166_1": "DE", "release_dates": [rated(3, "2008-08-21", "16")]},
+            {"iso_3166_1": "US", "release_dates": [rated(3, "2008-07-18", "PG-13")]},
+        ]
+    }
+    fake_tmdb.add("/3/movie/155", json=data)
+
+    content = auth_client.get(reverse("catalog:title_detail", args=["movie", 155])).content
+    content = content.decode()
+
+    if expected:
+        assert f'<span aria-hidden="true">{expected}</span>' in content
+        assert 'class="certification"' in content
+    else:
+        assert 'class="certification"' not in content
+
+
+def test_age_rating_tooltip_names_the_country(auth_client, fake_tmdb):
+    data = load_tmdb_fixture("movie_155")
+    data["release_dates"] = {
+        "results": [{"iso_3166_1": "DE", "release_dates": [rated(3, "2008-08-21", "16")]}]
+    }
+    fake_tmdb.add("/3/movie/155", json=data)
+
+    content = auth_client.get(reverse("catalog:title_detail", args=["movie", 155])).content
+    content = content.decode()
+
+    assert 'title="Altersfreigabe (Deutschland)"' in content
+    assert "Altersfreigabe (Deutschland): FSK 16" in content  # for screen readers
+
+
 # --- Availability without offers ---------------------------------------------------------------
 
 TODAY = date(2026, 11, 21)

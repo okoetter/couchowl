@@ -253,6 +253,7 @@ def save_title(
             "networks": [n["name"] for n in data.get("networks") or [] if n.get("name")],
             "watch_providers": watch_providers(data, regions),
             "release_dates": release_dates(data, regions) if is_movie else {},
+            "certifications": certifications(data, regions, is_movie=is_movie),
             "vote_average": data.get("vote_average"),
             "vote_count": data.get("vote_count") or 0,
         },
@@ -318,6 +319,45 @@ def release_dates(data: dict, regions) -> dict[str, dict]:
                     break
         stored[region] = entry
     return stored
+
+
+# Which release's age rating counts for a movie, in this order: theatrical, limited
+# theatrical, digital, physical (DVD/Blu-ray), TV, premiere. A cut version can have a
+# lower rating than the original; the cinema release is what people usually mean.
+CERTIFICATION_RELEASE_TYPES = (3, 2, 4, 5, 6, 1)
+
+
+def certifications(data: dict, regions, *, is_movie: bool) -> dict[str, str]:
+    """The age ratings from a TMDB details response for `regions`: {"DE": "16"}.
+
+    Movies have them per release (`release_dates`, see CERTIFICATION_RELEASE_TYPES; of
+    several releases of one type the earliest counts), shows once per country
+    (`content_ratings`). Regions without a rating are left out.
+    """
+    if is_movie:
+        results = (data.get("release_dates") or {}).get("results") or []
+        by_region = {
+            entry.get("iso_3166_1"): _movie_certification(entry.get("release_dates") or [])
+            for entry in results
+        }
+    else:
+        results = (data.get("content_ratings") or {}).get("results") or []
+        by_region = {
+            entry.get("iso_3166_1"): (entry.get("rating") or "").strip() for entry in results
+        }
+    return {region: by_region[region] for region in sorted(regions) if by_region.get(region)}
+
+
+def _movie_certification(releases: list[dict]) -> str:
+    rated = [r for r in releases if (r.get("certification") or "").strip()]
+    for release_type in CERTIFICATION_RELEASE_TYPES:
+        of_type = sorted(
+            (r for r in rated if r.get("type") == release_type),
+            key=lambda r: r.get("release_date") or "",
+        )
+        if of_type:
+            return of_type[0]["certification"].strip()
+    return ""
 
 
 def watch_providers(data: dict, regions) -> dict[str, dict]:

@@ -41,6 +41,10 @@ class Title(models.Model):
     # {"DE": {"theatrical": "2027-03-12", "digital": "2027-05-28"}}; {} for a region =
     # no dates known there. See catalog.providers.availability.
     release_dates = models.JSONField(_("release dates"), default=dict, blank=True)
+    # Age rating per region as TMDB sends it (FSK in Germany, MPA/TV ratings in the US),
+    # only our users' regions and only where one is known: {"DE": "16", "US": "PG-13"}.
+    # See catalog.services.certifications and the template tag `certification`.
+    certifications = models.JSONField(_("age ratings"), default=dict, blank=True)
     # TMDB user rating: average of 0-10 and number of votes (see catalog.templatetags)
     vote_average = models.FloatField(_("TMDB rating"), null=True, blank=True)
     vote_count = models.PositiveIntegerField(_("TMDB votes"), default=0)

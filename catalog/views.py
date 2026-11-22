@@ -445,6 +445,7 @@ def title_detail(request, media_type, tmdb_id):
             None if offers else providers.availability(title, region, timezone.localdate())
         ),
         "tmdb_link": title.tmdb_url(request.user.effective_tmdb_language),
+        "region": region,
         "region_name": country_name(region, get_language()),
         **_menu_context(request, media_type, tmdb_id, title),
     }

@@ -33,7 +33,9 @@ def test_details_include_all_translations(fake_tmdb):
     data = tmdb.get_client().details("tv", 70523, "de-AT")
 
     assert data["original_name"] == "Dark"
-    assert fake_tmdb.requests[0].url.params["append_to_response"] == tmdb.DETAILS_APPENDED
+    appended = fake_tmdb.requests[0].url.params["append_to_response"]
+    assert appended == tmdb.TV_DETAILS_APPENDED
+    assert {"translations", "watch/providers", "content_ratings"} <= set(appended.split(","))
 
 
 def test_movie_details_include_release_dates(fake_tmdb):

@@ -1147,6 +1147,18 @@ svg.play-icon {
   margin: 0;
 }
 
+/* Age rating in the subtitle, framed like the labels on cinema posters: "FSK 16" */
+.certification {
+  display: inline-block;
+  padding: 0 0.3em;
+  border: 1px solid currentcolor;
+  border-radius: calc(var(--pico-border-radius) / 2);
+  font-size: 0.85em;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: help;
+}
+
 .title-detail-actions {
   display: flex;
   flex-wrap: wrap;
