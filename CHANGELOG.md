@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Detail pages without streaming offers in the user's region say why: a show that hasn't
   started names its start date and network ("Starts on … on Prime Video"), a running show
   its original broadcaster, a movie its theatrical and digital release in the region
+- Show pages: a partly watched season shows a light green check
 
 ### Changed
 - Lists: the system list "Followed shows" is set apart on a tinted box with a bell and

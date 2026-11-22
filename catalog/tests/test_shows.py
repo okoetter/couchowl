@@ -504,6 +504,25 @@ def test_mark_and_unmark_season(auth_client, user, show):
     assert not WatchedEpisode.objects.exists()
 
 
+def test_partly_watched_season_has_a_mixed_check(auth_client, user, show):
+    def season_button(content, number):
+        return content.split(f'id="season-{number}-toggle"')[1].split("</form>")[0]
+
+    content = auth_client.post(episode_url(1, 1), {"action": "mark"}, headers=HTMX)
+    content = content.content.decode()  # the episode answer updates the season check too
+
+    assert 'aria-pressed="mixed"' in season_button(content, 1)
+    assert "Teilweise gesehen" in season_button(content, 1)
+
+    content = auth_client.get(show.get_absolute_url()).content.decode()
+    assert 'aria-pressed="mixed"' in season_button(content, 1)
+    assert 'aria-pressed="false"' in season_button(content, 2)
+
+    shows.mark_season(user, show.seasons.get(number=1))
+    content = auth_client.get(show.get_absolute_url()).content.decode()
+    assert 'aria-pressed="true"' in season_button(content, 1)
+
+
 def test_mark_whole_show_as_not_watched(auth_client, user, show):
     url = reverse("catalog:show_unwatched", args=[70523])
     assert url not in auth_client.get(show.get_absolute_url()).content.decode()

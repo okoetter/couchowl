@@ -1316,6 +1316,13 @@ button.check-button {
   --pico-color: #fff;
 }
 
+/* Partly watched season: a light green check, so it stands apart from both */
+.check-button[aria-pressed="mixed"] {
+  --pico-background-color: color-mix(in srgb, var(--pico-ins-color) 20%, transparent);
+  --pico-border-color: color-mix(in srgb, var(--pico-ins-color) 60%, transparent);
+  --pico-color: var(--pico-ins-color);
+}
+
 /* Not aired yet: a dashed circle, nothing to click */
 .check-button-upcoming {
   border: 1px dashed var(--pico-muted-border-color);

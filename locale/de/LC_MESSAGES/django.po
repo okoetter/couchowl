@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:51+0100\n"
+"POT-Creation-Date: 2026-11-22 12:19+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -575,8 +575,8 @@ msgstr "Du hast schon eine Liste mit diesem Namen."
 msgid "Watched on"
 msgstr "Gesehen am"
 
-#: catalog/forms.py:43 catalog/templates/catalog/_seasons.html:79
-#: catalog/templates/catalog/_seasons.html:159
+#: catalog/forms.py:43 catalog/templates/catalog/_seasons.html:80
+#: catalog/templates/catalog/_seasons.html:160
 #: catalog/templates/catalog/title_detail.html:121
 msgid "Date unknown"
 msgstr "Datum unbekannt"
@@ -993,35 +993,39 @@ msgid "Mark “%(name)s” as not watched"
 msgstr "„%(name)s“ als nicht gesehen markieren"
 
 #: catalog/templates/catalog/_seasons.html:27
-#: catalog/templates/catalog/_seasons.html:112
+#: catalog/templates/catalog/_seasons.html:113
 #: catalog/templates/catalog/_watched_button.html:28
 #: catalog/templates/catalog/_watched_button.html:49
 msgid "Watched – click to undo"
 msgstr "Gesehen – zum Rückgängigmachen klicken"
 
-#: catalog/templates/catalog/_seasons.html:33
+#: catalog/templates/catalog/_seasons.html:34
 #: catalog/templates/catalog/_watched_button.html:52
 #, python-format
 msgid "Mark “%(name)s” as watched"
 msgstr "„%(name)s“ als gesehen markieren"
 
-#: catalog/templates/catalog/_seasons.html:34
+#: catalog/templates/catalog/_seasons.html:35
+msgid "Partly watched – click to mark all aired episodes"
+msgstr "Teilweise gesehen – klicken, um alle ausgestrahlten Folgen zu markieren"
+
+#: catalog/templates/catalog/_seasons.html:35
 msgid "Mark all aired episodes as watched"
 msgstr "Alle ausgestrahlten Folgen als gesehen markieren"
 
-#: catalog/templates/catalog/_seasons.html:38
-#: catalog/templates/catalog/_seasons.html:123
+#: catalog/templates/catalog/_seasons.html:39
+#: catalog/templates/catalog/_seasons.html:124
 msgid "Not aired yet"
 msgstr "Noch nicht ausgestrahlt"
 
-#: catalog/templates/catalog/_seasons.html:48
+#: catalog/templates/catalog/_seasons.html:49
 #, python-format
 msgid "%(counter)s episode"
 msgid_plural "%(counter)s episodes"
 msgstr[0] "%(counter)s Folge"
 msgstr[1] "%(counter)s Folgen"
 
-#: catalog/templates/catalog/_seasons.html:50
+#: catalog/templates/catalog/_seasons.html:51
 #: catalog/templates/catalog/_watched_badge.html:20
 #: catalog/templates/catalog/search.html:45
 #: catalog/templates/catalog/title_detail.html:113 catalog/views.py:210
@@ -1029,79 +1033,79 @@ msgstr[1] "%(counter)s Folgen"
 msgid "Watched"
 msgstr "Gesehen"
 
-#: catalog/templates/catalog/_seasons.html:52
+#: catalog/templates/catalog/_seasons.html:53
 #, python-format
 msgid "%(watched)s/%(aired)s watched"
 msgstr "%(watched)s/%(aired)s gesehen"
 
-#: catalog/templates/catalog/_seasons.html:55
+#: catalog/templates/catalog/_seasons.html:56
 #, python-format
 msgid "last on %(date)s"
 msgstr "zuletzt am %(date)s"
 
-#: catalog/templates/catalog/_seasons.html:66
+#: catalog/templates/catalog/_seasons.html:67
 msgid "Show episodes"
 msgstr "Folgen anzeigen"
 
-#: catalog/templates/catalog/_seasons.html:75
+#: catalog/templates/catalog/_seasons.html:76
 msgid "Season watched"
 msgstr "Staffel gesehen"
 
-#: catalog/templates/catalog/_seasons.html:77
+#: catalog/templates/catalog/_seasons.html:78
 #: catalog/templates/catalog/title_detail.html:119
 #, python-format
 msgid "on %(date)s"
 msgstr "am %(date)s"
 
-#: catalog/templates/catalog/_seasons.html:81
-#: catalog/templates/catalog/_seasons.html:161
+#: catalog/templates/catalog/_seasons.html:82
+#: catalog/templates/catalog/_seasons.html:162
 #: catalog/templates/catalog/title_detail.html:123
 msgid "change"
 msgstr "ändern"
 
-#: catalog/templates/catalog/_seasons.html:90
+#: catalog/templates/catalog/_seasons.html:91
 msgid "Applies to all episodes of this season."
 msgstr "Gilt für alle Folgen dieser Staffel."
 
-#: catalog/templates/catalog/_seasons.html:91
-#: catalog/templates/catalog/_seasons.html:171
+#: catalog/templates/catalog/_seasons.html:92
+#: catalog/templates/catalog/_seasons.html:172
 #: catalog/templates/catalog/title_detail.html:134
 msgid "Save date"
 msgstr "Datum speichern"
 
-#: catalog/templates/catalog/_seasons.html:111
+#: catalog/templates/catalog/_seasons.html:112
 #, python-format
 msgid "Mark %(code)s as not watched"
 msgstr "%(code)s als nicht gesehen markieren"
 
-#: catalog/templates/catalog/_seasons.html:116
+#: catalog/templates/catalog/_seasons.html:117
 #: catalog/templates/catalog/_watched_button.html:34
 #: core/templates/core/dashboard.html:56
 #, python-format
 msgid "Mark %(code)s as watched"
 msgstr "%(code)s als gesehen markieren"
 
-#: catalog/templates/catalog/_seasons.html:117
+#: catalog/templates/catalog/_seasons.html:118
 #: catalog/templates/catalog/_watched_button.html:53
 #: catalog/templates/catalog/title_detail.html:150
 msgid "Mark as watched"
 msgstr "Als gesehen markieren"
 
-#: catalog/templates/catalog/_seasons.html:144
+#: catalog/templates/catalog/_seasons.html:145
 msgid "Air date unknown"
 msgstr "Termin unbekannt"
 
-#: catalog/templates/catalog/_seasons.html:148
+#: catalog/templates/catalog/_seasons.html:149
 #, python-format
 msgid "Airs on %(date)s"
 msgstr "Erscheint am %(date)s"
 
-#: catalog/templates/catalog/_seasons.html:150
+#: catalog/templates/catalog/_seasons.html:151
 #, python-format
 msgid "%(minutes)s min"
 msgstr "%(minutes)s Min."
 
-#: catalog/templates/catalog/_seasons.html:154
+#: catalog/templates/catalog/_seasons.html:155
 msgid "Change date"
 msgstr "Datum ändern"
 
@@ -1374,7 +1378,8 @@ msgstr "Noch kein Starttermin bekannt."
 #, python-format
 msgid ""
 "In cinemas in %(region_name)s on %(theatrical)s, digital from %(digital)s."
-msgstr "Kinostart in %(region_name)s am %(theatrical)s, digital ab %(digital)s."
+msgstr ""
+"Kinostart in %(region_name)s am %(theatrical)s, digital ab %(digital)s."
 
 #: catalog/templates/catalog/title_detail.html:204
 #, python-format
@@ -1397,7 +1402,8 @@ msgstr "Streaming-Angebote folgen meist zum digitalen Start."
 #: catalog/templates/catalog/title_detail.html:211
 #, python-format
 msgid "Comes out on %(starts)s (date for %(region_name)s not known yet)."
-msgstr "Erscheint am %(starts)s (Termin für %(region_name)s noch nicht bekannt)."
+msgstr ""
+"Erscheint am %(starts)s (Termin für %(region_name)s noch nicht bekannt)."
 
 #: catalog/templates/catalog/title_detail.html:213
 msgid "No release date known yet."

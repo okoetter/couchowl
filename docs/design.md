@@ -143,7 +143,9 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
 - **Seasons:** marking a season marks all its aired episodes; already watched ones keep
   their date. A season shows the date of its last watched episode; once complete, its date
   can be changed for all its episodes. Unmarking a whole season asks first (a misclick
-  would delete all dates).
+  would delete all dates). A partly watched season shows a light green check
+  (`aria-pressed="mixed"`), so started seasons stand out without opening them; a click
+  still marks the rest.
 - **A whole show** can be marked as not watched: "Mark all as not watched" under the
   progress line of the show page (as soon as one episode is watched, so it also works
   after a new episode has aired) and the check mark of a completely watched show in

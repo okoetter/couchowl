@@ -28,10 +28,11 @@
               <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </button>
           {% elif season.aired_count %}
+            {# Partly watched: "mixed" (screen readers: "partially pressed"), a light green check #}
             <input type="hidden" name="action" value="mark">
-            <button type="submit" class="check-button" aria-pressed="false"
+            <button type="submit" class="check-button" aria-pressed="{% if season.started %}mixed{% else %}false{% endif %}"
                     aria-label="{% blocktranslate with name=season.name %}Mark “{{ name }}” as watched{% endblocktranslate %}"
-                    title="{% translate 'Mark all aired episodes as watched' %}">
+                    title="{% if season.started %}{% translate 'Partly watched – click to mark all aired episodes' %}{% else %}{% translate 'Mark all aired episodes as watched' %}{% endif %}">
               <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </button>
           {% else %}
