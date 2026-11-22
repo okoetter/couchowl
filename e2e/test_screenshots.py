@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from conftest import dark_seasons, load_tmdb_fixture, tiny_png
-from e2e.conftest import LOCALE, login
+from e2e.conftest import LOCALE, login, wait_for_htmx
 
 pytestmark = pytest.mark.e2e
 
@@ -118,6 +118,7 @@ def show_list_compact(page, url):
     show_list_grid(page, url)
     page.get_by_role("button", name="Kompakte Liste").click()
     page.locator(".compact-list").wait_for()
+    wait_for_htmx(page)
     page.wait_for_load_state("networkidle")
 
 

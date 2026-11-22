@@ -38,6 +38,16 @@ def login(page, base_url, username, password=PASSWORD, *, expect_success=True):
         page.wait_for_load_state()
 
 
+def wait_for_htmx(page):
+    """Wait until htmx has finished its swap. Right after a swap, new elements with the id
+    of an old one still carry the old one's attributes for ~20 ms (htmx "settles" them, for
+    CSS transitions): e.g. the bell keeps the grid's class `follow-toggle-corner` when
+    switching to the compact list."""
+    page.wait_for_function(
+        "!document.querySelector('.htmx-request, .htmx-swapping, .htmx-settling')"
+    )
+
+
 # The browser reports German, so new users get region DE and a German interface
 # (the tests look for German texts). Used by the `page` fixture of pytest-playwright.
 LOCALE = "de-DE"

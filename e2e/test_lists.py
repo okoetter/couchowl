@@ -140,28 +140,29 @@ def test_compact_list_text_stays_left_of_the_buttons_on_phones(
     from e2e.test_screenshots import sample_lists, show_list_compact
 
     sample_lists(fake_tmdb, member)
-    context = browser.new_context(
+    # "with" closes the context even when an assertion fails, so its page can't disturb
+    # the next tests
+    with browser.new_context(
         locale=LOCALE, viewport={"width": width, "height": 800}, is_mobile=True, has_touch=True
-    )
-    page = context.new_page()
-    show_list_compact(page, live_server.url)
-    page.add_style_tag(content=f"html {{ font-size: {text_size} !important; }}")
+    ) as context:
+        page = context.new_page()
+        show_list_compact(page, live_server.url)
+        page.add_style_tag(content=f"html {{ font-size: {text_size} !important; }}")
 
-    rows = page.evaluate(
-        """() => [...document.querySelectorAll('.compact-list li')].map(li => ({
-          name: li.querySelector('strong').firstChild.textContent.trim(),
-          textEnd: li.querySelector('.result-link > div').getBoundingClientRect().right,
-          buttonStart: li.querySelector('form').getBoundingClientRect().left,
-        }))"""
-    )
-    assert any(row["name"] == "Dark" for row in rows)
-    for row in rows:
-        assert row["textEnd"] <= row["buttonStart"], row["name"]
-    overflow = page.evaluate(
-        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
-    )
-    assert overflow == 0
-    context.close()
+        rows = page.evaluate(
+            """() => [...document.querySelectorAll('.compact-list li')].map(li => ({
+              name: li.querySelector('strong').firstChild.textContent.trim(),
+              textEnd: li.querySelector('.result-link > div').getBoundingClientRect().right,
+              buttonStart: li.querySelector('form').getBoundingClientRect().left,
+            }))"""
+        )
+        assert any(row["name"] == "Dark" for row in rows)
+        for row in rows:
+            assert row["textEnd"] <= row["buttonStart"], row["name"]
+        overflow = page.evaluate(
+            "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+        )
+        assert overflow == 0
 
 
 def test_bell_on_the_poster_follows_and_unfollows(live_server, member, page, fake_tmdb):
