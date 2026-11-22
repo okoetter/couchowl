@@ -94,10 +94,20 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   import) took one click and one question per season on the show page.
   Unwatched buttons in the grid (movies and shows) only appear on hover, focus or touch
   devices, to keep the grid calm; the bar and "▶ S1 E3" show a show's progress anyway.
-- **Followed shows are marked in lists** with a bell (the icon of the Follow button on the
-  show page): after the name (compact) or in the top left corner of the poster (grid),
-  only for display; following and unfollowing stay on
-  the show page. Not in the system list "Followed shows", where every show has it.
+- **Bell in lists: follow and unfollow** (shows only), with the icon of the Follow button
+  on the show page. Filled = following, empty = not following (shape, not only color).
+  Grid: round button in the top left corner of the poster, like the check on the right;
+  with a mouse an unfollowed show's bell only appears on hover (like the empty check),
+  touch devices always show it. Compact: a round button left of the check. Hidden in
+  edit mode. The answer is just the bell; the first watched episode follows a show, so
+  the check's answer updates the bell too (`hx-swap-oob`). Also in "Followed shows":
+  an unfollowed show stays on the page until it is loaded again (empty bell), so a
+  misclick takes one more click instead of a trip to the show page; no question, as
+  unfollowing keeps all watched data.
+  Earlier the bell only marked followed shows (after the name, compact) and following
+  and unfollowing needed the show page; unfollowing (dropped or ended shows) is the
+  common manual step, because watching the first episode already follows.
+  Rejected: only unfollowing in lists (no empty bells on phones, but asymmetric).
 - **Removing titles: edit mode.** "Edit" next to the layout toggle swaps every watched
   button for a red trash button (same place, both views) and shows a hint that watched
   data stays; "Done" ends it. Filters and the layout toggle keep the mode. It is only a
@@ -105,7 +115,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   parameter. Earlier each compact row had a "×" next to the check: two buttons per row
   took room from the text and it wasn't clear which one did what; the grid had no way to
   remove at all. Without JavaScript nothing can be removed from a list (like the toasts).
-  Not in "Followed shows" (unfollow on the show page).
+  Not in "Followed shows" (unfollow with the bell).
   A tap removes right away; the toast "“Heat” removed · Undo" brings the entry back with
   its old date, so at its old place (the form carries title and date as hidden fields).
   Rejected: collecting removals and saving them with "Done": leaving the page without
@@ -119,7 +129,7 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   in the accent color (no separator line) with the bell after the name and the line
   "Automatic: all shows you follow"; the box reaches into the page margin as far as the
   hover tint of the other lists, so names stay aligned with them. Its page has the bell after the heading and a note instead
-  of the rename/delete links ("Contains every show you follow. Unfollow on the show's page
+  of the rename/delete links ("Contains every show you follow. Unfollow with the bell
   · hide in your profile"). Rejected: a pill "automatic" (too short to be clear; longer
   texts wrap on phones), a bell before the name (the name no longer lines up), a gray box
   (looks disabled), headings "Automatic" / "Own lists" (heavy for a single entry).

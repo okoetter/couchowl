@@ -1,0 +1,30 @@
+{% load i18n %}
+{% comment %}
+  Bell on the list page (shows only): follows or unfollows the show, like the Follow
+  button on the show page. Filled bell = following. `corner`: on the poster (grid view),
+  top left. The server answers with just this button (catalog.views.list_item_follow);
+  `oob`: updated by its id after a click on the check (the first watched episode follows).
+  Compact view: a round button like the check. Grid: like the check on the poster; with
+  a mouse, an unfollowed show's bell only appears on hover (CSS).
+{% endcomment %}
+{% if not item.title.is_movie %}
+  <form method="post" id="follow-toggle-{{ item.pk }}"
+        class="follow-toggle{% if corner %} follow-toggle-corner{% endif %}"
+        action="{% url 'catalog:list_item_follow' list.pk item.pk %}{{ filter_query }}"
+        hx-post="{% url 'catalog:list_item_follow' list.pk item.pk %}{{ filter_query }}"
+        hx-target="this" hx-swap="outerHTML"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% csrf_token %}
+    {% if item.following %}
+      <button type="submit" class="{% if corner %}icon-button{% else %}check-button{% endif %}" aria-pressed="true"
+              aria-label="{% blocktranslate %}Unfollow “{{ name }}”{% endblocktranslate %}"
+              title="{% translate 'Click to unfollow' %}">
+    {% else %}
+      <input type="hidden" name="following" value="1">
+      <button type="submit" class="{% if corner %}icon-button{% else %}check-button{% endif %}" aria-pressed="false"
+              aria-label="{% blocktranslate %}Follow “{{ name }}”{% endblocktranslate %}"
+              title="{% translate 'Follow' %}">
+    {% endif %}
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+    </button>
+  </form>
+{% endif %}

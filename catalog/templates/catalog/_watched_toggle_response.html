@@ -1,8 +1,10 @@
 {% comment %}
   Answer to the watched button on the list page: the new button replaces the old one.
-  The text below the title (both views) and the progress bar on the poster (grid) are
-  updated too ("out of band": htmx puts them in place by their id).
+  The text below the title (both views), the progress bar on the poster (grid) and the
+  bell (the first watched episode follows a show) are updated too ("out of band": htmx
+  puts them in place by their id).
 {% endcomment %}
 {% include "catalog/_watched_button.html" %}
 {% include "catalog/_watched_badge.html" with oob=True %}
 {% if corner %}{% include "catalog/_poster_progress.html" with oob=True %}{% endif %}
+{% include "catalog/_follow_button.html" with oob=True %}

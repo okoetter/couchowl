@@ -18,7 +18,7 @@
         <li class="list-index-system">
           <a href="{{ followed.get_absolute_url }}">
             <span class="list-index-name">
-              <strong>{{ followed.name }} {% include "catalog/_followed_icon.html" with decorative=True %}</strong>
+              <strong>{{ followed.name }} {% include "catalog/_followed_icon.html" %}</strong>
               <small>{% translate "Automatic: all shows you follow" %}</small>
             </span>
             <small>{% blocktranslate count counter=followed.item_count %}{{ counter }} show{% plural %}{{ counter }} shows{% endblocktranslate %}</small>

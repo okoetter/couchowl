@@ -570,7 +570,7 @@ button.danger.outline,
   margin-top: 0.15rem;
 }
 
-/* Bell after the name of a followed show (lists) */
+/* Bell after the name "Followed shows" (lists page, heading of the list) */
 svg.followed-icon {
   width: 0.95em;
   height: 0.95em;
@@ -776,7 +776,7 @@ details.dropdown.list-dropdown-compact > summary + ul {
   display: none;
 }
 
-#list-content.is-editing .watched-toggle {
+#list-content.is-editing :is(.watched-toggle, .follow-toggle) {
   display: none;
 }
 
@@ -887,24 +887,6 @@ button.remove-button:is(:hover, :focus-visible) {
   background: var(--pico-muted-border-color);
 }
 
-.followed-badge {
-  position: absolute;
-  top: 0.35rem;
-  left: 0.35rem;
-  display: grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 50%;
-  background: rgb(0 0 0 / 55%);
-}
-
-.followed-badge svg.followed-icon {
-  width: 0.9rem;
-  height: 0.9rem;
-  color: #fff;
-}
-
 /* Thin bar along the bottom edge; dark track so it shows on light and dark posters */
 .poster-progress progress {
   position: absolute;
@@ -978,8 +960,8 @@ svg.play-icon {
 }
 
 /* No border: the background alone shows the state. No transform: scaling makes the
-   edges look soft. */
-.watched-toggle-corner button {
+   edges look soft. Same for the bell (top left). */
+:is(.watched-toggle-corner, .follow-toggle-corner) button {
   --size: 2rem;
   display: grid;
   place-items: center;
@@ -996,18 +978,19 @@ svg.play-icon {
 }
 
 /* Unwatched: dimmed check, so it differs from a watched one even without color */
-.watched-toggle-corner button[aria-pressed="false"] {
+:is(.watched-toggle-corner, .follow-toggle-corner) button[aria-pressed="false"] {
   --pico-background-color: rgb(0 0 0 / 55%);
   --pico-color: rgb(255 255 255 / 55%);
 }
 
 /* Hovering the button itself: a bit larger and lighter, in its current state */
-.poster-grid .watched-toggle-corner button:is(:hover, :focus-visible) {
+.poster-grid :is(.watched-toggle-corner, .follow-toggle-corner) button:is(:hover, :focus-visible) {
   --size: 2.25rem;
   box-shadow: none;
 }
 
-.poster-grid .watched-toggle-corner button[aria-pressed="false"]:is(:hover, :focus-visible) {
+.poster-grid :is(.watched-toggle-corner, .follow-toggle-corner) button[aria-pressed="false"]:is(:hover, :focus-visible),
+.poster-grid .follow-toggle-corner button[aria-pressed="true"]:is(:hover, :focus-visible) {
   /* Lighter than normal, but still dark enough for the white check on light posters */
   --pico-background-color: rgb(95 95 95 / 85%);
   --pico-color: #fff;
@@ -1017,18 +1000,59 @@ svg.play-icon {
   --pico-background-color: color-mix(in srgb, var(--pico-ins-color) 75%, #fff);
 }
 
-/* With a mouse, the empty circle only appears on hover (calmer grid); watched titles
-   always show their check mark. Touch devices have no hover, so they always show it.
+/* With a mouse, the empty circle (and an unfollowed show's bell) only appears on hover
+   (calmer grid); watched titles always show their check mark, followed shows their bell.
+   Touch devices have no hover, so they always show it.
    Keyboard users see it when the entry has focus. */
 @media (hover: hover) {
-  .watched-toggle-corner button[aria-pressed="false"] {
+  :is(.watched-toggle-corner, .follow-toggle-corner) button[aria-pressed="false"] {
     opacity: 0;
   }
 
-  .poster-grid li:hover .watched-toggle-corner button,
-  .poster-grid li:focus-within .watched-toggle-corner button {
+  .poster-grid li:hover :is(.watched-toggle-corner, .follow-toggle-corner) button,
+  .poster-grid li:focus-within :is(.watched-toggle-corner, .follow-toggle-corner) button {
     opacity: 1;
   }
+}
+
+/* ---- Bell on the list page: follow / unfollow a show ---------------------------- */
+
+/* Filled bell = following; an empty one = not following (shape, not only color) */
+.follow-toggle {
+  margin: 0;
+}
+
+.follow-toggle button {
+  --pico-background-color: transparent;
+  --pico-border-color: var(--pico-secondary-border);
+  --pico-color: var(--pico-secondary);
+}
+
+.follow-toggle button[aria-pressed="true"] {
+  --pico-background-color: transparent;
+  --pico-border-color: var(--pico-primary);
+  --pico-color: var(--pico-primary);
+}
+
+.follow-toggle button svg.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.follow-toggle button[aria-pressed="true"] svg.icon {
+  fill: currentColor;
+}
+
+/* Grid: top left on the poster, white on the dark circle like the check */
+.follow-toggle-corner {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+}
+
+.follow-toggle-corner button[aria-pressed="true"] {
+  --pico-background-color: rgb(0 0 0 / 55%);
+  --pico-color: #fff;
 }
 
 /* ---- List toolbar: filters and layout toggle ----------------------------------- */

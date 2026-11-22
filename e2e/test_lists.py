@@ -132,9 +132,9 @@ def test_edit_mode(live_server, member, page, fake_tmdb):
 def test_compact_list_text_stays_left_of_the_buttons_on_phones(
     live_server, member, browser, fake_tmdb, width, text_size
 ):
-    """The text (title with the bell, "Show · 2017 · ★ 8,4", "Next: S2 E3" and the
-    progress bar) wraps instead of running under the round button, and the links above
-    the list wrap instead of widening the page.
+    """The text (title, "Show · 2017 · ★ 8,4", "Next: S2 E3" and the progress bar) wraps
+    instead of running under the round buttons (bell and check), and the links above the
+    list wrap instead of widening the page.
     (Larger text like Android's font size setting, see test_shows.py.)
     """
     from e2e.test_screenshots import sample_lists, show_list_compact
@@ -151,7 +151,7 @@ def test_compact_list_text_stays_left_of_the_buttons_on_phones(
         """() => [...document.querySelectorAll('.compact-list li')].map(li => ({
           name: li.querySelector('strong').firstChild.textContent.trim(),
           textEnd: li.querySelector('.result-link > div').getBoundingClientRect().right,
-          buttonStart: li.querySelector('.watched-toggle').getBoundingClientRect().left,
+          buttonStart: li.querySelector('form').getBoundingClientRect().left,
         }))"""
     )
     assert any(row["name"] == "Dark" for row in rows)
@@ -162,6 +162,35 @@ def test_compact_list_text_stays_left_of_the_buttons_on_phones(
     )
     assert overflow == 0
     context.close()
+
+
+def test_bell_on_the_poster_follows_and_unfollows(live_server, member, page, fake_tmdb):
+    """With a mouse, an unfollowed show's bell appears on hover; filled, it stays."""
+    from catalog import shows
+    from catalog.models import Title
+    from e2e.test_screenshots import sample_lists, show_list_grid
+
+    sample_lists(fake_tmdb, member)
+    shows.set_following(member, Title.objects.get(tmdb_id=70523), False)
+    show_list_grid(page, live_server.url)
+    follow = page.get_by_role("button", name="„Dark“ folgen")
+    unfollow = page.get_by_role("button", name="„Dark“ nicht mehr folgen")
+    expect(follow).to_have_css("opacity", "0")
+
+    follow.hover()
+    expect(follow).to_have_css("opacity", "1")
+    follow.click()
+    expect(unfollow).to_have_attribute("aria-pressed", "true")
+    page.mouse.move(0, 0)
+    expect(unfollow).to_have_css("opacity", "1")
+    assert shows.is_following(member, Title.objects.get(tmdb_id=70523))
+
+    unfollow.click()
+    expect(follow).to_have_attribute("aria-pressed", "false")
+    assert not shows.is_following(member, Title.objects.get(tmdb_id=70523))
+    # The edit mode shows the trash buttons instead
+    page.get_by_role("button", name="Bearbeiten").click()
+    expect(follow).to_be_hidden()
 
 
 def test_poster_opens_large_on_the_detail_page(live_server, member, page, fake_tmdb):

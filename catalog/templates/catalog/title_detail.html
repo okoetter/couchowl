@@ -53,7 +53,7 @@
         {% if not title.is_movie %}
           {% partialdef follow inline %}
             {# Follow / Following: followed shows appear in the system list "Followed shows". #}
-            {# The bell also marks followed shows in lists (_followed_icon.html). #}
+            {# The bell in lists does the same (_follow_button.html). #}
             <form id="follow" method="post" action="{% url 'catalog:show_follow' title.tmdb_id %}"
                   hx-post="{% url 'catalog:show_follow' title.tmdb_id %}" hx-target="this" hx-swap="outerHTML">
               {% csrf_token %}

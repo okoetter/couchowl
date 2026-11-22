@@ -449,6 +449,9 @@ PAGES = {
     "list-grid-hover": show_list_grid_hover,
     "list-grid-hover-watched": show_list_grid_hover_watched,
     "list-grid-hover-show": show_list_grid_hover_show,
+    # "Dark" not followed: empty bell (grid: on hover, phones always; compact: always)
+    "list-grid-hover-show-unfollowed": show_list_grid_hover_show,
+    "list-compact-unfollowed": show_list_compact,
     "list-compact": show_list_compact,
     "list-grid-edit": show_list_grid_edit,
     "list-compact-edit": show_list_compact_edit,
@@ -609,6 +612,13 @@ def watch_dark(user):
         shows.mark_season(user, season)
 
 
+def unfollow_dark(user):
+    from catalog import shows
+    from catalog.models import Title
+
+    shows.set_following(user, Title.objects.get(tmdb_id=70523), False)
+
+
 def sample_dashboard(fake_tmdb, user):
     """More shows for the dashboard: one being watched, one waiting for its next episode,
     two with announced seasons."""
@@ -694,6 +704,8 @@ def test_screenshot(live_server, member, browser, fake_tmdb, name, device, schem
     sample_lists(fake_tmdb, member)
     if name.endswith("-complete"):
         watch_dark(member)
+    if name.endswith("-unfollowed"):
+        unfollow_dark(member)
     if name.startswith(("dashboard", "upcoming")):
         sample_dashboard(fake_tmdb, member)
     provider_logos(fake_tmdb)

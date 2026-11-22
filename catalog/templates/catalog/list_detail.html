@@ -7,7 +7,7 @@
   <div class="list-header">
     {# System lists ("Followed shows") are computed: nothing to rename or delete, a note says why #}
     {% if list.is_system %}
-      <h1>{{ list.name }} {% include "catalog/_followed_icon.html" with decorative=True %}</h1>
+      <h1>{{ list.name }} {% include "catalog/_followed_icon.html" %}</h1>
     {% else %}
       <h1>{{ list.name }}</h1>
       <div class="list-header-links">
@@ -21,7 +21,7 @@
     <p class="list-note">
       {% url 'accounts:profile' as profile_url %}
       {% blocktranslate trimmed %}
-        Contains every show you follow. Unfollow on the show's page ·
+        Contains every show you follow. Unfollow with the bell ·
         <a href="{{ profile_url }}#id_show_followed_list">hide in your profile</a>
       {% endblocktranslate %}
     </p>
@@ -75,7 +75,7 @@
               <span class="visually-hidden">{{ layouts.COMPACT.label }}</span>
             </button>
           </form>
-          {% if not list.is_system %}{# Nothing to remove from "Followed shows" (unfollow on the show page) #}
+          {% if not list.is_system %}{# Nothing to remove from "Followed shows" (unfollow with the bell) #}
             <button type="button" class="outline secondary edit-toggle" @click="editing = !editing">
               <span class="edit-start"><svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>{% translate "Edit" %}</span>
               <span class="edit-done">{% translate "Done" %}</span>
@@ -103,14 +103,14 @@
                       <span class="poster poster-missing" aria-hidden="true"></span>
                     {% endif %}
                     <div>
-                      {# The bell marks followed shows; pointless in "Followed shows" itself #}
-                      <strong>{{ name }}{% if item.following and not list.is_system %} {% include "catalog/_followed_icon.html" %}{% endif %}</strong>
+                      <strong>{{ name }}</strong>
                       <small>
                         {{ item.title.get_media_type_display }}{% if item.title.year %} · {{ item.title.year }}{% endif %}{% rating item.title as stars %}{% if stars %} · {{ stars }}{% endif %}
                       </small>
                       {% include "catalog/_watched_badge.html" %}
                     </div>
                   </a>
+                  {% include "catalog/_follow_button.html" %}
                   {% include "catalog/_watched_button.html" %}
                   {% if not list.is_system %}{% include "catalog/_remove_button.html" %}{% endif %}
                 </li>
@@ -132,7 +132,6 @@
                       {% else %}
                         <span class="poster-missing" aria-hidden="true"></span>
                       {% endif %}
-                      {% if item.following and not list.is_system %}<span class="followed-badge">{% include "catalog/_followed_icon.html" %}</span>{% endif %}
                       {% include "catalog/_poster_progress.html" %}
                     </span>
                     <strong>{{ name }}</strong>
@@ -140,6 +139,7 @@
                     {% include "catalog/_watched_badge.html" with corner=True %}
                   </a>
                   {# Outside the link (a button inside a link is invalid), placed on the poster #}
+                  {% include "catalog/_follow_button.html" with corner=True %}
                   {% include "catalog/_watched_button.html" with corner=True %}
                   {% if not list.is_system %}{% include "catalog/_remove_button.html" with corner=True %}{% endif %}
                 </li>

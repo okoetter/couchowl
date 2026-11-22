@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Couch Owl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-22 13:22+0100\n"
+"POT-Creation-Date: 2026-11-22 13:46+0100\n"
 "PO-Revision-Date: 2026-11-06 18:50+0100\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
@@ -924,10 +924,26 @@ msgstr "Nein"
 msgid "Undo"
 msgstr "Rückgängig"
 
-#: catalog/templates/catalog/_followed_icon.html:1
+#: catalog/templates/catalog/_follow_button.html:19
+#, python-format
+msgid "Unfollow “%(name)s”"
+msgstr "„%(name)s“ nicht mehr folgen"
+
+#: catalog/templates/catalog/_follow_button.html:20
 #: catalog/templates/catalog/title_detail.html:62
-msgid "Following"
-msgstr "Gefolgt"
+msgid "Click to unfollow"
+msgstr "Klicken, um nicht mehr zu folgen"
+
+#: catalog/templates/catalog/_follow_button.html:24
+#, python-format
+msgid "Follow “%(name)s”"
+msgstr "„%(name)s“ folgen"
+
+#: catalog/templates/catalog/_follow_button.html:25
+#: catalog/templates/catalog/title_detail.html:65
+#: imports/templates/imports/import.html:164
+msgid "Follow"
+msgstr "Folgen"
 
 #: catalog/templates/catalog/_list_dropdown.html:14
 #, python-format
@@ -1033,7 +1049,7 @@ msgstr[1] "%(counter)s Folgen"
 #: catalog/templates/catalog/_seasons.html:51
 #: catalog/templates/catalog/_watched_badge.html:20
 #: catalog/templates/catalog/search.html:45
-#: catalog/templates/catalog/title_detail.html:113 catalog/views.py:210
+#: catalog/templates/catalog/title_detail.html:113 catalog/views.py:219
 #: imports/templates/imports/import.html:157
 msgid "Watched"
 msgstr "Gesehen"
@@ -1158,10 +1174,10 @@ msgstr "Löschen"
 #: catalog/templates/catalog/list_detail.html:23
 #, python-format
 msgid ""
-"Contains every show you follow. Unfollow on the show's page · <a "
+"Contains every show you follow. Unfollow with the bell · <a "
 "href=\"%(profile_url)s#id_show_followed_list\">hide in your profile</a>"
 msgstr ""
-"Enthält alle Serien, denen du folgst. Entfolgen auf der Serienseite · <a "
+"Enthält alle Serien, denen du folgst. Entfolgen mit der Glocke · <a "
 "href=\"%(profile_url)s#id_show_followed_list\">im Profil ausblenden</a>"
 
 #: catalog/templates/catalog/list_detail.html:45
@@ -1323,13 +1339,8 @@ msgid "View show on TMDB"
 msgstr "Serie bei TMDB ansehen"
 
 #: catalog/templates/catalog/title_detail.html:62
-msgid "Click to unfollow"
-msgstr "Klicken, um nicht mehr zu folgen"
-
-#: catalog/templates/catalog/title_detail.html:65
-#: imports/templates/imports/import.html:164
-msgid "Follow"
-msgstr "Folgen"
+msgid "Following"
+msgstr "Gefolgt"
 
 #: catalog/templates/catalog/title_detail.html:79
 msgid "All episodes watched"
@@ -1461,86 +1472,86 @@ msgstr[1] "(%(count)s Stimmen)"
 msgid "Age rating (%(country)s)"
 msgstr "Altersfreigabe (%(country)s)"
 
-#: catalog/views.py:48
+#: catalog/views.py:57
 msgid "Too many searches in a short time. Please wait a moment."
 msgstr "Zu viele Suchanfragen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:53
+#: catalog/views.py:62
 msgid "Search is not available: the administrator has not set up TMDB yet."
 msgstr ""
 "Die Suche ist nicht verfügbar: Der Administrator hat TMDB noch nicht "
 "eingerichtet."
 
-#: catalog/views.py:56 catalog/views.py:426 catalog/views.py:479
+#: catalog/views.py:65 catalog/views.py:478 catalog/views.py:531
 #: core/views.py:135 imports/views.py:39
 msgid "TMDB can't be reached right now. Please try again later."
 msgstr ""
 "TMDB ist gerade nicht erreichbar. Bitte versuche es später noch einmal."
 
-#: catalog/views.py:124
+#: catalog/views.py:133
 #, python-format
 msgid "List “%(name)s” created."
 msgstr "Liste „%(name)s“ angelegt."
 
-#: catalog/views.py:208 catalog/views.py:213
+#: catalog/views.py:217 catalog/views.py:222
 msgid "All"
 msgstr "Alle"
 
-#: catalog/views.py:209
+#: catalog/views.py:218
 msgid "Unwatched"
 msgstr "Ungesehen"
 
-#: catalog/views.py:214
+#: catalog/views.py:223
 msgid "Movies"
 msgstr "Filme"
 
-#: catalog/views.py:215
+#: catalog/views.py:224
 msgid "TV shows"
 msgstr "Serien"
 
-#: catalog/views.py:248 core/views.py:72
+#: catalog/views.py:257 core/views.py:72
 #, python-format
 msgid "%(episode)s watched."
 msgstr "%(episode)s gesehen."
 
-#: catalog/views.py:276 core/views.py:96
+#: catalog/views.py:285 core/views.py:96
 #, python-format
 msgid "%(code)s watched"
 msgstr "%(code)s gesehen"
 
-#: catalog/views.py:291
+#: catalog/views.py:300
 msgid "List renamed."
 msgstr "Liste umbenannt."
 
-#: catalog/views.py:303
+#: catalog/views.py:312
 #, python-format
 msgid "List “%(name)s” deleted."
 msgstr "Liste „%(name)s“ gelöscht."
 
-#: catalog/views.py:334
+#: catalog/views.py:343
 #, python-format
 msgid "“%(name)s” removed"
 msgstr "„%(name)s“ entfernt"
 
-#: catalog/views.py:423 catalog/views.py:476 core/views.py:132
+#: catalog/views.py:475 catalog/views.py:528 core/views.py:132
 #: imports/views.py:38
 msgid "The administrator has not set up TMDB yet."
 msgstr "Der Administrator hat TMDB noch nicht eingerichtet."
 
-#: catalog/views.py:469
+#: catalog/views.py:521
 msgid "Too many refreshes in a short time. Please wait a moment."
 msgstr "Zu viele Aktualisierungen in kurzer Zeit. Bitte warte einen Moment."
 
-#: catalog/views.py:481
+#: catalog/views.py:533
 msgid "Refreshed from TMDB."
 msgstr "Von TMDB aktualisiert."
 
-#: catalog/views.py:534
+#: catalog/views.py:586
 #, python-format
 msgid "Please enter a name (at most %(max)s characters)."
 msgstr "Bitte gib einen Namen ein (höchstens %(max)s Zeichen)."
 
-#: catalog/views.py:873
+#: catalog/views.py:925
 #, python-format
 msgid "%(count)s episode marked as watched."
 msgid_plural "%(count)s episodes marked as watched."

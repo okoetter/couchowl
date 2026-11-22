@@ -266,7 +266,7 @@ def test_back_button_shows_the_new_follow_state(live_server, page, watchlist_wit
     new version cookie makes it ask the server (Django answers with "Vary: Cookie")."""
     login(page, live_server.url, "anna")
     page.goto(f"{live_server.url}/lists/{watchlist_with_dark.pk}/")
-    bell = page.locator(".followed-icon")
+    bell = page.locator('.follow-toggle button[aria-pressed="true"]')
     expect(bell).to_have_count(0)
 
     page.get_by_role("link", name="Dark").first.click()
@@ -290,7 +290,7 @@ def test_page_from_the_bfcache_updates_in_place(live_server, page, watchlist_wit
     """
     login(page, live_server.url, "anna")
     page.goto(f"{live_server.url}/lists/{watchlist_with_dark.pk}/")
-    bell = page.locator(".followed-icon")
+    bell = page.locator('.follow-toggle button[aria-pressed="true"]')
     poster = page.locator(".list-content img, #list-content img").first.element_handle()
     restored = "() => dispatchEvent(new PageTransitionEvent('pageshow', {persisted: true}))"
 

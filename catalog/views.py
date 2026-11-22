@@ -22,7 +22,16 @@ from accounts.throttle import hit
 from . import lists as list_rules
 from . import posters, providers, services, shows, tmdb
 from .forms import ListForm, RestoreItemForm, WatchedDateForm
-from .models import Episode, MediaType, Season, Title, TitleTranslation, UserList, WatchedMovie
+from .models import (
+    Episode,
+    MediaType,
+    Season,
+    Title,
+    TitleTranslation,
+    UserList,
+    UserSeries,
+    WatchedMovie,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -371,7 +380,7 @@ def list_item_watched(request, pk, item_pk):
     `undo=<episode id>` takes that back; `unwatched` marks the whole show as not watched.
     """
     user_list = _user_list(request, pk)
-    item = get_object_or_404(user_list.items.select_related("title"), pk=item_pk)
+    item = _list_item(request, user_list, item_pk)
     if not item.title.is_movie:
         return _show_item_watched(request, user_list, item)
     if request.POST.get("watched"):
@@ -381,6 +390,49 @@ def list_item_watched(request, pk, item_pk):
     else:
         list_rules.unmark_watched(request.user, item.title)
     return _item_response(request, user_list, item.pk)
+
+
+def _list_item(request, user_list, item_pk):
+    """The entry `item_pk` of the list (404 if it isn't there).
+
+    In "Followed shows" also a show that was just unfollowed: its entry stays on the page
+    until it is loaded again, so its bell can follow it again (or its check be clicked).
+    """
+    if user_list.is_system:
+        return get_object_or_404(
+            UserSeries.objects.select_related("title"), pk=item_pk, user=request.user
+        )
+    return get_object_or_404(user_list.items.select_related("title"), pk=item_pk)
+
+
+@require_POST
+def list_item_follow(request, pk, item_pk):
+    """Bell on a list entry (shows only): `following` present = follow, missing = unfollow.
+
+    Answers with just the bell. Following changes no filter, so the entry always stays;
+    in "Followed shows" too, until the page is loaded again (a misclick takes one more).
+    """
+    user_list = _user_list(request, pk)
+    item = _list_item(request, user_list, item_pk)
+    if item.title.is_movie:
+        raise Http404
+    shows.set_following(request.user, item.title, bool(request.POST.get("following")))
+    if not _is_htmx_fragment_request(request):
+        return redirect(user_list.get_absolute_url() + _filter_query(_list_filters(request)))
+    item.following = shows.is_following(request.user, item.title)
+    translation = services.best_translations(
+        [item.title], request.user.effective_tmdb_language
+    ).get(item.title_id)
+    context = {
+        "list": user_list,
+        "item": item,
+        "name": translation.name if translation else item.title.original_title,
+        "corner": request.user.list_layout == User.ListLayout.GRID,
+        "filter_query": _filter_query(_list_filters(request)),
+    }
+    response = render(request, "catalog/_follow_button.html", context)
+    patch_vary_headers(response, ["HX-Request"])
+    return response
 
 
 def _show_item_watched(request, user_list, item):

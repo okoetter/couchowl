@@ -797,8 +797,8 @@ def test_followed_shows_list(auth_client, user, other_user, show):
 
     bell = '<svg viewBox="0 0 24 24" class="icon followed-icon" aria-hidden="true">'
     assert f"<h1>Gefolgte Serien {bell}" in content
-    # A note instead of rename/delete: why, where to unfollow, link to the profile setting
-    assert "Enthält alle Serien, denen du folgst. Entfolgen auf der Serienseite" in content
+    # A note instead of rename/delete: why, how to unfollow, link to the profile setting
+    assert "Enthält alle Serien, denen du folgst. Entfolgen mit der Glocke" in content
     assert f'href="{reverse("accounts:profile")}#id_show_followed_list"' in content
     assert shown_names(content) == ["Dark"]
     assert "S1 E1 von „Dark“ als gesehen markieren" in content  # as in other lists
@@ -875,21 +875,6 @@ def test_grid_shows_the_next_episode_and_the_progress_on_the_poster(auth_client,
     assert '<progress value="1" max="26" title="1 von 26 Folgen gesehen" aria-hidden="true">' in bar
 
 
-def test_grid_marks_followed_shows(auth_client, user, show):
-    from catalog import shows
-
-    user_list = user.lists.create(name="Watchlist")
-    list_rules.add_to_list(user_list, show)
-    badge = '<span class="followed-badge">'
-
-    assert badge not in auth_client.get(user_list.get_absolute_url()).content.decode()
-
-    shows.set_following(user, show, True)
-    assert badge in auth_client.get(user_list.get_absolute_url()).content.decode()
-    content = auth_client.get(reverse("catalog:list_detail", args=["followed"])).content.decode()
-    assert badge not in content
-
-
 def test_compact_view_shows_the_next_episode(auth_client, user, show):
     user.list_layout = "compact"
     user.save()
@@ -913,19 +898,129 @@ def test_compact_view_shows_the_next_episode(auth_client, user, show):
     assert '<progress value="1" max="26" aria-label="1 von 26 Folgen gesehen">' in badge
 
 
-def test_compact_view_marks_followed_shows(auth_client, user, show, mixed_list):
+def follow_button(content, pk):
+    """The bell form of entry `pk` (`hx-swap-oob` if updated out of band)."""
+    match = re.search(rf'<form [^>]*id="follow-toggle-{pk}".*?</form>', content, re.S)
+    return match.group(0) if match else None
+
+
+def test_bell_follows_and_unfollows_a_show_in_the_grid(auth_client, user, show):
+    from catalog import shows
+
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
+    url = reverse("catalog:list_item_follow", args=[user_list.pk, item.pk])
+
+    # Not followed: an empty bell on the poster that follows
+    bell = follow_button(auth_client.get(user_list.get_absolute_url()).content.decode(), item.pk)
+    assert 'class="follow-toggle follow-toggle-corner"' in bell
+    assert f'hx-post="{url}"' in bell
+    assert '<input type="hidden" name="following" value="1">' in bell
+    assert 'aria-pressed="false"' in bell
+    assert 'aria-label="„Dark“ folgen"' in bell
+
+    # The answer is just the bell, now filled
+    content = auth_client.post(url, {"following": "1"}, headers=HTMX).content.decode()
+    assert shows.is_following(user, show)
+    assert content.strip().startswith("<form")
+    assert 'aria-pressed="true"' in content
+    assert 'aria-label="„Dark“ nicht mehr folgen"' in content
+    assert 'name="following"' not in content
+
+    auth_client.post(url, headers=HTMX)
+    assert not shows.is_following(user, show)
+
+
+def test_bell_in_the_compact_view_keeps_the_filter(auth_client, user, show, mixed_list):
     from catalog import shows
 
     user.list_layout = "compact"
     user.save()
-    bell = 'class="icon followed-icon" role="img" aria-label="Gefolgt"'
+    item = mixed_list.items.get(title=show)
+    url = reverse("catalog:list_item_follow", args=[mixed_list.pk, item.pk])
 
-    assert bell not in auth_client.get(mixed_list.get_absolute_url()).content.decode()
-
-    shows.set_following(user, show, True)
     content = auth_client.get(mixed_list.get_absolute_url()).content.decode()
-    assert content.count(bell) == 1
+    assert content.count('class="follow-toggle"') == 1  # movies have no bell
 
-    # Not in "Followed shows": every show there is followed
-    content = auth_client.get(reverse("catalog:list_detail", args=["followed"])).content.decode()
-    assert bell not in content
+    content = auth_client.post(
+        f"{url}?status=unwatched", {"following": "1"}, headers=HTMX
+    ).content.decode()
+    assert shows.is_following(user, show)
+    assert 'class="follow-toggle"' in content
+    assert 'class="check-button" aria-pressed="true"' in content
+    assert f'hx-post="{url}?status=unwatched"' in content
+
+    # Without JavaScript: back to the list with its filter
+    response = auth_client.post(f"{url}?status=unwatched")
+    assert response.url == f"{mixed_list.get_absolute_url()}?status=unwatched"
+    assert not shows.is_following(user, show)
+
+
+def test_bell_is_only_for_shows_of_own_lists(auth_client, user, other_user, movie, show):
+    own = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(own, movie)
+    movie_item = own.items.get()
+    assert (
+        auth_client.post(
+            reverse("catalog:list_item_follow", args=[own.pk, movie_item.pk]), {"following": "1"}
+        ).status_code
+        == 404
+    )
+
+    foreign = other_user.lists.create(name="Eves Liste")
+    list_rules.add_to_list(foreign, show)
+    show_item = foreign.items.get()
+    url = reverse("catalog:list_item_follow", args=[foreign.pk, show_item.pk])
+    assert auth_client.post(url, {"following": "1"}).status_code == 404
+
+
+def test_first_watched_episode_fills_the_bell(auth_client, user, show):
+    user_list = user.lists.create(name="Watchlist")
+    list_rules.add_to_list(user_list, show)
+    item = user_list.items.get()
+
+    url = reverse("catalog:list_item_watched", args=[user_list.pk, item.pk])
+    content = auth_client.post(url, {"next": "1"}, headers=HTMX).content.decode()
+
+    bell = follow_button(content, item.pk)
+    assert 'hx-swap-oob="true"' in bell
+    assert 'aria-pressed="true"' in bell
+
+
+def test_unfollowed_show_stays_in_followed_shows_until_reload(auth_client, user, show):
+    from catalog import shows
+
+    # The first watched episode follows the show (later ones don't, after unfollowing)
+    shows.mark_episode(user, show.seasons.get(number=1).episodes.get(number=1))
+    series = shows.followed_shows(user).get()
+    url = reverse("catalog:list_item_follow", args=["followed", series.pk])
+    bell = follow_button(auth_client.get(FOLLOWED).content.decode(), series.pk)
+    assert 'aria-pressed="true"' in bell
+
+    # Unfollowed: the answer is the empty bell, the entry stays on the page
+    content = auth_client.post(url, headers=HTMX).content.decode()
+    assert not shows.is_following(user, show)
+    assert 'aria-pressed="false"' in content
+    # A second click follows again, although the show has left the list
+    auth_client.post(url, {"following": "1"}, headers=HTMX)
+    assert shows.is_following(user, show)
+
+    # Its check still works; the entry then leaves the page (here the last one: "empty")
+    auth_client.post(url, headers=HTMX)
+    watched = reverse("catalog:list_item_watched", args=["followed", series.pk])
+    response = auth_client.post(watched, {"next": "1"}, headers=HTMX)
+    assert user.watched_episodes.order_by("-pk").first().episode.code == "S1 E2"
+    assert "Du folgst keiner Serie" in response.content.decode()
+    assert shown_names(auth_client.get(FOLLOWED).content.decode()) == []
+
+
+def test_followed_shows_of_other_users_cannot_be_unfollowed(auth_client, other_user, show):
+    from catalog import shows
+
+    shows.set_following(other_user, show, True)
+    series = shows.followed_shows(other_user).get()
+
+    url = reverse("catalog:list_item_follow", args=["followed", series.pk])
+    assert auth_client.post(url).status_code == 404
+    assert shows.is_following(other_user, show)

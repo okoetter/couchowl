@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   started names its start date and network ("Starts on … on Prime Video"), a running show
   its original broadcaster, a movie its theatrical and digital release in the region
 - Show pages: a partly watched season shows a light green check
+- Lists: the bell follows and unfollows a show right in the list (filled = following);
+  in the grid an unfollowed show's bell appears on hover, on phones it is always shown.
+  In "Followed shows" an unfollowed show stays until the page is reloaded
 - Detail pages show the age rating for the user's region after the year ("FSK 16" in
   Germany, "PG-13" or "TV-MA" in the US), with the country as tooltip; titles get it on
   their next reload from TMDB
