@@ -3,7 +3,7 @@
 import pytest
 from playwright.sync_api import expect
 
-from catalog.models import TitleTranslation, WatchedEpisode
+from catalog.models import EpisodeTranslation, TitleTranslation, WatchedEpisode
 from conftest import load_tmdb_fixture
 from e2e.conftest import LOCALE, login
 
@@ -241,6 +241,40 @@ def test_long_title_does_not_widen_the_page_on_phones(
     page.reload()
     expect(page.locator("h1")).to_have_text("The Terminal List - Die Abschussliste")
     page.add_style_tag(content=f"html {{ font-size: {text_size} !important; }}")
+
+    overflow = page.evaluate(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+    )
+    assert overflow == 0
+    context.close()
+
+
+@pytest.mark.parametrize("width", [320, 390])
+def test_long_episode_name_does_not_widen_the_dashboard_on_phones(
+    live_server, member, browser, fake_tmdb, width
+):
+    """The next episode's name wraps to two lines at most, then "…" (on one line it once
+    widened the "Continue watching" column, and with it the page)."""
+    from catalog import services, shows
+
+    fake_tmdb.add_show(load_tmdb_fixture("tv_70523") | {"poster_path": None})
+    show = services.get_title("tv", 70523, "de-DE").title
+    shows.mark_episode(member, show.seasons.get(number=1).episodes.get(number=1))
+    EpisodeTranslation.objects.filter(episode__season__number=1, episode__number=2).update(
+        name="Was auch immer du tust, geh nicht nach Hause und bleib, wo du gerade bist"
+    )
+    context = browser.new_context(
+        locale=LOCALE, viewport={"width": width, "height": 800}, is_mobile=True, has_touch=True
+    )
+    page = context.new_page()
+    login(page, live_server.url, "anna")
+    page.goto(f"{live_server.url}/")
+    episode = page.locator(".watching-next")
+    expect(episode).to_contain_text("S1 E2 · Was auch immer")
+    lines = episode.evaluate(
+        "el => el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)"
+    )
+    assert round(lines) == 2
 
     overflow = page.evaluate(
         "document.documentElement.scrollWidth - document.documentElement.clientWidth"

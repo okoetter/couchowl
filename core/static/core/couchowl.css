@@ -1574,9 +1574,13 @@ details.episode-watched > summary::after {
 }
 
 /* The whole card opens the show: the title link's ::after covers it ("stretched link",
-   still one link for screen readers); the check button lies above it */
+   still one link for screen readers); the check button lies above it.
+   min-width: 0: a grid item is at least as wide as its content by default, so content
+   that can't shrink (once the one-line episode name) would widen the column and, on
+   phones, the page. */
 .watching-list li {
   position: relative;
+  min-width: 0;
   list-style: none;
   display: flex;
   align-items: center;
@@ -1633,20 +1637,17 @@ details.episode-watched > summary::after {
 }
 
 
-/* Long names wrap to two lines at most, the episode line stays on one line */
-.watching-text > a {
+/* Show name and episode line wrap to two lines at most, then "…". On one line, a phone
+   only had room for about 15 characters of the episode name. The episode code stays
+   together (.nowrap). */
+.watching-text > a,
+.watching-next {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
   overflow-wrap: anywhere;
-}
-
-.watching-next {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .watching-next {

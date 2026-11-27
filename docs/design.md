@@ -192,7 +192,10 @@ change. For what's planned next see [ROADMAP.md](ROADMAP.md); for setup and oper
   not flicker). Caught-up shows whose current season is still airing stay as a "waiting"
   card with the next air date ("in 3 days") instead of the button, after the watchable
   ones. Without a known date, or when the next season hasn't started, the card disappears;
-  a season start is an announcement.
+  a season start is an announcement. Show name and episode line ("S3 E4 · name") wrap to
+  two lines at most, then "…": on one line a phone only showed about 15 characters of the
+  episode name. Rejected: the name on a line of its own with the code next to the progress
+  bar (the code is what you look for when you continue, and it read as part of "23/30").
 - **Announcements:** seasons (no specials) of followed shows starting between today and
   `ANNOUNCEMENT_MONTHS` months ahead (default 3; months because that's how people think
   about it), earliest first. A season starts with its first episode; TMDB's season date

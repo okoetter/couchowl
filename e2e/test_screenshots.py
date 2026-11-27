@@ -634,7 +634,7 @@ def sample_dashboard(fake_tmdb, user):
     from django.utils import timezone
 
     from catalog import services, shows
-    from catalog.models import Episode, Season
+    from catalog.models import Episode, EpisodeTranslation, Season
 
     def save_show(tmdb_id, name, networks, poster):
         data = load_tmdb_fixture("tv_70523")
@@ -657,6 +657,10 @@ def sample_dashboard(fake_tmdb, user):
     long_name = save_show(1001, long_title, [], "show1")
     for number in (1, 2, 3):
         shows.mark_episode(user, long_name.seasons.get(number=1).episodes.get(number=number))
+    # Its next episode has a long name too: the tallest card (both wrap to two lines)
+    EpisodeTranslation.objects.filter(
+        episode__season__show=long_name, episode__season__number=1, episode__number=4
+    ).update(name="Was auch immer du tust, geh nicht nach Hause und bleib, wo du bist")
     soon = save_show(1002, "Kommt bald", ["ZDF"], "show2")
     starts_in(soon, 3, 1)
     later = save_show(1003, "Später", ["Netflix", "ZDFneo"], "show3")
