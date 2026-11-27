@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0-rc.2] - 2026-11-27
+
 ### Fixed
 - Dashboard on phones: a long name of the next episode widened "Continue watching" and
   the whole page. The episode line now wraps to two lines at most (on one line, phones
